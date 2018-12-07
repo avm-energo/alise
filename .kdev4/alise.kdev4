@@ -1,0 +1,22 @@
+[CMake]
+Build Directory Count=2
+Current Build Directory Index=1
+
+[CMake][CMake Build Directory 0]
+Build Directory Path=/home/anton/Documents/alise/build
+Build Type=Debug
+CMake Binary=/usr/bin/cmake
+Environment Profile=
+Extra Arguments=
+Install Directory=/usr/local/bin
+
+[CMake][CMake Build Directory 1]
+Build Directory Path=/home/anton/Documents/build/alise
+Build Type=Debug
+CMake Binary=/usr/bin/cmake
+Environment Profile=
+Extra Arguments=
+Install Directory=/usr/local/bin
+
+[Project]
+VersionControlSupport=kdevgit
