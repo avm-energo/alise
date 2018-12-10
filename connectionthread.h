@@ -22,6 +22,11 @@
 
 class ConnectionThread
 {
+public:
+    ConnectionThread();
+    ~ConnectionThread();
+    
+    void DoWork();
 };
 
 #endif // CONNECTIONTHREAD_H

@@ -17,4 +17,22 @@
  *
  */
 
+#include <unistd.h>
+#include "global.h"
 #include "connectionthread.h"
+
+ConnectionThread::ConnectionThread()
+{
+}
+
+ConnectionThread::~ConnectionThread()
+{
+}
+
+void ConnectionThread::DoWork()
+{
+    while (!Global.FinishThreads)
+    {
+        sleep(10);
+    }
+}

@@ -29,6 +29,7 @@
 #include <thread>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 #include "global.h"
 #include "log.h"
 #include "connectionthread.h"
@@ -236,11 +237,11 @@ void AliseServer::MainLoop()
 	    exit(1);
 	  }
 // from http://coryklein.com/tcp/2015/11/25/custom-configuration-of-tcp-socket-keep-alive-timeouts.html
-	  setsockopt(fd, IPPROTO_TCP, TCP_KEEPIDLE, (void *)&keepalive_time, sizeof (keepalive_time));
+/*	  setsockopt(fd, IPPROTO_TCP, TCP_KEEPIDLE, (void *)&keepalive_time, sizeof (keepalive_time));
 	  setsockopt(fd, IPPROTO_TCP, TCP_KEEPCNT, (void *)&keepalive_count, sizeof (keepalive_count));
-	  setsockopt(fd, IPPROTO_TCP, TCP_KEEPINTVL, (void *)&keepalive_interval, sizeof (keepalive_interval));
+	  setsockopt(fd, IPPROTO_TCP, TCP_KEEPINTVL, (void *)&keepalive_interval, sizeof (keepalive_interval)); */
 	  // start data exchange with new fd
-	  ct.AddNewCn(fd,sa.sin_addr.s_addr,sa.sin_port);
+//	  ct.AddNewCn(fd,sa.sin_addr.s_addr,sa.sin_port);
 	}
       }
     }

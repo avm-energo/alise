@@ -73,7 +73,6 @@ void Log::OpenLogFiles()
       std::cout << ALISELOGFILE;
       std::cout << " started\n";
     }
-  }
 }
 
 void Log::Run()
