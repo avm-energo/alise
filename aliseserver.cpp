@@ -33,6 +33,7 @@
 #include "global.h"
 #include "log.h"
 #include "connectionthread.h"
+#include "blinker.h"
 #include "aliseserver.h"
 
 AliseServer::AliseServer()
@@ -44,13 +45,14 @@ AliseServer::AliseServer()
     if ((tmpc = getenv("HOME")) == NULL)
         tmpc = getpwuid(getuid())->pw_dir;
     defhomedir = tmpc;
-    defhomedir += "/.supik/";
+    defhomedir += "/alise/";
     homedir = GetValueFromConfigmap("homedir", defhomedir);
-    printf("Home directory is: %s", homedir.c_str());
+    printf("Home directory is: %s\n", homedir.c_str());
     // сохраняем домашнюю директорию пользователя
     struct stat st;
     Global.HomeDirectory = homedir;
-    if (stat(homedir.c_str(),&st) == 0)
+    int res = stat(homedir.c_str(),&st);
+    if (res == 0)
     {
         if (S_ISDIR(st.st_mode))
         {
@@ -65,14 +67,20 @@ AliseServer::AliseServer()
     }
     else
     {
-        int res = mkdir(homedir.c_str(), 0x01b0);
+        res = errno;
+        char *message = new char[3000];
+        message = strerror(res);
+        fprintf(stderr, "%s\n", message);
+        res = mkdir(homedir.c_str(), 0x01b0);
         if (res)
         {
-            printf("Name not found!");
+            message = strerror(res);
+            fprintf(stderr, "%s\n", message);
             printf("%s", homedir.c_str());
             exit(1);
         }
     }
+    Global.LogFilename = GetValueFromConfigmap("logfile", ALISELOGFILE);
 }
 
 AliseServer::~AliseServer()
@@ -100,89 +108,95 @@ void Signal_Handler(int sig)
 
 void AliseServer::Start()
 {
-  int lfp;
-  pid_t pid;
-  struct sigaction sa;
-  char str[10];
+    int lfp;
+    pid_t pid;
+    struct sigaction sa;
+    char str[10];
   
-  if (getppid() == 1) // already a daemon (parent process id = 1 (init))
-    return;
+    if (getppid() == 1) // already a daemon (parent process id = 1 (init))
+        return;
   
-  printf("Server started\n");
-  pid = fork();
+    printf("Server started!\n");
+    pid = fork();
 
-  switch(pid)
-  {
+    switch(pid)
+    {
     case 0:
-      if (setsid() == -1)
-      {
-        printf("Failed to daemonize");
-        break;
-      }
-      chdir("/");
-      umask(0);
-      close(STDIN_FILENO);
-      close(STDOUT_FILENO);
-      close(STDERR_FILENO);
-      lfp=open(LOCK_FILE,O_RDWR|O_CREAT,0640);
-      if (lfp<0)
-      {
-        printf("Can't open lockfile for writing\n");
-        exit(1); /* can not open */
-      }
-      if (lockf(lfp,F_TLOCK,0)<0)
-      {
-        printf("Can't lock, another instance of alise is running?\n");
-        exit(0); /* can not lock */
-      }
-      /* first instance continues */
-      sprintf(str,"%d\n",getpid());
-      write(lfp,str,strlen(str)); /* record pid to lockfile */
-      signal(SIGCHLD,SIG_IGN); /* ignore child */
-      signal(SIGTSTP,SIG_IGN); /* ignore tty signals */
-      signal(SIGTTOU,SIG_IGN);
-      signal(SIGTTIN,SIG_IGN);
-      signal(SIGHUP,Signal_Handler); /* catch hangup signal */
-      signal(SIGTERM,Signal_Handler); /* catch kill signal */
+        printf("AAAAA!");
+        if (setsid() == -1)
+        {
+            printf("Failed to daemonize");
+            break;
+        }
+/*        chdir("/");
+        umask(0);
+        close(STDIN_FILENO);
+        close(STDOUT_FILENO);
+        close(STDERR_FILENO);
+        lfp=open(LOCK_FILE,O_RDWR|O_CREAT,0640);
+        if (lfp<0)
+        {
+            printf("Can't open lockfile for writing\n");
+            exit(1);
+        }
+        if (lockf(lfp,F_TLOCK,0)<0)
+        {
+            printf("Can't lock, another instance of alise is running?\n");
+            exit(0);
+        }
+        sprintf(str,"%d\n",getpid());
+        write(lfp,str,strlen(str)); /* record pid to lockfile  */
+//        signal(SIGCHLD,SIG_IGN); /* ignore child */
+//        signal(SIGTSTP,SIG_IGN); /* ignore tty signals */
+//        signal(SIGTTOU,SIG_IGN);
+//        signal(SIGTTIN,SIG_IGN);
+//        signal(SIGHUP,Signal_Handler); /* catch hangup signal */
+//        signal(SIGTERM,Signal_Handler); /* catch kill signal */ 
 
-//      printf("MainLoop");
-      MainLoop();
-      printf("Exited normally");
-      exit(0);
-      break;
+        printf("MainLoop");
+        MainLoop();
+        printf("Exited normally");
+        exit(0);
+        break;
     case -1:
-      printf("fork() error");
-      break;
+        printf("fork() error");
+        break;
       
     default:
-      std::string str("Main process has started with pid=");
-      str.append(std::to_string(pid));
-      printf("%s\n", str.c_str());
-      exit(0);
-      break;
-  }
+        std::string str("Main process has started with pid=");
+        str.append(std::to_string(pid));
+        printf("%s\n", str.c_str());
+        exit(0);
+        break;
+    }
 }
 
 void AliseServer::MainLoop()
 {
-  int sockfd, fd;
+/*  int sockfd, fd;
   struct sockaddr_in sa;
   socklen_t n;
 //  int keepalive_enabled = 1;
   int keepalive_time = 180; // seconds of silence to send keepalive packet
   int keepalive_count = 3; // number of retries
-  int keepalive_interval = 30; // seconds to wait between retries
+  int keepalive_interval = 30; // seconds to wait between retries */
 
-  Log log;
-  std::thread thr(&Log::Run, &log);
-  thr.detach();
+    Global.BLog.OpenLogFiles();
+    std::thread thr(&Log::Run, &Global.BLog);
+    thr.detach();
+    printf("Log thread started");
+    
 
-  fd = 0;
+    Blinker blink;
+    std::thread blinkthr(&Blinker::Run, &blink);
+    blinkthr.detach();
+  
+/*  fd = 0;
   sockfd = socket(PF_INET, SOCK_STREAM, 0);
 
   if(sockfd < 0)
   {
-    SDERR("Failed to open socket");
+    ERR("Failed to open socket");
     exit(1);
   }
   else
@@ -198,12 +212,12 @@ void AliseServer::MainLoop()
     int reuseaddr=1;
     if (setsockopt(sockfd,SOL_SOCKET,SO_REUSEADDR,&reuseaddr,sizeof(reuseaddr))==-1)
     {
-      SDERR(strerror(errno));
+      ERR(strerror(errno));
       exit(1);
     }
     
     if(bind(sockfd, (struct sockaddr *) &sa, sizeof(sa)) < 0)
-      SDERR("Failed to bind");
+      ERR("Failed to bind");
     else
     {
       if(!listen(sockfd, 5))
@@ -217,36 +231,41 @@ void AliseServer::MainLoop()
         n = sizeof(sa);
         if((fd = accept(sockfd, (struct sockaddr *) &sa, &n)) < 0)
         {
-            SDERR("Failed to accept");
+            ERR("Failed to accept");
             break;
         }
         std::string str("Connection #");
         str.append(std::to_string(fd));
         str.append(" accepted from: ");
         str.append(inet_ntoa(sa.sin_addr));
-        SDINF(str);
+        INF(str);
         if ((fcntl(fd, F_SETFL, O_NONBLOCK)) < 0)
         {
-            SDERR("Failed to enter non-blocking mode");
+            ERR("Failed to enter non-blocking mode");
             exit(1);
         }
 	  int n=1;
 	  if (setsockopt(fd,SOL_SOCKET,SO_KEEPALIVE,(void*)&n,sizeof(n))<0)
 	  {
-	    SDERR("Failed to set keep alive socket");
+	    ERR("Failed to set keep alive socket");
 	    exit(1);
 	  }
 // from http://coryklein.com/tcp/2015/11/25/custom-configuration-of-tcp-socket-keep-alive-timeouts.html
-/*	  setsockopt(fd, IPPROTO_TCP, TCP_KEEPIDLE, (void *)&keepalive_time, sizeof (keepalive_time));
-	  setsockopt(fd, IPPROTO_TCP, TCP_KEEPCNT, (void *)&keepalive_count, sizeof (keepalive_count));
-	  setsockopt(fd, IPPROTO_TCP, TCP_KEEPINTVL, (void *)&keepalive_interval, sizeof (keepalive_interval)); */
+//	  setsockopt(fd, IPPROTO_TCP, TCP_KEEPIDLE, (void *)&keepalive_time, sizeof (keepalive_time));
+//	  setsockopt(fd, IPPROTO_TCP, TCP_KEEPCNT, (void *)&keepalive_count, sizeof (keepalive_count));
+//	  setsockopt(fd, IPPROTO_TCP, TCP_KEEPINTVL, (void *)&keepalive_interval, sizeof (keepalive_interval)); 
 	  // start data exchange with new fd
 //	  ct.AddNewCn(fd,sa.sin_addr.s_addr,sa.sin_port);
 	}
       }
     }
-  }
-  SDINF("Exited from main loop");
+  } */
+    while (!Global.FinishThreads)
+    {
+//        INF("Another 10 seconds passed");
+        sleep(10);
+    }
+  INF("Exited from main loop");
 }
 
 void AliseServer::FillConfigmap()

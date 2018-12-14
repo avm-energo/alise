@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.6)
 project(alise)
 
+add_definitions(-std=c++11)
+
 find_path(LibArchive_INCLUDE_DIR
     NAMES archive.h
     PATHS

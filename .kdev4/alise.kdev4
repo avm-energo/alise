@@ -4,7 +4,6 @@ BuildItems=@Variant(\x00\x00\x00\t\x00\x00\x00\x00\x01\x00\x00\x00\x0b\x00\x00\x
 [CMake]
 Build Directory Count=2
 Current Build Directory Index=1
-Temporary Build Directory Index=1
 
 [CMake][CMake Build Directory 0]
 Build Directory Path=/home/anton/Documents/alise/build
@@ -21,6 +20,28 @@ CMake Binary=/usr/bin/cmake
 Environment Profile=
 Extra Arguments=
 Install Directory=/usr/local/bin
+
+[Launch]
+Launch Configurations=Launch Configuration 0
+
+[Launch][Launch Configuration 0]
+Configured Launch Modes=execute
+Configured Launchers=nativeAppLauncher
+Name=alise
+Type=Native Application
+
+[Launch][Launch Configuration 0][Data]
+Debugger Shell=
+Dependencies=@Variant(\x00\x00\x00\t\x00\x00\x00\x00\x01\x00\x00\x00\x0b\x00\x00\x00\x00\x02\x00\x00\x00\n\x00a\x00l\x00i\x00s\x00e\x00\x00\x00\n\x00a\x00l\x00i\x00s\x00e)
+Dependency Action=Build
+Display Demangle Names=true
+Display Static Members=false
+GDB Path=file:///usr/bin/gdb
+Project Target=alise,alise
+Remote GDB Config Script=
+Remote GDB Run Script=
+Remote GDB Shell Script=
+Start With=GdbConsole
 
 [Project]
 VersionControlSupport=kdevgit

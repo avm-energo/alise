@@ -55,16 +55,19 @@ void Blinker::Run()
                 case LEDMODE_OFF:
                     CurrentLedMode = LEDMODE_ON;
                     LedEndTime = tt + LedOffTimes[BlinkMode];
+//                    INF("LED on");
                     break;
                 case LEDMODE_ON:
                     CurrentLedMode = LEDMODE_OFF;
                     LedEndTime = tt + LedOnTimes[BlinkMode];
+//                    INF("LED off");
                     break;
                 default:
                     break;
             }
             SetLed(GPIO_BLINK_LED_PORT, CurrentLedMode);
         }
+        usleep(100000);
     }
 }
 
@@ -86,5 +89,9 @@ void Blinker::GPIOExport(int gpio)
     fd = open("/sys/class/gpio/export", O_WRONLY);
     sprintf(buf, "%d", gpio);
     write(fd, buf, strlen(buf));
+    close(fd);
+    fd = open("/sys/class/gpio/gpio63/direction", O_WRONLY);
+//    sprintf(buf, "out");
+    write(fd, "out", 3);
     close(fd);
 }
