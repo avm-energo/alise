@@ -27,7 +27,12 @@
 #define BLINK_03HZ_ONTIME   1500 // ms
 #define BLINK_03HZ_OFFTIME  1500
 
-#define GPIO_BLINK_LED_PORT 63 // p1_31
+#define GPIO_BLINK_LED      63  // p1_31
+#define GPIO_RSTBUTTON      70  // p2_8
+#define GPIO_PWR1           5   // p0_5
+#define GPIO_PWR2           113 // p3_17
+
+#define RST_TIMEOUT         4000 // ms
 
 #include <chrono>
 #include <map>
@@ -57,7 +62,7 @@ public:
     
 private:
     int BlinkMode;
-    std::chrono::time_point<std::chrono::system_clock> LedEndTime;
+    std::chrono::time_point<std::chrono::system_clock> LedEndTime, RstEndTime;
     int CurrentLedMode;
 
     std::map<int, std::chrono::duration<int, std::milli> > LedOnTimes = \
@@ -71,7 +76,8 @@ private:
     { BLINK_03HZ, std::chrono::milliseconds(BLINK_03HZ_OFFTIME) }};
     
     void SetLed(int gpio, int value);
-    void GPIOExport(int gpio);
+    void GPIOExport(int gpio, int mode);
+    bool GetResetStatus();
 };
 
 #endif // BLINKER_H

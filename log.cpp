@@ -129,7 +129,7 @@ void Log::Run()
                 }
             }
         }
-        usleep(1000);
+        usleep(10000);
     }
 }
 

@@ -21,13 +21,17 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <fstream>
 #include "global.h"
 #include "blinker.h"
 
 Blinker::Blinker()
 {
     BlinkMode = BLINK_1HZ;
-    GPIOExport(GPIO_BLINK_LED_PORT);
+    GPIOExport(GPIO_BLINK_LED, O_WRONLY);
+    GPIOExport(GPIO_PWR1, O_RDONLY);
+    GPIOExport(GPIO_PWR2, O_RDONLY);
+    GPIOExport(GPIO_RSTBUTTON, O_RDONLY);
     LedEndTime = std::chrono::system_clock::now() + LedOnTimes[BlinkMode];
     CurrentLedMode = LEDMODE_ON;
 }
@@ -45,9 +49,12 @@ void Blinker::SetMode(int mode)
 
 void Blinker::Run()
 {
+    int rstpushes;
+    rstpushes = 0;
     while (!Global.FinishThreads)
     {
         std::chrono::time_point<std::chrono::system_clock> tt = std::chrono::system_clock::now();
+        // blink
         if (LedEndTime < tt) // timeout reached
         {
             switch (CurrentLedMode)
@@ -65,8 +72,15 @@ void Blinker::Run()
                 default:
                     break;
             }
-            SetLed(GPIO_BLINK_LED_PORT, CurrentLedMode);
+            SetLed(GPIO_BLINK_LED, CurrentLedMode);
         }
+        // reset check
+        if (!GetResetStatus())
+        {
+            rstpushes++;
+            printf("RST button has been pushed %d times\n", rstpushes);
+        }
+        
         usleep(100000);
     }
 }
@@ -82,7 +96,7 @@ void Blinker::SetLed(int gpio, int value)
     close(fd);
 }
 
-void Blinker::GPIOExport(int gpio)
+void Blinker::GPIOExport(int gpio, int mode)
 {
     int fd;
     char buf[255];
@@ -90,8 +104,21 @@ void Blinker::GPIOExport(int gpio)
     sprintf(buf, "%d", gpio);
     write(fd, buf, strlen(buf));
     close(fd);
-    fd = open("/sys/class/gpio/gpio63/direction", O_WRONLY);
+    fd = open("/sys/class/gpio/gpio%d/direction", mode);
 //    sprintf(buf, "out");
-    write(fd, "out", 3);
+    if (mode == O_WRONLY)
+        write(fd, "out", 3);
+    else
+        write(fd, "in", 2);
     close(fd);
+}
+
+bool Blinker::GetResetStatus()
+{
+    bool val;
+    std::string getval_str = "/sys/class/gpio/gpio" + std::to_string(GPIO_RSTBUTTON) + "/value";
+    std::ifstream getvalgpio(getval_str.c_str());
+    getvalgpio >> val;
+    getvalgpio.close();
+    return val;
 }
