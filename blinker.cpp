@@ -21,8 +21,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <vector>
 #include <fstream>
+#include <sys/reboot.h>
 #include "global.h"
+#include "log.h"
 #include "blinker.h"
 
 Blinker::Blinker()
@@ -34,6 +37,7 @@ Blinker::Blinker()
     GPIOExport(GPIO_RSTBUTTON, O_RDONLY);
     LedEndTime = std::chrono::system_clock::now() + LedOnTimes[BlinkMode];
     CurrentLedMode = LEDMODE_ON;
+    ResetIsActive = false;
 }
 
 Blinker::~Blinker()
@@ -45,10 +49,14 @@ void Blinker::SetMode(int mode)
     BlinkMode = mode;
     LedEndTime = std::chrono::system_clock::now() + LedOnTimes[BlinkMode];
     CurrentLedMode = LEDMODE_ON;
+    std::string tmps = "Set LED mode: " + std::to_string(mode);
+    INF(tmps);
 }
 
 void Blinker::Run()
 {
+    std::string tmps;
+    const std::string address_string = "address";
     int rstpushes;
     rstpushes = 0;
     while (!Global.FinishThreads)
@@ -77,10 +85,58 @@ void Blinker::Run()
         // reset check
         if (!GetResetStatus())
         {
-            rstpushes++;
-            printf("RST button has been pushed %d times\n", rstpushes);
+            if (!ResetIsActive)
+            {
+                ResetIsActive = true;
+                RstEndTime = tt + std::chrono::milliseconds(RST_TIMEOUT);
+            }
+            else
+            {
+                if (tt > RstEndTime)
+                {
+                    ++rstpushes;
+                    tmps = "RST button has been pushed " + std::to_string(rstpushes) + " times\n";
+                    INF(tmps);
+                    std::ifstream lfs(Global.IPFile.c_str());
+                    if (!lfs.is_open())
+                    {
+                        tmps = "Error opening file" + Global.IPFile;
+                        ERR(tmps);
+                    }
+                    else
+                    { 
+                        std::vector<std::string> tmpv;
+                        char *line = new char[255];
+                        int foundpos;
+                        while (!lfs.eof())
+                        {
+                            lfs.getline(line, 255);
+                            tmps = line;
+                            if (tmps.empty())
+                                continue;
+                            foundpos = tmps.find(address_string);
+                            if (foundpos != std::string::npos)
+                            {
+                                tmps = tmps.substr(0, foundpos+address_string.length());
+                                tmps.push_back(' ');
+                                tmps += Global.DefaultIPString;
+                            }
+                            tmpv.push_back(tmps);
+                        }
+                        lfs.close();
+                        std::ofstream ofs(Global.IPFile.c_str());
+                        for (std::vector<std::string>::const_iterator it=tmpv.begin(); it != tmpv.end(); ++it)
+                            ofs << *it << '\n';
+                        ofs.close();
+                        printf("Going reboot now...");
+                        sync();
+                        reboot(RB_AUTOBOOT);
+                    }
+                }
+            }
         }
-        
+        else
+            ResetIsActive = false;
         usleep(100000);
     }
 }
@@ -104,12 +160,13 @@ void Blinker::GPIOExport(int gpio, int mode)
     sprintf(buf, "%d", gpio);
     write(fd, buf, strlen(buf));
     close(fd);
-    fd = open("/sys/class/gpio/gpio%d/direction", mode);
-//    sprintf(buf, "out");
+    sprintf(buf, "/sys/class/gpio/gpio%d/direction", gpio);
+    fd = open(buf, O_WRONLY);
     if (mode == O_WRONLY)
-        write(fd, "out", 3);
+        sprintf(buf, "out");
     else
-        write(fd, "in", 2);
+        sprintf(buf, "in");
+    write(fd, buf, strlen(buf));
     close(fd);
 }
 

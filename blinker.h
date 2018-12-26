@@ -64,6 +64,7 @@ private:
     int BlinkMode;
     std::chrono::time_point<std::chrono::system_clock> LedEndTime, RstEndTime;
     int CurrentLedMode;
+    bool ResetIsActive;
 
     std::map<int, std::chrono::duration<int, std::milli> > LedOnTimes = \
     {{ BLINK_1HZ, std::chrono::milliseconds(BLINK_1HZ_ONTIME) }, \

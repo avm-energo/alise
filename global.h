@@ -18,6 +18,8 @@ class GlobalClass
 public:
     std::string HomeDirectory, LogFilename;
     bool FinishThreads;
+    std::string DefaultIPString;
+    std::string IPFile; // /etc/network/interfaces.d/eth1
     Log BLog;
 
     GlobalClass();

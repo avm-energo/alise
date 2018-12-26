@@ -60,7 +60,7 @@ AliseServer::AliseServer()
         }
         else
         {
-            printf("Home directory not found!");
+            printf("Home directory not found!\n");
             printf("%s", homedir.c_str());
             exit(1);
         }
@@ -81,12 +81,15 @@ AliseServer::AliseServer()
         }
     }
     Global.LogFilename = GetValueFromConfigmap("logfile", ALISELOGFILE);
+    Global.DefaultIPString = GetValueFromConfigmap("defaultip", ALISELOGFILE);
+    Global.IPFile = GetValueFromConfigmap("ipfile", ALISELOGFILE);
+    PidFile = GetValueFromConfigmap("pidfile", ALISELOGFILE);
 }
 
 AliseServer::~AliseServer()
 {
   Global.FinishThreads = true;
-  printf("Alise finished");
+  printf("Alise finished\n");
 }
 
 void Signal_Handler(int sig)
@@ -100,7 +103,7 @@ void Signal_Handler(int sig)
       break;
     case SIGTERM:
       Global.FinishThreads = true;
-      printf("Supik terminated");
+      printf("Supik terminated\n");
       exit(0);
       break;
   }
@@ -113,19 +116,21 @@ void AliseServer::Start()
     struct sigaction sa;
     char str[10];
   
-    if (getppid() == 1) // already a daemon (parent process id = 1 (init))
+/*    if (getppid() == 1) // already a daemon (parent process id = 1 (init))
+    {
+        printf("A daemon already\n");
         return;
-  
+    } */
     printf("Server started!\n");
     pid = fork();
 
     switch(pid)
     {
     case 0:
-        printf("AAAAA!");
+    {
         if (setsid() == -1)
         {
-            printf("Failed to daemonize");
+            printf("Failed to daemonize\n");
             break;
         }
 /*        chdir("/");
@@ -153,13 +158,21 @@ void AliseServer::Start()
 //        signal(SIGHUP,Signal_Handler); /* catch hangup signal */
 //        signal(SIGTERM,Signal_Handler); /* catch kill signal */ 
 
-        printf("MainLoop");
+        std::fstream file;
+        file.open(PidFile, std::fstream::out | std::fstream::trunc);
+        if (file.is_open())
+        {
+            file << getpid();
+            file.close();
+        }
+        printf("MainLoop\n");
         MainLoop();
-        printf("Exited normally");
+        printf("Exited normally\n");
         exit(0);
         break;
+    }
     case -1:
-        printf("fork() error");
+        printf("fork() error\n");
         break;
       
     default:
