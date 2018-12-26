@@ -297,6 +297,7 @@ void AliseServer::FillConfigmap()
                 configmap[key] = value;
         }
     }
+    configfile.close();
 }
 
 std::string AliseServer::GetValueFromConfigmap(const std::string& key, const std::string& defaultvalue)
