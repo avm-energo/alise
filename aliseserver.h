@@ -32,6 +32,7 @@ public:
     
 private:
     std::map<std::string, std::string> configmap;
+    std::string PidFile;
     
     void MainLoop();
     void FillConfigmap();

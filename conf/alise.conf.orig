@@ -1,0 +1,5 @@
+homedir=/root/alise
+logfile=/var/log/alise.log
+defaultip=172.16.31.67
+ipfile=/etc/network/interfaces.d/eth1
+pidfile=/run/alise.pid

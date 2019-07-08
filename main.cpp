@@ -1,4 +1,6 @@
 #include <cstring>
+#include <stdio.h>
+#include <stdlib.h>
 #include "aliseserver.h"
 #include "global.h"
 

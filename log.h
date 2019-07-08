@@ -32,14 +32,12 @@
 
 #define LOGLEVEL	LL_NFLOG
 
-#define LOGERR(a)	Log::Msg(MT_ERR, a, __FILE__, __LINE__)
-
 #define LL_CRLOG	0
 #define LL_ERLOG	1
 #define LL_WRLOG	2
 #define LL_NFLOG	3
 
-#define ALISELOGFILE    "log/sqlparse.log"
+#define ALISELOGFILE    "/var/log/alise.log"
 #define LOGFILEMAX	5
 
 class Log

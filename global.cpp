@@ -1,3 +1,4 @@
+#include <thread>
 #include "global.h"
 
 GlobalClass Global;

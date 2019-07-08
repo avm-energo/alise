@@ -18,10 +18,11 @@
  *
  */
 #include <sstream>
-#include <iomanip>
+//#include <iomanip>
 #include <iostream>
+#include <ctime>
 #include <queue>
-#include <codecvt>
+// #include <codecvt>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <stdio.h>
@@ -59,26 +60,27 @@ Log::~Log()
 
 void Log::OpenLogFiles()
 {
-    file.open(ALISELOGFILE, std::fstream::out | std::fstream::app);
+    file.open(Global.LogFilename, std::fstream::out | std::fstream::app);
     if (!file.is_open())
     {
       std::cout << "Log file can't be opened: ";
-      std::cout << ALISELOGFILE;
+      std::cout << Global.LogFilename;
       std::cout << "\n";
       return;
     }
     else
     {
       std::cout << "Log file ";
-      std::cout << ALISELOGFILE;
+      std::cout << Global.LogFilename;
       std::cout << " started\n";
     }
 }
-
+    
 void Log::Run()
 {
     const std::string MsgTypeStrings[] = {"CRITICAL", "ERROR", "WARNING", "INFO"};
     IdentMsgCount = 0;
+    Msg(LL_NFLOG, "=== Log started ===", __FILE__, __LINE__);
     while (!Global.FinishThreads)
     {
         if (!Queue.empty())
@@ -117,16 +119,17 @@ void Log::Run()
                     // http://stackoverflow.com/questions/12835577/how-to-convert-stdchronotime-point-to-calendar-datetime-string-with	  
                     std::chrono::milliseconds mseconds = std::chrono::duration_cast<std::chrono::milliseconds>(ms.now.time_since_epoch());
                     std::size_t fraction = mseconds.count() % 1000;
-                    time_t nowtt = std::chrono::system_clock::to_time_t(ms.now);
-	    
-                    file << std::put_time(std::localtime(&nowtt), "%d-%m-%Y %H:%M:%S") << "." << fraction << "][";
+                    time_t t = time(0);
+                    struct tm *now = localtime(&t);
+                    file << '[' << now->tm_mday << '-' << (now->tm_mon + 1) << '-' << (now->tm_year + 1900);
+                    file << ' ' << now->tm_hour << ':' << now->tm_min << ':' << now->tm_sec << '.' << fraction << "][";
                     file << MsgTypeStrings[ms.type] << "] " << ms.file << ":" << ms.line << " " << ms.msg << "\n";
                     file.flush();
                     CheckAndGz();
                 }
             }
         }
-        usleep(1000);
+        usleep(10000);
     }
 }
 
