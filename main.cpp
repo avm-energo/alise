@@ -1,22 +1,37 @@
-#include <cstring>
-#include <stdio.h>
-#include <stdlib.h>
-#include "aliseserver.h"
-#include "global.h"
 
-int main(int argc, char **argv)
+#include "../comaversion/comaversion.h"
+#include "../gen/logger.h"
+#include "../gen/stdfunc.h"
+#include "controller.h"
+#include "stmbroker.h"
+
+#include <QCoreApplication>
+#include <config.h>
+#include <iostream>
+int main(int argc, char *argv[])
 {
-    if (argc > 1)
+    std::cout << "Started " << std::endl;
+
+    GitVersion gitVersion;
+    QCoreApplication a(argc, argv);
+    a.setApplicationVersion(QString(COMAVERSION) + "-" + gitVersion.getGitHash());
+
+    QCommandLineParser parser;
+
+    parser.addHelpOption();
+    parser.addVersionOption();
+
+    if (QCoreApplication::arguments().size() > 1)
     {
-        if (strcmp(argv[1], "--version") == 0)
-        {
-            printf("alise daemon v%s\n", ALISE_VERSION);
-            exit(0);
-        }
+        parser.process(QCoreApplication::arguments());
+        return 0;
     }
-    Global.FinishThreads = false;
-    AliseServer *ST = new AliseServer();
-    printf("Server initialized\n");
-    ST->Start();
-    return 0;
+    StdFunc::Init();
+    Logging::writeStart();
+    qInstallMessageHandler(Logging::messageHandler);
+    Controller controller;
+    if (!controller.launch())
+        return 13;
+    std::cout << "Enter the event loop" << std::endl;
+    return a.exec();
 }
