@@ -17,9 +17,9 @@ OOMScoreAdjust=-500
 Restart=always
 RestartSec=0
 TimeoutSec=0
-ExecStart=/usr/local/etc/alise/alise start
-ExecStop=/usr/local/etc/alise/alise stop
-ExecReload=/usr/local/etc/alise/alise restart
+ExecStart=/usr/local/etc/rc.d/alise start
+ExecStop=/usr/local/etc/rc.d/alise stop
+ExecReload=/usr/local/etc/rc.d/alise restart
 
 [Install]
 WantedBy=multi-user.target
