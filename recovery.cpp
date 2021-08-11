@@ -36,7 +36,7 @@ void Recovery::eth0()
         qCritical() << "Couldn't change perm for " << eth0path;
     }
 }
-
+#if defined(AVTUK_STM)
 void Recovery::eth2()
 {
     if (!QFile::exists(":/network/eth2"))
@@ -60,7 +60,7 @@ void Recovery::eth2()
         qCritical() << "Couldn't change perm for " << eth2path;
     }
 }
-
+#endif
 void Recovery::sync()
 {
     QString program = "sync";
@@ -90,7 +90,7 @@ void Recovery::receiveBlock(const DataTypes::BlockStruct blk)
         if (mainBlock.resetReq && (!resetInit))
         {
             eth0();
-#if defined(AVTUK_14)
+#if defined(AVTUK_STM)
             eth2();
 #endif
             sync();

@@ -15,7 +15,9 @@ signals:
 
 private:
     void eth0();
+#if defined(AVTUK_STM)
     void eth2();
+#endif
     void sync();
     void restartNetwork();
     bool resetInit = false;

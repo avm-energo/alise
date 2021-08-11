@@ -9,9 +9,9 @@ find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Xml REQUIRED)
 
 if (AVTUK-14)
-    add_compile_definitions(AVTUK_14 )
+    add_compile_definitions(AVTUK_STM)
 elseif  (AVTUK-12)
-    add_compile_definitions(AVTUK_12 )
+    add_compile_definitions(AVTUK_NO_STM)
 endif()
 
 if (NOT ( EXISTS "${CMAKE_CURRENT_BINARY_DIR}/conanbuildinfo.txt" AND ${CACHED_PROJECT_TARGET_NAME} STREQUAL ${PROJECT_TARGET_NAME}))
@@ -69,10 +69,12 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${PROTOS_GENERATED_DIR})
 configure_file(${CMAKE_SOURCE_DIR}/cconfig.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h @ONLY)
 
 message(STATUS ALISE ${protos_DIR})
-target_link_libraries(${PROJECT_NAME} gen comaversion protos Qt5::Core Qt5::Xml pthread ZeroMQ::libzmq-static cppzmq::cppzmq)
 if (AVTUK-14)
+    ##WARNING Link interfaces before gen (!)
     target_link_libraries(${PROJECT_NAME} interfaces)
 endif()
+target_link_libraries(${PROJECT_NAME}  gen comaversion protos Qt5::Core Qt5::Xml pthread ZeroMQ::libzmq-static cppzmq::cppzmq)
+
 
 install(TARGETS ${PROJECT_NAME}
 )

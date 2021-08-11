@@ -20,11 +20,11 @@ Controller::Controller(std::string addr, QObject *parent) noexcept
     connect(worker, &runner::ZeroRunner::healthReceived, &m_stmBroker, &deviceType::setIndication);
     // NOTE avtuk will be rebooted
     connect(&recovery, &Recovery::rebootReq, &m_stmBroker, &deviceType::rebootMyself);
-#if defined(AVTUK_14)
+#if defined(AVTUK_STM)
     connect(worker, &runner::ZeroRunner::timeReceived, &m_stmBroker, &deviceType::setTime);
     connect(worker, &runner::ZeroRunner::timeRequest, &m_stmBroker, &deviceType::getTime);
 
-#elif defined(AVTUK_12)
+#elif defined(AVTUK_NO_STM)
     connect(worker, &runner::ZeroRunner::timeRequest, &timeSync, //
         [&] { DataManager::addSignalToOutList(DataTypes::SignalTypes::Timespec, timeSync.systemTime()); });
 #endif
@@ -40,7 +40,7 @@ Controller::Controller(std::string addr, QObject *parent) noexcept
         syncCounter++;
         if (syncCounter == minSecs)
         {
-#if defined(AVTUK_14)
+#if defined(AVTUK_STM)
             m_stmBroker.setTime(timeSync.systemTime());
 #endif
             syncCounter = 0;
@@ -54,7 +54,7 @@ Controller::~Controller()
 
 bool Controller::launch()
 {
-#if defined(AVTUK_14)
+#if defined(AVTUK_STM)
     if (!m_stmBroker.connectToStm())
     {
         delete worker;
@@ -71,7 +71,7 @@ bool Controller::launch()
             syncer.handleTime(time);
         },
         Qt::DirectConnection);
-#if defined(AVTUK_14)
+#if defined(AVTUK_STM)
     m_stmBroker.getTime();
 #endif
     worker->runServer();

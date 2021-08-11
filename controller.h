@@ -1,8 +1,8 @@
 #pragma once
 #include "recovery.h"
-#if defined(AVTUK_14)
+#if defined(AVTUK_STM)
 #include "stmbroker.h"
-#elif defined(AVTUK_12)
+#elif defined(AVTUK_NO_STM)
 #include "gpiobroker.h"
 #endif
 #include "timesyncronizer.h"
@@ -14,9 +14,9 @@
 class Controller : public QObject
 {
 public:
-#if defined(AVTUK_14)
+#if defined(AVTUK_STM)
     using deviceType = StmBroker;
-#elif defined(AVTUK_12)
+#elif defined(AVTUK_NO_STM)
     using deviceType = GpioBroker;
 #endif
     explicit Controller(QObject *parent = nullptr) noexcept;
