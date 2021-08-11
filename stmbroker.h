@@ -1,4 +1,5 @@
 #pragma once
+#include "../gen/datatypes.h"
 #include "../gen/modules.h"
 #include "protos.pb.h"
 
@@ -25,7 +26,7 @@ public /*slots*/:
     void rebootMyself();
 
 private:
-    AVTUK_14::Indication transform(alise::Health_Code code) const;
+    AVTUK_CCU::Indication transform(alise::Health_Code code) const;
     timespec transform(google::protobuf::Timestamp timestamp) const
     {
         timespec temp;
@@ -38,5 +39,13 @@ private:
     QTimer m_timer;
 #ifdef TEST_INDICATOR
     QTimer m_testTimer;
+
 #endif
+    void printbs(const DataTypes::BitStringStruct &st)
+    {
+        std::cout << "BitString {"
+                  << "Addr:" << st.sigAdr << ","
+                  << "Val:" << st.sigVal << ","
+                  << "Qual:" << st.sigQuality << " }" << std::endl;
+    }
 };

@@ -1,6 +1,6 @@
 #pragma once
+#include <ctime>
 #include <iostream>
-#include <time.h>
 inline std::ostream &operator<<(std::ostream &os, const timespec &time)
 {
 

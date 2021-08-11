@@ -51,7 +51,7 @@ void ZeroPublisher::publishTime(const timespec time)
     appendToQueue(admin, protoTime);
 }
 
-void ZeroPublisher::publishPowerStatus(const AVTUK_14::Main powerStatus)
+void ZeroPublisher::publishPowerStatus(const AVTUK_CCU::Main powerStatus)
 {
     alise::PowerStatus protoPower;
     protoPower.set_pwrin(powerStatus.PWRIN);
@@ -62,9 +62,9 @@ void ZeroPublisher::publishBlock(const DataTypes::BlockStruct blk)
 {
     switch (blk.data.size())
     {
-    case sizeof(AVTUK_14::Main):
+    case sizeof(AVTUK_CCU::Main):
     {
-        AVTUK_14::Main powerStatus;
+        AVTUK_CCU::Main powerStatus;
         memcpy(&powerStatus, blk.data.data(), sizeof(powerStatus));
         publishPowerStatus(powerStatus);
     }

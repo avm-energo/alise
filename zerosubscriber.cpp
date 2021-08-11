@@ -33,14 +33,15 @@ void ZeroSubscriber::work()
             const auto &messageContent = packedMessage.content();
             if (messageContent.Is<alise::Health>())
             {
-                alise::Health protoHealth;
-                if (!messageContent.UnpackTo(&protoHealth))
+                alise::Health *protoHealth = new alise::Health;
+                if (!messageContent.UnpackTo(protoHealth))
                 {
                     qWarning() << Error::WriteError;
                     continue;
                 }
-                qInfo() << "Receive health:" << protoHealth.code();
-                emit healthReceived(protoHealth.code());
+                qInfo() << "Receive health:" << protoHealth->code();
+                emit healthReceived(protoHealth->code());
+                delete protoHealth;
             }
             else if (messageContent.Is<google::protobuf::Timestamp>())
             {

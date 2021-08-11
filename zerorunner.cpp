@@ -16,7 +16,7 @@ void ZeroRunner::runServer()
 {
     qRegisterMetaType<ZeroSubscriber::healthType>("healthType");
     qRegisterMetaType<timespec>();
-    qRegisterMetaType<AVTUK_14::Main>();
+    qRegisterMetaType<AVTUK_CCU::Main>();
     frontend_.bind("tcp://*:5555");
     backendSub_.bind("inproc://backendSub");
     backendPub_.bind("inproc://backendPub");

@@ -3,7 +3,6 @@
 #include "../gen/logger.h"
 #include "../gen/stdfunc.h"
 #include "controller.h"
-#include "stmbroker.h"
 
 #include <QCoreApplication>
 #include <config.h>

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QObject>
-#include <time.h>
+#include <ctime>
 class TimeSyncronizer : public QObject
 {
     Q_OBJECT

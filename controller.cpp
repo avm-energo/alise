@@ -14,16 +14,24 @@ Controller::Controller(QObject *parent) noexcept : Controller("0.0.0.0", parent)
 
 Controller::Controller(std::string addr, QObject *parent) noexcept
     : QObject(parent), worker(new runner::ZeroRunner(this)), m_stmBroker({})
+
 {
-    connect(worker, &runner::ZeroRunner::healthReceived, &m_stmBroker, &StmBroker::setIndication);
-    connect(worker, &runner::ZeroRunner::timeReceived, &m_stmBroker, &StmBroker::setTime);
+
+    connect(worker, &runner::ZeroRunner::healthReceived, &m_stmBroker, &deviceType::setIndication);
+    // NOTE avtuk will be rebooted
+    connect(&recovery, &Recovery::rebootReq, &m_stmBroker, &deviceType::rebootMyself);
+#if defined(AVTUK_14)
+    connect(worker, &runner::ZeroRunner::timeReceived, &m_stmBroker, &deviceType::setTime);
+    connect(worker, &runner::ZeroRunner::timeRequest, &m_stmBroker, &deviceType::getTime);
+
+#elif defined(AVTUK_12)
+    connect(worker, &runner::ZeroRunner::timeRequest, &timeSync, //
+        [&] { DataManager::addSignalToOutList(DataTypes::SignalTypes::Timespec, timeSync.systemTime()); });
+#endif
     connect(worker, &runner::ZeroRunner::timeReceived, &timeSync, &TimeSyncronizer::handleTime);
-    connect(worker, &runner::ZeroRunner::timeRequest, &m_stmBroker, &StmBroker::getTime);
+
     const auto &manager = DataManager::GetInstance();
     connect(&manager, &DataManager::blockReceived, &recovery, &Recovery::receiveBlock);
-
-    // NOTE avtuk will be rebooted
-    connect(&recovery, &Recovery::rebootReq, &m_stmBroker, &StmBroker::rebootMyself);
 
     connect(&timeSync, &TimeSyncronizer::ntpStatusChanged, worker, &runner::ZeroRunner::publishNtpStatus);
     connect(&timeSync, &TimeSyncronizer::ntpStatusChanged, this, [&](bool status) {
@@ -32,7 +40,9 @@ Controller::Controller(std::string addr, QObject *parent) noexcept
         syncCounter++;
         if (syncCounter == minSecs)
         {
+#if defined(AVTUK_14)
             m_stmBroker.setTime(timeSync.systemTime());
+#endif
             syncCounter = 0;
         }
     });
@@ -44,11 +54,13 @@ Controller::~Controller()
 
 bool Controller::launch()
 {
+#if defined(AVTUK_14)
     if (!m_stmBroker.connectToStm())
     {
         delete worker;
         return false;
     }
+#endif
     const auto &manager = DataManager::GetInstance();
     auto connectionTimeSync = std::shared_ptr<QMetaObject::Connection>(new QMetaObject::Connection);
 
@@ -59,7 +71,9 @@ bool Controller::launch()
             syncer.handleTime(time);
         },
         Qt::DirectConnection);
+#if defined(AVTUK_14)
     m_stmBroker.getTime();
+#endif
     worker->runServer();
 
     return true;

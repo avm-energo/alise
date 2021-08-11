@@ -1,4 +1,4 @@
-project(alise VERSION 1.0.0)
+project(alise VERSION 0.0.1)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -8,18 +8,24 @@ find_package(Qt5Core)
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Xml REQUIRED)
 
+if (AVTUK-14)
+    add_compile_definitions(AVTUK_14 )
+elseif  (AVTUK-12)
+    add_compile_definitions(AVTUK_12 )
+endif()
+
 if (NOT ( EXISTS "${CMAKE_CURRENT_BINARY_DIR}/conanbuildinfo.txt" AND ${CACHED_PROJECT_TARGET_NAME} STREQUAL ${PROJECT_TARGET_NAME}))
-#    execute_process(COMMAND ${CONAN_MAIN_INIT}
-#        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/..
-#        RESULT_VARIABLE CMD_ERROR)
+
     execute_process(
         COMMAND ${CMAKE_COMMAND} -E env
-            CONAN_USER_HOME=${USER_DIRECTORY} ${CONAN_EXEC} install . -g cmake -g cmake_find_package -s arch=${CONAN_TARGET_NAME} -s arch_build=${CONAN_TARGET_NAME} -if ${CMAKE_CURRENT_BINARY_DIR} --build=missing
-        RESULT_VARIABLE CMD_ERROR
+            CONAN_USER_HOME=${USER_DIRECTORY} ${CONAN_EXEC} install . --profile ${CONAN_PROFILE} -g cmake -g cmake_find_package -s arch=${CONAN_TARGET_NAME} -s arch_build=${CONAN_TARGET_NAME} -if ${CMAKE_CURRENT_BINARY_DIR} --build=missing
+        RESULT_VARIABLE CMD_ERROR_CODE
+        OUTPUT_VARIABLE CMD_OUTPUT
+        ERROR_VARIABLE CMD_ERROR
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     )
     message(STATUS "Init conan for " ${PROJECT_TARGET_NAME})
-    message(STATUS "CMD_ERROR:" ${CMD_ERROR})
+    message(STATUS "CMD_ERROR_CODE: ${CMD_ERROR} with  ${CMD_OUTPUT} and ${CMD_ERROR}")
 
 endif()
 
@@ -28,8 +34,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_BINARY_DIR}")
 find_package(ZeroMQ REQUIRED)
 find_package(cppzmq REQUIRED)
 
-add_executable(
-    ${PROJECT_NAME}
+set(SOURCES
     main.cpp
     timesyncronizer.cpp
     timesyncronizer.h
@@ -38,8 +43,7 @@ add_executable(
     zerorunner.h
     controller.cpp
     controller.h
-    stmbroker.cpp
-    stmbroker.h
+
     zeropublisher.cpp
     zeropublisher.h
     zerosubscriber.cpp
@@ -47,13 +51,28 @@ add_executable(
     interfaces.qrc
     recovery.cpp
     recovery.h)
+
+if (AVTUK-14)
+    list(APPEND SOURCES
+        stmbroker.cpp
+        stmbroker.h)
+elseif  (AVTUK-12)
+    list(APPEND SOURCES
+        gpiobroker.cpp
+        gpiobroker.h)
+endif()
+add_executable(${PROJECT_NAME} ${SOURCES})
+
 target_include_directories(${PROJECT_NAME} PUBLIC ${CONAN_INCLUDE_DIRS_CPPZMQ})
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROTOS_GENERATED_DIR})
 
 configure_file(${CMAKE_SOURCE_DIR}/cconfig.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h @ONLY)
 
 message(STATUS ALISE ${protos_DIR})
-target_link_libraries(${PROJECT_NAME} interfaces gen comaversion protos Qt5::Core Qt5::Xml pthread ZeroMQ::libzmq-static cppzmq::cppzmq)
+target_link_libraries(${PROJECT_NAME} gen comaversion protos Qt5::Core Qt5::Xml pthread ZeroMQ::libzmq-static cppzmq::cppzmq)
+if (AVTUK-14)
+    target_link_libraries(${PROJECT_NAME} interfaces)
+endif()
 
 install(TARGETS ${PROJECT_NAME}
 )

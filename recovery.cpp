@@ -83,14 +83,16 @@ void Recovery::receiveBlock(const DataTypes::BlockStruct blk)
 {
     switch (blk.data.size())
     {
-    case sizeof(AVTUK_14::Main):
+    case sizeof(AVTUK_CCU::Main):
     {
-        AVTUK_14::Main mainBlock;
+        AVTUK_CCU::Main mainBlock;
         memcpy(&mainBlock, blk.data.data(), sizeof(mainBlock));
         if (mainBlock.resetReq && (!resetInit))
         {
             eth0();
+#if defined(AVTUK_14)
             eth2();
+#endif
             sync();
             restartNetwork();
             sync();
