@@ -7,6 +7,7 @@
 #include <QProcess>
 
 constexpr char eth0path[] = "/etc/network/interfaces.d/eth0";
+constexpr char eth1path[] = "/etc/network/interfaces.d/eth1";
 constexpr char eth2path[] = "/etc/network/interfaces.d/eth2";
 
 Recovery::Recovery(QObject *parent) : QObject(parent)
@@ -36,6 +37,31 @@ void Recovery::eth0()
         qCritical() << "Couldn't change perm for " << eth0path;
     }
 }
+#if defined(AVTUK_NO_STM)
+void Recovery::eth1()
+{
+    if (!QFile::exists(":/network/eth1"))
+    {
+        qCritical() << "No eth0 recovery";
+        return;
+    }
+    if (QFile::exists(eth1path))
+    {
+        QFile::remove(eth1path);
+    }
+
+    if (!QFile::copy(":/network/eth1", eth1path))
+    {
+        qCritical() << "Couldn't copy eth1";
+        return;
+    }
+    if (!QFile(eth1path).setPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ReadUser
+            | QFileDevice::ReadGroup | QFileDevice::ReadOther))
+    {
+        qCritical() << "Couldn't change perm for " << eth1path;
+    }
+}
+#endif
 #if defined(AVTUK_STM)
 void Recovery::eth2()
 {
@@ -90,6 +116,9 @@ void Recovery::receiveBlock(const DataTypes::BlockStruct blk)
         if (mainBlock.resetReq && (!resetInit))
         {
             eth0();
+#if defined(AVTUK_NO_STM)
+            eth1();
+#endif
 #if defined(AVTUK_STM)
             eth2();
 #endif

@@ -15,6 +15,9 @@ signals:
 
 private:
     void eth0();
+#if defined(AVTUK_NO_STM)
+    void eth1();
+#endif
 #if defined(AVTUK_STM)
     void eth2();
 #endif
