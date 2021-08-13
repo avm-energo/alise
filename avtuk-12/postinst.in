@@ -19,7 +19,7 @@ service_name=@SERVICE_NAME@
     chmod 644 /usr/lib/systemd/system/$service_name
     systemctl daemon-reload
 # fi
-systemctl start $service_name_path 2>/dev/null
+systemctl start $service_name 2>/dev/null
 
 # Not required, but it lets the user know the name of the
 # service by printing it to the terminal. Also, if it's disabled,
