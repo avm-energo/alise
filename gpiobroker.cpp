@@ -124,6 +124,10 @@ void GpioBroker::setIndication(alise::Health_Code code)
 
 void GpioBroker::rebootMyself()
 {
+    m_timer.stop();
+    m_gpioTimer.stop();
+    m_resetTimer.stop();
+    setGpioValue(GpioLedPin, false + '0');
     sync();
     reboot(RB_AUTOBOOT);
 }
@@ -202,7 +206,6 @@ void GpioBroker::blinker(int code)
     }
     ++shortBlink;
     setGpioValue(GpioLedPin, blinkStatus + '0');
-    qDebug() << "Led: " << blinkStatus << " now, will be updated after " << m_gpioTimer.interval();
     blinkStatus = !blinkStatus;
 }
 
