@@ -38,6 +38,7 @@ GpioBroker::GpioBroker(QObject *parent) : QObject(parent)
     QObject::connect(&m_resetTimer, &QTimer::timeout, this, &GpioBroker::reset);
     m_timer.start();
     m_gpioTimer.start();
+    m_resetTimer.start();
 #ifdef TEST_INDICATOR
     QTimer *testTimer = new QTimer(this);
     testTimer->setInterval(70009);
@@ -130,15 +131,22 @@ void GpioBroker::rebootMyself()
 void GpioBroker::reset()
 {
     bool status = false;
-    auto value = gpioStatus(GpioResetPin, &status);
-    if (!value)
+    bool value = !gpioStatus(GpioResetPin, &status);
+
+    if (value)
     {
-        resetCounter = 0;
-        if (resetCounter > 20 && resetCounter <= 40)
-            rebootMyself();
+        resetCounter += value;
         return;
     }
 
+    // soft reset (only reboot)
+    if ((resetCounter > 20) && (resetCounter <= 40))
+    {
+        resetCounter = 0;
+        rebootMyself();
+        return;
+    }
+    // hard reset
     if (resetCounter > 40)
     {
         resetCounter = 0;
@@ -151,14 +159,10 @@ void GpioBroker::reset()
 
         // TODO Проверить то ли сдвигаем
         str.PWRIN = status1 ^ (status2 << 1);
-        str.resetReq = value;
+        str.resetReq = true;
         std::memcpy(blk.data.data(), &str, sizeof(AVTUK_CCU::Main));
         blk.ID = AVTUK_CCU::MainBlock;
         DataManager::addSignalToOutList(DataTypes::SignalTypes::Block, blk);
-    }
-    else
-    {
-        ++resetCounter;
     }
 }
 
