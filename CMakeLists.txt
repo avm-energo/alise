@@ -59,6 +59,8 @@ if (AVTUK-14)
         stmbroker.h)
 elseif  (AVTUK-12)
     list(APPEND SOURCES
+        gpiohelper.c
+        gpiohelper.h
         gpiobroker.cpp
         gpiobroker.h)
 endif()

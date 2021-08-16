@@ -73,6 +73,8 @@ bool Controller::launch()
         Qt::DirectConnection);
 #if defined(AVTUK_STM)
     m_stmBroker.getTime();
+#elif defined(AVTUK_NO_STM)
+    timeSync.systemTime();
 #endif
     worker->runServer();
 

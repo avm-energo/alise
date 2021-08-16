@@ -2,6 +2,7 @@
 
 #include "../gen/datamanager.h"
 #include "../gen/error.h"
+#include "gpiohelper.h"
 
 #include <QDebug>
 #include <QRandomGenerator>
@@ -13,6 +14,17 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+struct GpioPin
+{
+    int chip;
+    int offset;
+};
+
+constexpr GpioPin PowerStatusPin0 { 0, 5 };
+constexpr GpioPin PowerStatusPin1 { 3, 17 };
+constexpr GpioPin LedPin { 1, 31 };
+constexpr GpioPin ResetPin { 2, 6 };
 enum GpioPowerStatus
 {
     Pin1 = 5,
@@ -61,11 +73,10 @@ bool isdigit(char ch)
 
 void GpioBroker::checkPowerUnit()
 {
-    bool status = false;
-    auto status1 = gpioStatus(GpioPowerStatus::Pin1, &status);
-    auto status2 = gpioStatus(GpioPowerStatus::Pin2, &status);
-    if (!status)
-        return;
+
+    auto status1 = gpio_read(PowerStatusPin0.chip, PowerStatusPin0.offset);
+
+    auto status2 = gpio_read(PowerStatusPin1.chip, PowerStatusPin1.offset);
 
     DataTypes::BlockStruct blk;
     blk.data.resize(sizeof(AVTUK_CCU::Main));
@@ -77,6 +88,15 @@ void GpioBroker::checkPowerUnit()
     std::memcpy(blk.data.data(), &str, sizeof(AVTUK_CCU::Main));
     blk.ID = AVTUK_CCU::MainBlock;
     DataManager::addSignalToOutList(DataTypes::SignalTypes::Block, blk);
+}
+
+void get_chip_info(void)
+{
+    // struct gpiochip_info info;
+    //  int fd, rv;
+    //  fd = open("/dev/gpiochip0", O_RDWR);
+    // rv = ioctl(fd, GPIO_GET_CHIPINFO_IOCTL, info);
+    // gpio_list("/dev/gpiochip0");
 }
 
 void GpioBroker::setIndication(alise::Health_Code code)
