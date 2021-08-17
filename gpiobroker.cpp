@@ -2,43 +2,18 @@
 
 #include "../gen/datamanager.h"
 #include "../gen/error.h"
-#include "gpiohelper.h"
 
 #include <QDebug>
 #include <QRandomGenerator>
-#include <cstdio>
+#include <config.h>
 #include <cstdlib>
-#include <fcntl.h>
-#include <fstream>
 #include <sys/reboot.h>
-#include <sys/stat.h>
-#include <sys/types.h>
 #include <unistd.h>
 
-struct GpioPin
-{
-    int chip;
-    int offset;
-};
-
-constexpr GpioPin PowerStatusPin0 { 0, 5 };
-constexpr GpioPin PowerStatusPin1 { 3, 17 };
-constexpr GpioPin LedPin { 1, 31 };
-constexpr GpioPin ResetPin { 2, 6 };
-enum GpioPowerStatus
-{
-    Pin1 = 5,
-    Pin2 = 113
-};
-
-constexpr int GpioLedPin = 63;
-constexpr int GpioResetPin = 70;
-constexpr char prefix[] = "/sys/class/gpio/gpio";
-enum LedTimeout
-{
-    Small = 125,
-    Big = 500
-};
+constexpr GpioBroker::GpioPin PowerStatusPin0 { 0, 5 };
+constexpr GpioBroker::GpioPin PowerStatusPin1 { 3, 17 };
+constexpr GpioBroker::GpioPin LedPin { 1, 31 };
+constexpr GpioBroker::GpioPin ResetPin { 2, 6 };
 
 GpioBroker::GpioBroker(QObject *parent) : QObject(parent)
 {
@@ -61,21 +36,33 @@ GpioBroker::GpioBroker(QObject *parent) : QObject(parent)
     });
     testTimer->start();
 #endif
-}
-namespace detail
-{
-bool isdigit(char ch)
-{
-    return std::isdigit(static_cast<unsigned char>(ch));
-}
 
+    chip0.open(std::to_string(0));
+    {
+        auto line = chip0.get_line(PowerStatusPin0.offset);
+        line.request({ PROGNAME, ::gpiod::line_request::DIRECTION_INPUT, 0 });
+    }
+    chip1.open(std::to_string(1));
+    {
+        auto line = chip1.get_line(LedPin.offset);
+        line.request({ PROGNAME, ::gpiod::line_request::DIRECTION_OUTPUT, 0 });
+    }
+    chip2.open(std::to_string(2));
+    {
+        auto line = chip2.get_line(ResetPin.offset);
+        line.request({ PROGNAME, ::gpiod::line_request::DIRECTION_OUTPUT, 0 });
+    }
+    chip3.open(std::to_string(3));
+    {
+        auto line = chip3.get_line(PowerStatusPin1.offset);
+        line.request({ PROGNAME, ::gpiod::line_request::DIRECTION_INPUT, 0 });
+    }
 }
 
 void GpioBroker::checkPowerUnit()
 {
-    auto status1 = gpio_read(PowerStatusPin0.chip, PowerStatusPin0.offset);
-    auto status2 = gpio_read(PowerStatusPin1.chip, PowerStatusPin1.offset);
-
+    auto status1 = chip0.get_line(PowerStatusPin0.offset).get_value();
+    auto status2 = chip3.get_line(PowerStatusPin1.offset).get_value();
     DataTypes::BlockStruct blk;
     blk.data.resize(sizeof(AVTUK_CCU::Main));
     AVTUK_CCU::Main str;
@@ -88,26 +75,16 @@ void GpioBroker::checkPowerUnit()
     DataManager::addSignalToOutList(DataTypes::SignalTypes::Block, blk);
 }
 
-void get_chip_info(void)
-{
-    // struct gpiochip_info info;
-    //  int fd, rv;
-    //  fd = open("/dev/gpiochip0", O_RDWR);
-    // rv = ioctl(fd, GPIO_GET_CHIPINFO_IOCTL, info);
-    // gpio_list("/dev/gpiochip0");
-}
-
 void GpioBroker::setIndication(alise::Health_Code code)
 {
     m_gpioTimer.stop();
     shortBlink = blinkStatus = 0;
     QObject::disconnect(&m_gpioTimer, &QTimer::timeout, nullptr, nullptr);
+    chip1.get_line(LedPin.offset).set_value(blinkStatus);
 
-    gpio_write(LedPin.chip, LedPin.offset, blinkStatus /*+ '0'*/);
-    // setGpioValue(GpioLedPin, blinkStatus + '0');
     if (noBooter)
     {
-        m_gpioTimer.setInterval(LedTimeout::Small);
+        m_gpioTimer.setInterval(BlinkTimeout::small);
         noBooter = !noBooter;
     }
 
@@ -115,27 +92,25 @@ void GpioBroker::setIndication(alise::Health_Code code)
     {
     case alise::Health_Code_Startup:
     {
-        m_gpioTimer.setInterval(LedTimeout::Small);
-        QObject::connect(&m_gpioTimer, &QTimer::timeout, this, [&status = blinkStatus] {
-            gpio_write(LedPin.chip, LedPin.offset, status /*+ '0'*/);
-            //     setGpioValue(GpioLedPin, status + '0');
+        m_gpioTimer.setInterval(BlinkTimeout::small);
+        QObject::connect(&m_gpioTimer, &QTimer::timeout, this, [&status = blinkStatus, &chip = chip1] {
+            chip.get_line(LedPin.offset).set_value(status);
             status = !status;
         });
         break;
     }
     case alise::Health_Code_Work:
     {
-        m_gpioTimer.setInterval(LedTimeout::Big);
-        QObject::connect(&m_gpioTimer, &QTimer::timeout, this, [&status = blinkStatus] {
-            gpio_write(LedPin.chip, LedPin.offset, status /*+ '0'*/);
-            // setGpioValue(GpioLedPin, status + '0');
+        m_gpioTimer.setInterval(BlinkTimeout::big);
+        QObject::connect(&m_gpioTimer, &QTimer::timeout, this, [&status = blinkStatus, &chip = chip1] {
+            chip.get_line(LedPin.offset).set_value(status);
             status = !status;
         });
         break;
     }
     default:
     {
-        m_gpioTimer.setInterval(LedTimeout::Small);
+        m_gpioTimer.setInterval(BlinkTimeout::small);
         currentMode = BlinkMode::big;
         QObject::connect(&m_gpioTimer, &QTimer::timeout, this, [=] { blinker(code); });
     }
@@ -148,17 +123,14 @@ void GpioBroker::rebootMyself()
     m_timer.stop();
     m_gpioTimer.stop();
     m_resetTimer.stop();
-    gpio_write(LedPin.chip, LedPin.offset, false /*+ '0'*/);
-    // setGpioValue(GpioLedPin, false + '0');
+    chip1.get_line(LedPin.offset).set_value(false);
     sync();
     reboot(RB_AUTOBOOT);
 }
 
 void GpioBroker::reset()
 {
-    // bool status = false;
-    bool value = !gpio_read(ResetPin.chip, ResetPin.offset);
-    // bool value = !gpioStatus(GpioResetPin, &status);
+    bool value = !chip2.get_line(ResetPin.offset).get_value();
 
     if (value)
     {
@@ -177,11 +149,10 @@ void GpioBroker::reset()
     if (resetCounter > 40)
     {
         resetCounter = 0;
-        // bool status = false;
-        auto status1 = gpio_read(PowerStatusPin0.chip, PowerStatusPin0.offset);
-        auto status2 = gpio_read(PowerStatusPin1.chip, PowerStatusPin1.offset);
-        // auto status1 = gpioStatus(GpioPowerStatus::Pin1, &status);
-        // auto status2 = gpioStatus(GpioPowerStatus::Pin2, &status);
+
+        auto status1 = chip0.get_line(PowerStatusPin0.offset).get_value();
+        auto status2 = chip3.get_line(PowerStatusPin1.offset).get_value();
+
         DataTypes::BlockStruct blk;
         blk.data.resize(sizeof(AVTUK_CCU::Main));
         AVTUK_CCU::Main str;
@@ -206,12 +177,12 @@ void GpioBroker::blinker(int code)
         if ((shortBlink / 2) == 1 && !(shortBlink % 2))
         {
             shortBlink = 0;
-            m_gpioTimer.setInterval(LedTimeout::Small);
+            m_gpioTimer.setInterval(BlinkTimeout::small);
             currentMode = BlinkMode::small;
             break;
         }
 
-        m_gpioTimer.setInterval(LedTimeout::Big);
+        m_gpioTimer.setInterval(BlinkTimeout::big);
         break;
     }
     case BlinkMode::small:
@@ -220,132 +191,24 @@ void GpioBroker::blinker(int code)
         if ((shortBlink / 2) == code && !(shortBlink % 2))
         {
             shortBlink = 0;
-            m_gpioTimer.setInterval(LedTimeout::Big);
+            m_gpioTimer.setInterval(BlinkTimeout::big);
             currentMode = BlinkMode::big;
             break;
         }
 
-        m_gpioTimer.setInterval(LedTimeout::Small);
+        m_gpioTimer.setInterval(BlinkTimeout::small);
         break;
     }
     }
     ++shortBlink;
-    gpio_write(LedPin.chip, LedPin.offset, blinkStatus /*+ '0'*/);
-    //   setGpioValue(GpioLedPin, blinkStatus + '0');
+    chip1.get_line(LedPin.offset).set_value(blinkStatus);
+
     blinkStatus = !blinkStatus;
 }
 
 void GpioBroker::criticalBlinking()
 {
-    gpio_write(LedPin.chip, LedPin.offset, blinkStatus /*+ '0'*/);
-    //  setGpioValue(GpioLedPin, blinkStatus + '0');
+    auto line = chip1.get_line(LedPin.offset);
+    line.set_value(blinkStatus);
     blinkStatus = !blinkStatus;
-}
-
-bool GpioBroker::gpioExport(uint8_t gpio)
-{
-    auto fd = std::fopen("/sys/class/gpio/export", "w");
-    if (!fd)
-    {
-        auto str = std::strerror(errno);
-        std::cout << Error::FileOpenError << str << '\n';
-        qCritical() << Error::FileOpenError << str;
-        return false;
-    }
-    {
-        auto rc = std::fputs(std::to_string(gpio).c_str(), fd);
-        if (rc == EOF)
-        {
-            auto str = std::strerror(errno);
-            std::cout << Error::FileWriteError << str << '\n';
-            qCritical() << Error::FileWriteError << str;
-            return false;
-        }
-    }
-    std::fclose(fd);
-    return true;
-}
-
-bool GpioBroker::gpioOpen(GpioBroker::Mode mode, const std::string &path)
-{
-    auto fd = std::fopen(path.c_str(), "w");
-    if (!fd)
-    {
-        auto str = std::strerror(errno);
-        std::cout << Error::FileOpenError << str << '\n';
-        qCritical() << Error::FileOpenError << str;
-        return false;
-    }
-
-    int rc = 0;
-    switch (mode)
-    {
-    case Mode::in:
-        rc = std::fputs("in", fd);
-        break;
-    case Mode::out:
-        rc = std::fputs("out", fd);
-        break;
-    default:
-        return false;
-    }
-
-    std::fclose(fd);
-    if (rc == EOF)
-    {
-        auto str = std::strerror(errno);
-        std::cout << Error::FileWriteError << str << '\n';
-        qCritical() << Error::FileWriteError << str;
-        return false;
-    }
-    return true;
-}
-
-uint8_t GpioBroker::gpioStatus(uint8_t gpio, bool *ok)
-{
-    if (ok)
-        *ok = false;
-    if (!gpioExport(gpio))
-        return 0;
-
-    std::string dir_path = prefix + std::to_string(gpio) + "/direction";
-
-    if (!gpioOpen(Mode::in, dir_path))
-        return 0;
-
-    std::string val_path = prefix + std::to_string(gpio) + "/value";
-    if (std::ifstream is { val_path, std::ios::binary })
-    {
-        char status = 0;
-        is.get(status);
-        //   qDebug() << status;
-        is.close();
-        if (!detail::isdigit(status))
-            return 0;
-        auto unsignedStatus = static_cast<unsigned char>(status);
-        if (ok)
-            *ok = true;
-        return +(unsignedStatus - '0');
-    }
-    return 0;
-}
-
-bool GpioBroker::setGpioValue(uint8_t gpio, uint8_t value)
-{
-
-    if (!gpioExport(gpio))
-        return false;
-
-    std::string dir_path = prefix + std::to_string(gpio) + "/direction";
-
-    if (!gpioOpen(Mode::out, dir_path))
-        return false;
-    std::string val_path = prefix + std::to_string(gpio) + "/value";
-    if (std::ofstream os { val_path })
-    {
-        os.put(value);
-        os.close();
-        return true;
-    }
-    return false;
 }

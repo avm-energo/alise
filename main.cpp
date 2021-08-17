@@ -4,12 +4,12 @@
 #include "../gen/stdfunc.h"
 #include "controller.h"
 
-#ifdef AVTUK_NO_STM
-#include "gpiohelper.h"
-#endif
-
 #include <QCoreApplication>
 #include <config.h>
+
+#ifdef AVTUK_NO_STM
+void listPins();
+#endif
 
 int main(int argc, char *argv[])
 {
@@ -23,8 +23,8 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription("Avtuk LInux SErver");
 #ifdef AVTUK_NO_STM
     QCommandLineOption showGpio("g", "List all gpios");
-#endif
     parser.addOption(showGpio);
+#endif
     parser.addHelpOption();
     parser.addVersionOption();
     if (QCoreApplication::arguments().size() > 1)
@@ -34,10 +34,7 @@ int main(int argc, char *argv[])
         bool showPins = parser.isSet(showGpio);
         if (showPins)
         {
-            gpio_list("/dev/gpiochip0");
-            gpio_list("/dev/gpiochip1");
-            gpio_list("/dev/gpiochip2");
-            gpio_list("/dev/gpiochip3");
+            listPins();
         }
 #endif
         return 0;
@@ -52,3 +49,37 @@ int main(int argc, char *argv[])
     std::cout << "Enter the event loop" << std::endl;
     return a.exec();
 }
+
+#ifdef AVTUK_NO_STM
+void listPins()
+{
+    for (auto &cit : ::gpiod::make_chip_iter())
+    {
+        std::cout << cit.name() << " - " << cit.num_lines() << " lines:" << ::std::endl;
+
+        for (auto &lit : ::gpiod::line_iter(cit))
+        {
+            std::cout << "\tline ";
+            std::cout.width(3);
+            std::cout << lit.offset() << ": ";
+
+            std::cout.width(12);
+            std::cout << (lit.name().empty() ? "unnamed" : lit.name());
+            std::cout << " ";
+
+            std::cout.width(12);
+            std::cout << (lit.consumer().empty() ? "unused" : lit.consumer());
+            std::cout << " ";
+
+            std::cout.width(8);
+            std::cout << (lit.direction() == ::gpiod::line::DIRECTION_INPUT ? "input" : "output");
+            std::cout << " ";
+
+            std::cout.width(10);
+            std::cout << (lit.active_state() == ::gpiod::line::ACTIVE_LOW ? "active-low" : "active-high");
+
+            std::cout << ::std::endl;
+        }
+    }
+}
+#endif

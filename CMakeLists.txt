@@ -14,6 +14,10 @@ if (AVTUK-14)
 elseif  (AVTUK-12)
     set(AVTUK_MODULE_PATH avtuk-12)
     add_compile_definitions(AVTUK_NO_STM)
+    find_library(GPIODCXX_LIBRARY NAMES libgpiodcxx.so)
+    if(NOT GPIODCXX_LIBRARY)
+      message(FATAL_ERROR "gpiod library not found. Install apt install libgpiod-dev")
+    endif()
 endif()
 
 if (NOT ( EXISTS "${CMAKE_CURRENT_BINARY_DIR}/conanbuildinfo.txt" AND ${CACHED_PROJECT_TARGET_NAME} STREQUAL ${PROJECT_TARGET_NAME}))
@@ -59,8 +63,6 @@ if (AVTUK-14)
         stmbroker.h)
 elseif  (AVTUK-12)
     list(APPEND SOURCES
-        gpiohelper.c
-        gpiohelper.h
         gpiobroker.cpp
         gpiobroker.h)
 endif()
@@ -75,6 +77,9 @@ message(STATUS ALISE ${protos_DIR})
 if (AVTUK-14)
     ##WARNING Link interfaces before gen (!)
     target_link_libraries(${PROJECT_NAME} interfaces)
+endif()
+if (AVTUK-12)
+    target_link_libraries(${PROJECT_NAME} ${GPIODCXX_LIBRARY})
 endif()
 target_link_libraries(${PROJECT_NAME}  gen comaversion protos Qt5::Core Qt5::Xml pthread ZeroMQ::libzmq-static cppzmq::cppzmq)
 
@@ -127,6 +132,7 @@ configure_file(${PRERM_IN} ${PRERM_OUT} @ONLY)
 set(CPACK_PACKAGE_FILE_NAME ${PROJECT_NAME}-${PROJECT_VERSION})
 set(CPACK_GENERATOR "DEB")
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER "AVM-Energo") #required
+set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "Avtuk LInux SErver")
 set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
 set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})

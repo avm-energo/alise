@@ -5,20 +5,26 @@
 
 #include <QObject>
 #include <QTimer>
+#include <gpiod.hpp>
 class GpioBroker : public QObject
 {
-    enum Mode
-    {
-        in,
-        out
-    };
-    enum BlinkMode
+    enum class BlinkMode
     {
         small,
         big
     };
+    enum BlinkTimeout
+    {
+        small = 125,
+        big = 500
+    };
 
 public:
+    struct GpioPin
+    {
+        int chip;
+        int offset;
+    };
     GpioBroker(QObject *parent = nullptr);
     void checkPowerUnit();
     void setIndication(alise::Health_Code code);
@@ -28,15 +34,6 @@ public:
     void rebootMyself();
 
 private:
-    AVTUK_CCU::Indication transform(alise::Health_Code code) const;
-    timespec transform(google::protobuf::Timestamp timestamp) const
-    {
-        timespec temp;
-        temp.tv_nsec = timestamp.nanos();
-        temp.tv_sec = timestamp.seconds();
-        return temp;
-    }
-
     bool noBooter = true;
     bool blinkStatus = true;
     int shortBlink = 0;
@@ -49,10 +46,8 @@ private:
     void reset();
     void blinker(int code);
     void criticalBlinking();
-    bool gpioExport(uint8_t gpio);
-    bool gpioOpen(Mode mode, const std::string &path);
-    uint8_t gpioStatus(uint8_t gpio, bool *ok = nullptr);
-    bool setGpioValue(uint8_t gpio, uint8_t value);
+
+    ::gpiod::chip chip0, chip1, chip2, chip3;
 };
 
 #endif // GPIOBROKER_H
