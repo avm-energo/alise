@@ -42,7 +42,7 @@ void gpio_list(const char *dev_name)
     printf("Chip label: %s\n", info.label);
     printf("Number of lines: %d\n", info.lines);
 
-    for (int i = 0; i < info.lines; i++)
+    for (uint32_t i = 0; i < info.lines; i++)
     {
         line_info.line_offset = i;
 
@@ -68,7 +68,7 @@ void gpio_list(const char *dev_name)
     close(fd);
 }
 
-uint8_t gpio_read_detail(const char *dev_name, int offset)
+uint8_t gpio_read_detail(const char *dev_name, uint32_t offset)
 {
     struct gpiohandle_request rq;
     struct gpiohandle_data data;
@@ -116,7 +116,7 @@ uint8_t gpio_read_detail(const char *dev_name, int offset)
     return data.values[0];
 }
 
-void gpio_write_detail(const char *dev_name, int offset, uint8_t value)
+void gpio_write_detail(const char *dev_name, uint32_t offset, uint8_t value)
 
 {
     struct gpiohandle_request rq;
@@ -165,22 +165,20 @@ void gpio_write_detail(const char *dev_name, int offset, uint8_t value)
     close(rq.fd);
 }
 
-uint8_t gpio_read(uint8_t dev_name, int offset)
+uint8_t gpio_read(uint8_t dev_name, uint32_t offset)
 {
-    char buffer[15];
+    char buffer[15] = GPIO_PREFIX;
     char str[2];
-    memcpy(&buffer, gpio_device_prefix, 14);
     sprintf(str, "%d", dev_name);
     buffer[13] = str[0];
     buffer[14] = '\0';
     return gpio_read_detail(buffer, offset);
 }
 
-void gpio_write(uint8_t dev_name, int offset, uint8_t value)
+void gpio_write(uint8_t dev_name, uint32_t offset, uint8_t value)
 {
-    char buffer[15];
+    char buffer[15] = GPIO_PREFIX;
     char str[2];
-    memcpy(&buffer, gpio_device_prefix, 14);
     sprintf(str, "%d", dev_name);
     buffer[13] = str[0];
     buffer[14] = '\0';

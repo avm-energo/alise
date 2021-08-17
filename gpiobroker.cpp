@@ -73,9 +73,7 @@ bool isdigit(char ch)
 
 void GpioBroker::checkPowerUnit()
 {
-
     auto status1 = gpio_read(PowerStatusPin0.chip, PowerStatusPin0.offset);
-
     auto status2 = gpio_read(PowerStatusPin1.chip, PowerStatusPin1.offset);
 
     DataTypes::BlockStruct blk;
@@ -105,7 +103,8 @@ void GpioBroker::setIndication(alise::Health_Code code)
     shortBlink = blinkStatus = 0;
     QObject::disconnect(&m_gpioTimer, &QTimer::timeout, nullptr, nullptr);
 
-    setGpioValue(GpioLedPin, blinkStatus + '0');
+    gpio_write(LedPin.chip, LedPin.offset, blinkStatus /*+ '0'*/);
+    // setGpioValue(GpioLedPin, blinkStatus + '0');
     if (noBooter)
     {
         m_gpioTimer.setInterval(LedTimeout::Small);
@@ -117,8 +116,9 @@ void GpioBroker::setIndication(alise::Health_Code code)
     case alise::Health_Code_Startup:
     {
         m_gpioTimer.setInterval(LedTimeout::Small);
-        QObject::connect(&m_gpioTimer, &QTimer::timeout, this, [&status = blinkStatus, this] {
-            setGpioValue(GpioLedPin, status + '0');
+        QObject::connect(&m_gpioTimer, &QTimer::timeout, this, [&status = blinkStatus] {
+            gpio_write(LedPin.chip, LedPin.offset, status /*+ '0'*/);
+            //     setGpioValue(GpioLedPin, status + '0');
             status = !status;
         });
         break;
@@ -126,8 +126,9 @@ void GpioBroker::setIndication(alise::Health_Code code)
     case alise::Health_Code_Work:
     {
         m_gpioTimer.setInterval(LedTimeout::Big);
-        QObject::connect(&m_gpioTimer, &QTimer::timeout, this, [&status = blinkStatus, this] {
-            setGpioValue(GpioLedPin, status + '0');
+        QObject::connect(&m_gpioTimer, &QTimer::timeout, this, [&status = blinkStatus] {
+            gpio_write(LedPin.chip, LedPin.offset, status /*+ '0'*/);
+            // setGpioValue(GpioLedPin, status + '0');
             status = !status;
         });
         break;
@@ -147,15 +148,17 @@ void GpioBroker::rebootMyself()
     m_timer.stop();
     m_gpioTimer.stop();
     m_resetTimer.stop();
-    setGpioValue(GpioLedPin, false + '0');
+    gpio_write(LedPin.chip, LedPin.offset, false /*+ '0'*/);
+    // setGpioValue(GpioLedPin, false + '0');
     sync();
     reboot(RB_AUTOBOOT);
 }
 
 void GpioBroker::reset()
 {
-    bool status = false;
-    bool value = !gpioStatus(GpioResetPin, &status);
+    // bool status = false;
+    bool value = !gpio_read(ResetPin.chip, ResetPin.offset);
+    // bool value = !gpioStatus(GpioResetPin, &status);
 
     if (value)
     {
@@ -174,9 +177,11 @@ void GpioBroker::reset()
     if (resetCounter > 40)
     {
         resetCounter = 0;
-        bool status = false;
-        auto status1 = gpioStatus(GpioPowerStatus::Pin1, &status);
-        auto status2 = gpioStatus(GpioPowerStatus::Pin2, &status);
+        // bool status = false;
+        auto status1 = gpio_read(PowerStatusPin0.chip, PowerStatusPin0.offset);
+        auto status2 = gpio_read(PowerStatusPin1.chip, PowerStatusPin1.offset);
+        // auto status1 = gpioStatus(GpioPowerStatus::Pin1, &status);
+        // auto status2 = gpioStatus(GpioPowerStatus::Pin2, &status);
         DataTypes::BlockStruct blk;
         blk.data.resize(sizeof(AVTUK_CCU::Main));
         AVTUK_CCU::Main str;
@@ -225,14 +230,15 @@ void GpioBroker::blinker(int code)
     }
     }
     ++shortBlink;
-    setGpioValue(GpioLedPin, blinkStatus + '0');
+    gpio_write(LedPin.chip, LedPin.offset, blinkStatus /*+ '0'*/);
+    //   setGpioValue(GpioLedPin, blinkStatus + '0');
     blinkStatus = !blinkStatus;
 }
 
 void GpioBroker::criticalBlinking()
 {
-
-    setGpioValue(GpioLedPin, blinkStatus + '0');
+    gpio_write(LedPin.chip, LedPin.offset, blinkStatus /*+ '0'*/);
+    //  setGpioValue(GpioLedPin, blinkStatus + '0');
     blinkStatus = !blinkStatus;
 }
 
