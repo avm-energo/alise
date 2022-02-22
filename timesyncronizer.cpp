@@ -13,6 +13,9 @@
 #include <sys/socket.h>
 #include <sys/time.h>
 #include <sys/timex.h>
+
+#include <QProcess>
+
 #define NTP_PORT 123
 
 /* This program uses an NTP mode 6 control message, which is the
@@ -72,7 +75,13 @@ timespec TimeSyncronizer::systemTime() const
 
 void TimeSyncronizer::setSystemTime(const timespec &systemTime)
 {
-    clock_settime(CLOCK_REALTIME, &systemTime);
+    QString program = "/usr/sbin/hwclock";
+    QStringList arguments { "-w" };
+
+    clock_settime(CLOCK_REALTIME, &systemTime); // set current datetime
+    QProcess *myProcess = new QProcess(this); // set datetime to RTC
+    myProcess->start(program, arguments);
+    myProcess->waitForFinished();
 }
 
 int ntpdStatus()
