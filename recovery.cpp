@@ -98,6 +98,7 @@ void Recovery::sync()
 
 void Recovery::restartNetwork()
 {
+    qInfo() << "Restarting network";
     QString program = "/etc/init.d/networking";
     QStringList arguments { "restart" };
     QProcess *myProcess = new QProcess(this);
