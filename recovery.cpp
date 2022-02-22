@@ -42,7 +42,7 @@ void Recovery::eth1()
 {
     if (!QFile::exists(":/network/eth1"))
     {
-        qCritical() << "No eth0 recovery";
+        qCritical() << "No eth1 recovery";
         return;
     }
     if (QFile::exists(eth1path))
@@ -67,7 +67,7 @@ void Recovery::eth2()
 {
     if (!QFile::exists(":/network/eth2"))
     {
-        qCritical() << "No eth0 recovery";
+        qCritical() << "No eth2 recovery";
         return;
     }
     if (QFile::exists(eth2path))
