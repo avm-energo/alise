@@ -1,0 +1,937 @@
+Running /opt/Qt/Tools/CMake/bin/cmake -S /home/anton/Desktop/coma/src -B /home/anton/Desktop/coma/build-src-Desktop_Qt_5_15_2_GCC_64bit-Debug -GNinja -DCMAKE_BUILD_TYPE:STRING=Debug -DCMAKE_PROJECT_INCLUDE_BEFORE:PATH=/opt/Qt/Tools/QtCreator/share/qtcreator/package-manager/auto-setup.cmake -DQT_QMAKE_EXECUTABLE:STRING=/opt/Qt/5.15.2/gcc_64/bin/qmake -DCMAKE_PREFIX_PATH:STRING=/opt/Qt/5.15.2/gcc_64 -DCMAKE_C_COMPILER:STRING=/usr/bin/gcc -DCMAKE_CXX_COMPILER:STRING=/usr/bin/g++ in /home/anton/Desktop/coma/build-src-Desktop_Qt_5_15_2_GCC_64bit-Debug.
+-- The C compiler identification is GNU 10.2.1
+-- The CXX compiler identification is GNU 10.2.1
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/gcc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/g++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- MSVC_C_ARCHITECTURE_ID: 
+-- Target architecture - x86_64
+-- Linux
+-- Cached target arch: 
+-- Current target arch: linux64
+-- Sysroot: 
+-- Current user directory for conan: /home/anton
+Configuration:
+[settings]
+arch=x86_64
+arch_build=x86_64
+build_type=Release
+compiler=gcc
+compiler.libcxx=libstdc++
+compiler.version=11
+os=Linux
+os_build=Linux
+[options]
+[build_requires]
+[env]
+
+libtool/2.4.6: Not found in local cache, looking in remotes...
+libtool/2.4.6: Trying with 'conancenter'...
+Downloading conanmanifest.txt
+Downloading conanfile.py
+Downloading conan_export.tgz
+libtool/2.4.6: Downloaded recipe revision 0
+automake/1.16.4: Not found in local cache, looking in remotes...
+automake/1.16.4: Trying with 'conancenter'...
+Downloading conanmanifest.txt
+Downloading conanfile.py
+Downloading conan_export.tgz
+automake/1.16.4: Downloaded recipe revision 0
+autoconf/2.71: Not found in local cache, looking in remotes...
+autoconf/2.71: Trying with 'conancenter'...
+Downloading conanmanifest.txt
+Downloading conanfile.py
+Downloading conan_export.tgz
+autoconf/2.71: Downloaded recipe revision 0
+m4/1.4.19: Not found in local cache, looking in remotes...
+m4/1.4.19: Trying with 'conancenter'...
+Downloading conanmanifest.txt
+Downloading conanfile.py
+Downloading conan_export.tgz
+m4/1.4.19: Downloaded recipe revision 0
+gnu-config/cci.20201022: Not found in local cache, looking in remotes...
+gnu-config/cci.20201022: Trying with 'conancenter'...
+Downloading conanmanifest.txt
+Downloading conanfile.py
+Downloading conan_export.tgz
+gnu-config/cci.20201022: Downloaded recipe revision 0
+conanfile.txt: Installing package
+Requirements
+    boost/1.75.0 from 'conancenter' - Cache
+    hidapi/0.10.1 from 'conancenter' - Cache
+    libusb/1.0.24 from 'conancenter' - Cache
+Packages
+    boost/1.75.0:524ea35a8120baabdde02483add58d81bf541327 - Cache
+    hidapi/0.10.1:b6b5c360dff5dfdf35f8012c07f249f45188c917 - Build
+    libusb/1.0.24:3d63915f7708d2f1299f0a16ae549023ed4f8d96 - Download
+Build requirements
+    autoconf/2.71 from 'conancenter' - Downloaded
+    automake/1.16.4 from 'conancenter' - Downloaded
+    gnu-config/cci.20201022 from 'conancenter' - Downloaded
+    libtool/2.4.6 from 'conancenter' - Downloaded
+    m4/1.4.19 from 'conancenter' - Downloaded
+Build requirements packages
+    autoconf/2.71:5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9 - Download
+    automake/1.16.4:258f6f05ca54813b3d7180161753df7f9ccf7e1d - Download
+    gnu-config/cci.20201022:5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9 - Download
+    libtool/2.4.6:00ffeae55ec276f0fef26ad0ed5cd0191ca724ce - Build
+    m4/1.4.19:24647d9fe8ec489125dfbae4b3ebefaf7581674c - Download
+
+Installing (downloading, building) binaries...
+gnu-config/cci.20201022: Retrieving package 5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9 from remote 'conancenter' 
+Downloading conanmanifest.txt
+Downloading conaninfo.txt
+Downloading conan_package.tgz
+gnu-config/cci.20201022: Package installed 5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9
+gnu-config/cci.20201022: Downloaded package revision 0
+libusb/1.0.24: Retrieving package 3d63915f7708d2f1299f0a16ae549023ed4f8d96 from remote 'conancenter' 
+Downloading conanmanifest.txt
+Downloading conaninfo.txt
+Downloading conan_package.tgz
+libusb/1.0.24: Package installed 3d63915f7708d2f1299f0a16ae549023ed4f8d96
+libusb/1.0.24: Downloaded package revision 0
+m4/1.4.19: Retrieving package 24647d9fe8ec489125dfbae4b3ebefaf7581674c from remote 'conancenter' 
+Downloading conanmanifest.txt
+Downloading conaninfo.txt
+Downloading conan_package.tgz
+m4/1.4.19: Package installed 24647d9fe8ec489125dfbae4b3ebefaf7581674c
+m4/1.4.19: Downloaded package revision 0
+autoconf/2.71: Retrieving package 5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9 from remote 'conancenter' 
+Downloading conanmanifest.txt
+Downloading conaninfo.txt
+Downloading conan_package.tgz
+autoconf/2.71: Package installed 5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9
+autoconf/2.71: Downloaded package revision 0
+automake/1.16.4: Retrieving package 258f6f05ca54813b3d7180161753df7f9ccf7e1d from remote 'conancenter' 
+Downloading conanmanifest.txt
+Downloading conaninfo.txt
+Downloading conan_package.tgz
+automake/1.16.4: Package installed 258f6f05ca54813b3d7180161753df7f9ccf7e1d
+automake/1.16.4: Downloaded package revision 0
+boost/1.75.0: Already installed!
+gnu-config/cci.20201022: Appending PATH environment variable: /home/anton/.conan/data/gnu-config/cci.20201022/_/_/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/bin
+Package already installed: libudev-dev
+m4/1.4.19: Appending PATH environment variable: /home/anton/.conan/data/m4/1.4.19/_/_/package/24647d9fe8ec489125dfbae4b3ebefaf7581674c/bin
+m4/1.4.19: Setting M4 environment variable: /home/anton/.conan/data/m4/1.4.19/_/_/package/24647d9fe8ec489125dfbae4b3ebefaf7581674c/bin/m4
+autoconf/2.71: Appending PATH env var with : /home/anton/.conan/data/autoconf/2.71/_/_/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/bin
+autoconf/2.71: Setting AC_MACRODIR to /home/anton/.conan/data/autoconf/2.71/_/_/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/bin/share/autoconf
+autoconf/2.71: Setting AUTOCONF to /home/anton/.conan/data/autoconf/2.71/_/_/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/bin/autoconf
+autoconf/2.71: Setting AUTORECONF to /home/anton/.conan/data/autoconf/2.71/_/_/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/bin/autoreconf
+autoconf/2.71: Setting AUTOHEADER to /home/anton/.conan/data/autoconf/2.71/_/_/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/bin/autoheader
+autoconf/2.71: Setting AUTOM4TE to /home/anton/.conan/data/autoconf/2.71/_/_/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/bin/autom4te
+autoconf/2.71: Setting AUTOM4TE_PERLLIBDIR to /home/anton/.conan/data/autoconf/2.71/_/_/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/bin/share/autoconf
+automake/1.16.4: Appending PATH environment variable:: /home/anton/.conan/data/automake/1.16.4/_/_/package/258f6f05ca54813b3d7180161753df7f9ccf7e1d/bin
+automake/1.16.4: Appending ACLOCAL environment variable with: /home/anton/.conan/data/automake/1.16.4/_/_/package/258f6f05ca54813b3d7180161753df7f9ccf7e1d/bin/aclocal
+automake/1.16.4: Setting AUTOMAKE_DATADIR to /home/anton/.conan/data/automake/1.16.4/_/_/package/258f6f05ca54813b3d7180161753df7f9ccf7e1d/res
+automake/1.16.4: Setting AUTOMAKE_LIBDIR to /home/anton/.conan/data/automake/1.16.4/_/_/package/258f6f05ca54813b3d7180161753df7f9ccf7e1d/res/automake-1.16
+automake/1.16.4: Setting AUTOMAKE_PERLLIBDIR to /home/anton/.conan/data/automake/1.16.4/_/_/package/258f6f05ca54813b3d7180161753df7f9ccf7e1d/res/automake-1.16
+automake/1.16.4: Setting AUTOMAKE to /home/anton/.conan/data/automake/1.16.4/_/_/package/258f6f05ca54813b3d7180161753df7f9ccf7e1d/bin/automake
+automake/1.16.4: Append M4 include directories to AUTOMAKE_CONAN_INCLUDES environment variable
+libtool/2.4.6: Applying build-requirement: gnu-config/cci.20201022
+Downloading conan_sources.tgz
+libtool/2.4.6: Configuring sources in /home/anton/.conan/data/libtool/2.4.6/_/_/source
+
+libtool/2.4.6: Copying sources to build folder
+libtool/2.4.6: Building your package in /home/anton/.conan/data/libtool/2.4.6/_/_/build/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce
+libtool/2.4.6: Generator txt created conanbuildinfo.txt
+libtool/2.4.6: Aggregating env generators
+libtool/2.4.6: Calling build()
+libtool/2.4.6: Calling:
+ > source_subfolder/configure '--datarootdir=/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res' '--prefix=/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce' '--enable-shared' '--enable-static' '--enable-ltdl-install' '--bindir=${prefix}/bin' '--sbindir=${prefix}/bin' '--libexecdir=${prefix}/bin' '--libdir=${prefix}/lib' '--includedir=${prefix}/include' '--oldincludedir=${prefix}/include' 
+## ------------------------- ##
+## Configuring libtool 2.4.6 ##
+## ------------------------- ##
+
+checking for GNU M4 that supports accurate traces... /home/anton/.conan/data/m4/1.4.19/_/_/package/24647d9fe8ec489125dfbae4b3ebefaf7581674c/bin/m4
+checking whether /home/anton/.conan/data/m4/1.4.19/_/_/package/24647d9fe8ec489125dfbae4b3ebefaf7581674c/bin/m4 accepts --gnu... yes
+checking how m4 supports trace files... --debugfile
+checking for a BSD-compatible install... /usr/bin/install -c
+checking whether build environment is sane... yes
+checking for a thread-safe mkdir -p... /usr/bin/mkdir -p
+checking for gawk... no
+checking for mawk... mawk
+checking whether make sets $(MAKE)... yes
+checking whether make supports nested variables... yes
+checking whether make supports nested variables... (cached) yes
+checking build system type... x86_64-pc-linux-gnu
+checking host system type... x86_64-pc-linux-gnu
+configure: autobuild project... GNU Libtool
+configure: autobuild revision... 2.4.6
+configure: autobuild hostname... dv7
+configure: autobuild mode... default
+configure: autobuild timestamp... 20220218T144837Z
+checking for gcc... /usr/bin/gcc
+checking whether the C compiler works... yes
+checking for C compiler default output file name... a.out
+checking for suffix of executables... 
+checking whether we are cross compiling... no
+checking for suffix of object files... o
+checking whether we are using the GNU C compiler... yes
+checking whether /usr/bin/gcc accepts -g... yes
+checking for /usr/bin/gcc option to accept ISO C89... none needed
+checking whether /usr/bin/gcc understands -c and -o together... yes
+checking for style of include used by make... GNU
+checking dependency style of /usr/bin/gcc... gcc3
+checking how to run the C preprocessor... /usr/bin/gcc -E
+checking for grep that handles long lines and -e... /usr/bin/grep
+checking for egrep... /usr/bin/grep -E
+checking for Minix Amsterdam compiler... no
+checking for ar... ar
+checking for ranlib... ranlib
+checking how to run the C preprocessor... /usr/bin/gcc -E
+checking how to print strings... printf
+checking for a sed that does not truncate output... /usr/bin/sed
+checking for fgrep... /usr/bin/grep -F
+checking for ld used by /usr/bin/gcc... /usr/bin/ld
+checking if the linker (/usr/bin/ld) is GNU ld... yes
+checking for BSD- or MS-compatible name lister (nm)... /usr/bin/nm -B
+checking the name lister (/usr/bin/nm -B) interface... BSD nm
+checking whether ln -s works... yes
+checking the maximum length of command line arguments... 1572864
+checking how to convert x86_64-pc-linux-gnu file names to x86_64-pc-linux-gnu format... func_convert_file_noop
+checking how to convert x86_64-pc-linux-gnu file names to toolchain format... func_convert_file_noop
+checking for /usr/bin/ld option to reload object files... -r
+checking for objdump... objdump
+checking how to recognize dependent libraries... pass_all
+checking for dlltool... no
+checking how to associate runtime and link libraries... printf %s\n
+checking for archiver @FILE support... @
+checking for strip... strip
+checking for ranlib... (cached) ranlib
+checking command to parse /usr/bin/nm -B output from /usr/bin/gcc object... ok
+checking for sysroot... no
+checking for a working dd... /usr/bin/dd
+checking how to truncate binary pipes... /usr/bin/dd bs=4096 count=1
+checking for mt... mt
+checking if mt is a manifest tool... no
+checking for ANSI C header files... yes
+checking for sys/types.h... yes
+checking for sys/stat.h... yes
+checking for stdlib.h... yes
+checking for string.h... yes
+checking for memory.h... yes
+checking for strings.h... yes
+checking for inttypes.h... yes
+checking for stdint.h... yes
+checking for unistd.h... yes
+checking for dlfcn.h... yes
+checking for objdir... .libs
+checking if /usr/bin/gcc supports -fno-rtti -fno-exceptions... no
+checking for /usr/bin/gcc option to produce PIC... -fPIC -DPIC
+checking if /usr/bin/gcc PIC flag -fPIC -DPIC works... yes
+checking if /usr/bin/gcc static flag -static works... yes
+checking if /usr/bin/gcc supports -c -o file.o... yes
+checking if /usr/bin/gcc supports -c -o file.o... (cached) yes
+checking whether the /usr/bin/gcc linker (/usr/bin/ld -m elf_x86_64) supports shared libraries... yes
+checking whether -lc should be explicitly linked in... no
+checking dynamic linker characteristics... GNU/Linux ld.so
+checking how to hardcode library paths into programs... immediate
+checking for shl_load... no
+checking for shl_load in -ldld... no
+checking for dlopen... no
+checking for dlopen in -ldl... yes
+checking whether a program can dlopen itself... yes
+checking whether a statically linked program can dlopen itself... no
+checking whether stripping libraries is possible... yes
+checking if libtool supports shared libraries... yes
+checking whether to build shared libraries... yes
+checking whether to build static libraries... yes
+checking what extension is used for runtime loadable modules... .so
+checking what variable specifies run-time module search path... LD_LIBRARY_PATH
+checking for the default library search path... /lib /usr/lib /usr/lib/x86_64-linux-gnu/libfakeroot /usr/local/lib /usr/local/lib/x86_64-linux-gnu /lib/x86_64-linux-gnu /usr/lib/x86_64-linux-gnu /lib32 /usr/lib32 
+checking for library containing dlopen... -ldl
+checking for dlerror... yes
+checking for shl_load... (cached) no
+checking for shl_load in -ldld... (cached) no
+checking for dld_link in -ldld... no
+checking for _ prefix in compiled symbols... no
+checking whether deplibs are loaded by dlopen... yes
+checking for argz.h... yes
+checking for error_t... yes
+checking for argz_add... yes
+checking for argz_append... yes
+checking for argz_count... yes
+checking for argz_create_sep... yes
+checking for argz_insert... yes
+checking for argz_next... yes
+checking for argz_stringify... yes
+checking if argz actually works... yes
+checking whether libtool supports -dlopen/-dlpreopen... yes
+checking for unistd.h... (cached) yes
+checking for dl.h... no
+checking for sys/dl.h... no
+checking for dld.h... no
+checking for mach-o/dyld.h... no
+checking for dirent.h... yes
+checking for closedir... yes
+checking for opendir... yes
+checking for readdir... yes
+checking for strlcat... no
+checking for strlcpy... no
+checking whether we are using the GNU C++ compiler... yes
+checking whether /usr/bin/g++ accepts -g... yes
+checking dependency style of /usr/bin/g++... gcc3
+checking how to run the C++ preprocessor... /usr/bin/g++ -E
+checking for ld used by /usr/bin/g++... /usr/bin/ld -m elf_x86_64
+checking if the linker (/usr/bin/ld -m elf_x86_64) is GNU ld... yes
+checking whether the /usr/bin/g++ linker (/usr/bin/ld -m elf_x86_64) supports shared libraries... yes
+checking for /usr/bin/g++ option to produce PIC... -fPIC -DPIC
+checking if /usr/bin/g++ PIC flag -fPIC -DPIC works... yes
+checking if /usr/bin/g++ static flag -static works... yes
+checking if /usr/bin/g++ supports -c -o file.o... yes
+checking if /usr/bin/g++ supports -c -o file.o... (cached) yes
+checking whether the /usr/bin/g++ linker (/usr/bin/ld -m elf_x86_64) supports shared libraries... yes
+checking dynamic linker characteristics... (cached) GNU/Linux ld.so
+checking how to hardcode library paths into programs... immediate
+checking for g77... no
+checking for xlf... no
+checking for f77... no
+checking for frt... no
+checking for pgf77... no
+checking for cf77... no
+checking for fort77... no
+checking for fl32... no
+checking for af77... no
+checking for xlf90... no
+checking for f90... no
+checking for pgf90... no
+checking for pghpf... no
+checking for epcf90... no
+checking for gfortran... no
+checking for g95... no
+checking for xlf95... no
+checking for f95... no
+checking for fort... no
+checking for ifort... no
+checking for ifc... no
+checking for efc... no
+checking for pgfortran... no
+checking for pgf95... no
+checking for lf95... no
+checking for ftn... no
+checking for nagfor... no
+checking whether we are using the GNU Fortran 77 compiler... no
+checking whether  accepts -g... no
+checking for gfortran... no
+checking for g95... no
+checking for xlf95... no
+checking for f95... no
+checking for fort... no
+checking for ifort... no
+checking for ifc... no
+checking for efc... no
+checking for pgfortran... no
+checking for pgf95... no
+checking for lf95... no
+checking for ftn... no
+checking for nagfor... no
+checking for xlf90... no
+checking for f90... no
+checking for pgf90... no
+checking for pghpf... no
+checking for epcf90... no
+checking for g77... no
+checking for xlf... no
+checking for f77... no
+checking for frt... no
+checking for pgf77... no
+checking for cf77... no
+checking for fort77... no
+checking for fl32... no
+checking for af77... no
+checking whether we are using the GNU Fortran compiler... no
+checking whether  accepts -g... no
+checking for gccgo... no
+checking for gcj... no
+checking for windres... no
+checking that generated files are newer than configure... done
+configure: creating ./config.status
+config.status: creating Makefile
+config.status: creating config.h
+config.status: linking source_subfolder/GNUmakefile to GNUmakefile
+config.status: executing tests/atconfig commands
+config.status: executing depfiles commands
+config.status: executing libtool commands
+  GEN      libtoolize
+make  all-recursive
+make[1]: Entering directory '/home/anton/.conan/data/libtool/2.4.6/_/_/build/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce'
+Making all in .
+make[2]: Entering directory '/home/anton/.conan/data/libtool/2.4.6/_/_/build/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce'
+  CC       libltdl/loaders/dlopen.lo
+  CC       libltdl/lt__strl.lo
+  CC       libltdl/loaders/libltdl_libltdl_la-preopen.lo
+  CC       libltdl/libltdl_libltdl_la-lt__alloc.lo
+  CC       libltdl/libltdl_libltdl_la-lt_dlloader.lo
+  CC       libltdl/libltdl_libltdl_la-lt_error.lo
+  CC       libltdl/libltdl_libltdl_la-ltdl.lo
+  CC       libltdl/libltdl_libltdl_la-slist.lo
+  CCLD     libltdl/dlopen.la
+ar: `u' modifier ignored since `D' is the default (see `U')
+  CCLD     libltdl/libltdl.la
+ar: `u' modifier ignored since `D' is the default (see `U')
+make[2]: Leaving directory '/home/anton/.conan/data/libtool/2.4.6/_/_/build/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce'
+make[1]: Leaving directory '/home/anton/.conan/data/libtool/2.4.6/_/_/build/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce'
+libtool/2.4.6: Package '00ffeae55ec276f0fef26ad0ed5cd0191ca724ce' built
+libtool/2.4.6: Build folder /home/anton/.conan/data/libtool/2.4.6/_/_/build/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce
+libtool/2.4.6: Generated conaninfo.txt
+libtool/2.4.6: Generated conanbuildinfo.txt
+libtool/2.4.6: Generating the package
+libtool/2.4.6: Package folder /home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce
+libtool/2.4.6: Calling package()
+make  install-recursive
+make[1]: Entering directory '/home/anton/.conan/data/libtool/2.4.6/_/_/build/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce'
+Making install in .
+make[2]: Entering directory '/home/anton/.conan/data/libtool/2.4.6/_/_/build/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce'
+make[3]: Entering directory '/home/anton/.conan/data/libtool/2.4.6/_/_/build/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce'
+ /usr/bin/mkdir -p '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/bin'
+ /usr/bin/install -c libtool '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/bin'
+ GREP='/usr/bin/grep' SED='/usr/bin/sed' 'source_subfolder/build-aux/inline-source' libtoolize > '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/bin/libtoolize'
+ /usr/bin/mkdir -p '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/include'
+ /usr/bin/install -c -m 644 source_subfolder/libltdl/ltdl.h '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/include'
+ /usr/bin/mkdir -p '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/info'
+ /usr/bin/install -c -m 644 source_subfolder/doc/libtool.info source_subfolder/doc/libtool.info-1 source_subfolder/doc/libtool.info-2 '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/info'
+ /usr/bin/mkdir -p '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/include/libltdl'
+ /usr/bin/install -c -m 644 source_subfolder/libltdl/libltdl/lt_system.h source_subfolder/libltdl/libltdl/lt_error.h source_subfolder/libltdl/libltdl/lt_dlloader.h '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/include/libltdl'
+ /usr/bin/mkdir -p '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/man/man1'
+ /usr/bin/install -c -m 644 source_subfolder/doc/libtool.1 source_subfolder/doc/libtoolize.1 '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/man/man1'
+ /usr/bin/mkdir -p '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/lib'
+ /bin/bash ./libtool   --mode=install /usr/bin/install -c   libltdl/libltdl.la '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/lib'
+libtool: install: /usr/bin/install -c libltdl/.libs/libltdl.so.7.3.1 /home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/lib/libltdl.so.7.3.1
+libtool: install: (cd /home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/lib && { ln -s -f libltdl.so.7.3.1 libltdl.so.7 || { rm -f libltdl.so.7 && ln -s libltdl.so.7.3.1 libltdl.so.7; }; })
+libtool: install: (cd /home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/lib && { ln -s -f libltdl.so.7.3.1 libltdl.so || { rm -f libltdl.so && ln -s libltdl.so.7.3.1 libltdl.so; }; })
+libtool: install: /usr/bin/install -c libltdl/.libs/libltdl.lai /home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/lib/libltdl.la
+ install-info --info-dir='/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/info' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/info/libtool.info'
+libtool: install: /usr/bin/install -c libltdl/.libs/libltdl.a /home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/lib/libltdl.a
+rm -rf '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/libtool'/*
+libtool: install: chmod 644 /home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/lib/libltdl.a
+libtool: install: ranlib /home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/lib/libltdl.a
+ /usr/bin/install -c -m 644 'source_subfolder/m4/libtool.m4' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/aclocal/libtool.m4'
+ /usr/bin/install -c -m 644 'source_subfolder/m4/ltargz.m4' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/aclocal/ltargz.m4'
+ /usr/bin/install -c -m 644 'source_subfolder/m4/ltdl.m4' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/aclocal/ltdl.m4'
+ /usr/bin/install -c -m 644 'source_subfolder/m4/ltoptions.m4' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/aclocal/ltoptions.m4'
+ /usr/bin/install -c -m 644 'source_subfolder/m4/ltsugar.m4' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/aclocal/ltsugar.m4'
+ /usr/bin/install -c -m 644 'source_subfolder/m4/ltversion.m4' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/aclocal/ltversion.m4'
+ /usr/bin/install -c -m 644 'source_subfolder/m4/lt~obsolete.m4' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/aclocal/lt~obsolete.m4'
+ /usr/bin/install -c 'source_subfolder/build-aux/compile' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/libtool/build-aux/compile'
+ /usr/bin/install -c 'source_subfolder/build-aux/config.guess' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/libtool/build-aux/config.guess'
+libtool: finish: PATH="/home/anton/.conan/data/gnu-config/cci.20201022/_/_/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/bin:/home/anton/.conan/data/automake/1.16.4/_/_/package/258f6f05ca54813b3d7180161753df7f9ccf7e1d/bin:/home/anton/.conan/data/autoconf/2.71/_/_/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/bin:/home/anton/.conan/data/m4/1.4.19/_/_/package/24647d9fe8ec489125dfbae4b3ebefaf7581674c/bin:/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games:/opt/Qt/Tools/Ninja:/sbin" ldconfig -n /home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/lib
+ /usr/bin/install -c 'source_subfolder/build-aux/config.sub' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/libtool/build-aux/config.sub'
+ /usr/bin/install -c 'source_subfolder/build-aux/depcomp' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/libtool/build-aux/depcomp'
+ /usr/bin/install -c 'source_subfolder/build-aux/install-sh' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/libtool/build-aux/install-sh'
+ /usr/bin/install -c 'source_subfolder/build-aux/missing' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/libtool/build-aux/missing'
+ /usr/bin/install -c -m 644 'source_subfolder/build-aux/ltmain.sh' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/libtool/build-aux/ltmain.sh'
+ /usr/bin/install -c -m 644 'source_subfolder/libltdl/COPYING.LIB' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/libtool/COPYING.LIB'
+ /usr/bin/install -c -m 644 'source_subfolder/libltdl/Makefile.am' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/libtool/Makefile.am'
+ /usr/bin/install -c -m 644 'source_subfolder/libltdl/README' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/libtool/README'
+ /usr/bin/install -c -m 644 'source_subfolder/libltdl/configure.ac' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/libtool/configure.ac'
+ /usr/bin/install -c -m 644 'source_subfolder/libltdl/aclocal.m4' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/libtool/aclocal.m4'
+ /usr/bin/install -c -m 644 'source_subfolder/libltdl/Makefile.in' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/libtool/Makefile.in'
+ /usr/bin/install -c -m 644 'source_subfolder/libltdl/config-h.in' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/libtool/config-h.in'
+----------------------------------------------------------------------
+Libraries have been installed in:
+   /home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/lib
+
+If you ever happen to want to link against installed libraries
+in a given directory, LIBDIR, you must either use libtool, and
+specify the full pathname of the library, or use the '-LLIBDIR'
+flag during linking and do at least one of the following:
+   - add LIBDIR to the 'LD_LIBRARY_PATH' environment variable
+     during execution
+   - add LIBDIR to the 'LD_RUN_PATH' environment variable
+     during linking
+   - use the '-Wl,-rpath -Wl,LIBDIR' linker flag
+   - have your system administrator add LIBDIR to '/etc/ld.so.conf'
+
+See any operating system documentation about shared libraries for
+more information, such as the ld(1) and ld.so(8) manual pages.
+----------------------------------------------------------------------
+ /usr/bin/install -c -m 644 'source_subfolder/libltdl/configure' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/libtool/configure'
+ /usr/bin/install -c -m 644 'source_subfolder/libltdl/libltdl/lt__alloc.h' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/libtool/libltdl/lt__alloc.h'
+ /usr/bin/install -c -m 644 'source_subfolder/libltdl/libltdl/lt__argz_.h' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/libtool/libltdl/lt__argz_.h'
+ /usr/bin/install -c -m 644 'source_subfolder/libltdl/libltdl/lt__dirent.h' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/libtool/libltdl/lt__dirent.h'
+ /usr/bin/install -c -m 644 'source_subfolder/libltdl/libltdl/lt__glibc.h' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/libtool/libltdl/lt__glibc.h'
+ /usr/bin/install -c -m 644 'source_subfolder/libltdl/libltdl/lt__private.h' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/libtool/libltdl/lt__private.h'
+ /usr/bin/install -c -m 644 'source_subfolder/libltdl/libltdl/lt__strl.h' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/libtool/libltdl/lt__strl.h'
+ /usr/bin/install -c -m 644 'source_subfolder/libltdl/libltdl/lt_dlloader.h' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/libtool/libltdl/lt_dlloader.h'
+ /usr/bin/install -c -m 644 'source_subfolder/libltdl/libltdl/lt_error.h' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/libtool/libltdl/lt_error.h'
+ /usr/bin/install -c -m 644 'source_subfolder/libltdl/libltdl/lt_system.h' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/libtool/libltdl/lt_system.h'
+ /usr/bin/install -c -m 644 'source_subfolder/libltdl/libltdl/slist.h' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/libtool/libltdl/slist.h'
+ /usr/bin/install -c -m 644 'source_subfolder/libltdl/loaders/dld_link.c' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/libtool/loaders/dld_link.c'
+ /usr/bin/install -c -m 644 'source_subfolder/libltdl/loaders/dlopen.c' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/libtool/loaders/dlopen.c'
+ /usr/bin/install -c -m 644 'source_subfolder/libltdl/loaders/dyld.c' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/libtool/loaders/dyld.c'
+ /usr/bin/install -c -m 644 'source_subfolder/libltdl/loaders/load_add_on.c' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/libtool/loaders/load_add_on.c'
+ /usr/bin/install -c -m 644 'source_subfolder/libltdl/loaders/loadlibrary.c' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/libtool/loaders/loadlibrary.c'
+ /usr/bin/install -c -m 644 'source_subfolder/libltdl/loaders/preopen.c' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/libtool/loaders/preopen.c'
+ /usr/bin/install -c -m 644 'source_subfolder/libltdl/loaders/shl_load.c' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/libtool/loaders/shl_load.c'
+ /usr/bin/install -c -m 644 'source_subfolder/libltdl/lt__alloc.c' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/libtool/lt__alloc.c'
+ /usr/bin/install -c -m 644 'source_subfolder/libltdl/lt__argz.c' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/libtool/lt__argz.c'
+ /usr/bin/install -c -m 644 'source_subfolder/libltdl/lt__dirent.c' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/libtool/lt__dirent.c'
+ /usr/bin/install -c -m 644 'source_subfolder/libltdl/lt__strl.c' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/libtool/lt__strl.c'
+ /usr/bin/install -c -m 644 'source_subfolder/libltdl/lt_dlloader.c' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/libtool/lt_dlloader.c'
+ /usr/bin/install -c -m 644 'source_subfolder/libltdl/lt_error.c' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/libtool/lt_error.c'
+ /usr/bin/install -c -m 644 'source_subfolder/libltdl/ltdl.c' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/libtool/ltdl.c'
+ /usr/bin/install -c -m 644 'source_subfolder/libltdl/ltdl.h' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/libtool/ltdl.h'
+ /usr/bin/install -c -m 644 'source_subfolder/libltdl/ltdl.mk' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/libtool/ltdl.mk'
+ /usr/bin/install -c -m 644 'source_subfolder/libltdl/slist.c' '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/libtool/slist.c'
+chmod a+x '/home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/libtool/configure'
+make[3]: Leaving directory '/home/anton/.conan/data/libtool/2.4.6/_/_/build/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce'
+make[2]: Leaving directory '/home/anton/.conan/data/libtool/2.4.6/_/_/build/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce'
+make[1]: Leaving directory '/home/anton/.conan/data/libtool/2.4.6/_/_/build/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce'
+libtool/2.4.6 package(): Packaged 9 files
+libtool/2.4.6 package(): Packaged 8 '.m4' files
+libtool/2.4.6 package(): Packaged 15 '.c' files
+libtool/2.4.6 package(): Packaged 2 '.in' files: config-h.in, Makefile.in
+libtool/2.4.6 package(): Packaged 1 '.am' file: Makefile.am
+libtool/2.4.6 package(): Packaged 1 '.ac' file: configure.ac
+libtool/2.4.6 package(): Packaged 1 '.mk' file: ltdl.mk
+libtool/2.4.6 package(): Packaged 1 '.LIB' file: COPYING.LIB
+libtool/2.4.6 package(): Packaged 15 '.h' files
+libtool/2.4.6 package(): Packaged 1 '.sh' file: ltmain.sh
+libtool/2.4.6 package(): Packaged 1 '.guess' file: config.guess
+libtool/2.4.6 package(): Packaged 1 '.sub' file: config.sub
+libtool/2.4.6 package(): Packaged 1 '.a' file: libltdl.a
+libtool/2.4.6: Package '00ffeae55ec276f0fef26ad0ed5cd0191ca724ce' created
+libtool/2.4.6: Created package revision 97ed05f04a552cb7c48ba84763404cf4
+libtool/2.4.6: Appending PATH env: /home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/bin
+libtool/2.4.6: Setting LIBTOOLIZE env to /home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/bin/libtoolize
+libtool/2.4.6: Setting LIBTOOL_PREFIX environment variable to /home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce
+libtool/2.4.6: Setting LIBTOOL_DATADIR environment variable to /home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res
+libtool/2.4.6: Setting LIBTOOL_PKGAUXDIR environment variable to /home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/libtool/build-aux
+libtool/2.4.6: Setting LIBTOOL_PKGLTDLDIR environment variable to /home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/libtool
+libtool/2.4.6: Setting LIBTOOL_ACLOCALDIR environment variable to /home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/aclocal
+libtool/2.4.6: Appending ACLOCAL_PATH env: /home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/aclocal
+libtool/2.4.6: Appending AUTOMAKE_CONAN_INCLUDES environment variable: /home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/res/aclocal
+hidapi/0.10.1: Applying build-requirement: libtool/2.4.6
+hidapi/0.10.1: Applying build-requirement: automake/1.16.4
+hidapi/0.10.1: Applying build-requirement: autoconf/2.71
+hidapi/0.10.1: Applying build-requirement: m4/1.4.19
+hidapi/0.10.1: Configuring sources in /home/anton/.conan/data/hidapi/0.10.1/_/_/source
+
+hidapi/0.10.1: Copying sources to build folder
+hidapi/0.10.1: Building your package in /home/anton/.conan/data/hidapi/0.10.1/_/_/build/b6b5c360dff5dfdf35f8012c07f249f45188c917
+hidapi/0.10.1: Generator pkg_config created libtool.pc
+hidapi/0.10.1: Generator pkg_config created libusb-1.0.pc
+hidapi/0.10.1: Generator pkg_config created automake.pc
+hidapi/0.10.1: Generator pkg_config created autoconf.pc
+hidapi/0.10.1: Generator pkg_config created m4.pc
+hidapi/0.10.1: Aggregating env generators
+hidapi/0.10.1: Calling build()
++ autoreconf --install --verbose --force
+autoreconf: export WARNINGS=
+autoreconf: Entering directory '.'
+autoreconf: configure.ac: not using Gettext
+autoreconf: running: /home/anton/.conan/data/automake/1.16.4/_/_/package/258f6f05ca54813b3d7180161753df7f9ccf7e1d/bin/aclocal --force -I m4
+autoreconf: configure.ac: tracing
+autoreconf: running: /home/anton/.conan/data/libtool/2.4.6/_/_/package/00ffeae55ec276f0fef26ad0ed5cd0191ca724ce/bin/libtoolize --copy --force
+libtoolize: putting auxiliary files in '.'.
+libtoolize: copying file './ltmain.sh'
+libtoolize: putting macros in 'm4'.
+libtoolize: copying file 'm4/libtool.m4'
+libtoolize: copying file 'm4/ltoptions.m4'
+libtoolize: copying file 'm4/ltsugar.m4'
+libtoolize: copying file 'm4/ltversion.m4'
+libtoolize: copying file 'm4/lt~obsolete.m4'
+libtoolize: Consider adding 'AC_CONFIG_MACRO_DIRS([m4])' to configure.ac,
+libtoolize: and rerunning libtoolize and aclocal.
+autoreconf: configure.ac: not using Intltool
+autoreconf: configure.ac: not using Gtkdoc
+autoreconf: running: /home/anton/.conan/data/automake/1.16.4/_/_/package/258f6f05ca54813b3d7180161753df7f9ccf7e1d/bin/aclocal --force -I m4
+autoreconf: running: /home/anton/.conan/data/autoconf/2.71/_/_/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/bin/autoconf --force
+autoreconf: running: /home/anton/.conan/data/autoconf/2.71/_/_/package/5ab84d6acfe1f23c4fae0ab88f26e3a396351ac9/bin/autoheader --force
+autoreconf: running: /home/anton/.conan/data/automake/1.16.4/_/_/package/258f6f05ca54813b3d7180161753df7f9ccf7e1d/bin/automake --add-missing --copy --force-missing
+configure.ac:18: installing './ar-lib'
+configure.ac:18: installing './compile'
+configure.ac:19: installing './config.guess'
+configure.ac:19: installing './config.sub'
+configure.ac:15: installing './install-sh'
+configure.ac:15: installing './missing'
+hidtest/Makefile.am: installing './depcomp'
+autoreconf: Leaving directory '.'
+hidapi/0.10.1: Calling:
+ > source_subfolder/configure '--enable-shared' '--disable-static' '--prefix=/home/anton/.conan/data/hidapi/0.10.1/_/_/package/b6b5c360dff5dfdf35f8012c07f249f45188c917' '--bindir=${prefix}/bin' '--sbindir=${prefix}/bin' '--libexecdir=${prefix}/bin' '--libdir=${prefix}/lib' '--includedir=${prefix}/include' '--oldincludedir=${prefix}/include' '--datarootdir=${prefix}/share' 
+checking for a BSD-compatible install... /usr/bin/install -c
+checking whether build environment is sane... yes
+checking for a race-free mkdir -p... /usr/bin/mkdir -p
+checking for gawk... no
+checking for mawk... mawk
+checking whether make sets $(MAKE)... yes
+checking whether make supports nested variables... yes
+checking whether make supports the include directive... yes (GNU style)
+checking for gcc... /usr/bin/gcc
+checking whether the C compiler works... yes
+checking for C compiler default output file name... a.out
+checking for suffix of executables... 
+checking whether we are cross compiling... no
+checking for suffix of object files... o
+checking whether the compiler supports GNU C... yes
+checking whether /usr/bin/gcc accepts -g... yes
+checking for /usr/bin/gcc option to enable C11 features... none needed
+checking whether /usr/bin/gcc understands -c and -o together... yes
+checking dependency style of /usr/bin/gcc... gcc3
+checking for ar... ar
+checking the archiver (ar) interface... ar
+checking build system type... x86_64-pc-linux-gnu
+checking host system type... x86_64-pc-linux-gnu
+checking how to print strings... printf
+checking for a sed that does not truncate output... /usr/bin/sed
+checking for grep that handles long lines and -e... /usr/bin/grep
+checking for egrep... /usr/bin/grep -E
+checking for fgrep... /usr/bin/grep -F
+checking for ld used by /usr/bin/gcc... /usr/bin/ld
+checking if the linker (/usr/bin/ld) is GNU ld... yes
+checking for BSD- or MS-compatible name lister (nm)... /usr/bin/nm -B
+checking the name lister (/usr/bin/nm -B) interface... BSD nm
+checking whether ln -s works... yes
+checking the maximum length of command line arguments... 1572864
+checking how to convert x86_64-pc-linux-gnu file names to x86_64-pc-linux-gnu format... func_convert_file_noop
+checking how to convert x86_64-pc-linux-gnu file names to toolchain format... func_convert_file_noop
+checking for /usr/bin/ld option to reload object files... -r
+checking for objdump... objdump
+checking how to recognize dependent libraries... pass_all
+checking for dlltool... no
+checking how to associate runtime and link libraries... printf %s\n
+checking for archiver @FILE support... @
+checking for strip... strip
+checking for ranlib... ranlib
+checking command to parse /usr/bin/nm -B output from /usr/bin/gcc object... ok
+checking for sysroot... no
+checking for a working dd... /usr/bin/dd
+checking how to truncate binary pipes... /usr/bin/dd bs=4096 count=1
+checking for mt... mt
+checking if mt is a manifest tool... no
+checking for stdio.h... yes
+checking for stdlib.h... yes
+checking for string.h... yes
+checking for inttypes.h... yes
+checking for stdint.h... yes
+checking for strings.h... yes
+checking for sys/stat.h... yes
+checking for sys/types.h... yes
+checking for unistd.h... yes
+checking for dlfcn.h... yes
+checking for objdir... .libs
+checking if /usr/bin/gcc supports -fno-rtti -fno-exceptions... no
+checking for /usr/bin/gcc option to produce PIC... -fPIC -DPIC
+checking if /usr/bin/gcc PIC flag -fPIC -DPIC works... yes
+checking if /usr/bin/gcc static flag -static works... no
+checking if /usr/bin/gcc supports -c -o file.o... yes
+checking if /usr/bin/gcc supports -c -o file.o... (cached) yes
+checking whether the /usr/bin/gcc linker (/usr/bin/ld -m elf_x86_64) supports shared libraries... yes
+checking whether -lc should be explicitly linked in... no
+checking dynamic linker characteristics... GNU/Linux ld.so
+checking how to hardcode library paths into programs... immediate
+checking whether stripping libraries is possible... yes
+checking if libtool supports shared libraries... yes
+checking whether to build shared libraries... yes
+checking whether to build static libraries... no
+checking for gcc... (cached) /usr/bin/gcc
+checking whether the compiler supports GNU C... (cached) yes
+checking whether /usr/bin/gcc accepts -g... (cached) yes
+checking for /usr/bin/gcc option to enable C11 features... (cached) none needed
+checking whether /usr/bin/gcc understands -c and -o together... (cached) yes
+checking dependency style of /usr/bin/gcc... (cached) gcc3
+checking whether the compiler supports GNU C++... yes
+checking whether /usr/bin/g++ accepts -g... yes
+checking for /usr/bin/g++ option to enable C++11 features... none needed
+checking dependency style of /usr/bin/g++... gcc3
+checking how to run the C++ preprocessor... /usr/bin/g++ -E
+checking for ld used by /usr/bin/g++... /usr/bin/ld -m elf_x86_64
+checking if the linker (/usr/bin/ld -m elf_x86_64) is GNU ld... yes
+checking whether the /usr/bin/g++ linker (/usr/bin/ld -m elf_x86_64) supports shared libraries... yes
+checking for /usr/bin/g++ option to produce PIC... -fPIC -DPIC
+checking if /usr/bin/g++ PIC flag -fPIC -DPIC works... yes
+checking if /usr/bin/g++ static flag -static works... no
+checking if /usr/bin/g++ supports -c -o file.o... yes
+checking if /usr/bin/g++ supports -c -o file.o... (cached) yes
+checking whether the /usr/bin/g++ linker (/usr/bin/ld -m elf_x86_64) supports shared libraries... yes
+checking dynamic linker characteristics... (cached) GNU/Linux ld.so
+checking how to hardcode library paths into programs... immediate
+checking for gcc... gcc
+checking whether the compiler supports GNU Objective C... no
+checking whether gcc accepts -g... no
+checking dependency style of gcc... gcc3
+checking for pkg-config... no
+checking whether make supports nested variables... (cached) yes
+checking operating system... x86_64-pc-linux-gnu
+ (Linux back-end)
+checking for libudev... 
+  Library libudev was not found on this system.
+  Please install it and re-run ./configure
+
+hidapi/0.10.1: 
+hidapi/0.10.1: ERROR: Package 'b6b5c360dff5dfdf35f8012c07f249f45188c917' build failed
+hidapi/0.10.1: WARN: Build folder /home/anton/.conan/data/hidapi/0.10.1/_/_/build/b6b5c360dff5dfdf35f8012c07f249f45188c917
+ERROR: hidapi/0.10.1: Error in build() method, line 79
+	autotools = self._configure_autotools()
+while calling '_configure_autotools', line 71
+	self._autotools.configure(configure_dir=self._source_subfolder, args=args)
+	ConanException: Error 1 while executing source_subfolder/configure '--enable-shared' '--disable-static' '--prefix=/home/anton/.conan/data/hidapi/0.10.1/_/_/package/b6b5c360dff5dfdf35f8012c07f249f45188c917' '--bindir=${prefix}/bin' '--sbindir=${prefix}/bin' '--libexecdir=${prefix}/bin' '--libdir=${prefix}/lib' '--includedir=${prefix}/include' '--oldincludedir=${prefix}/include' '--datarootdir=${prefix}/share' 
+-- Init conan for linux64
+-- CMD_ERROR:1
+-- Modules dir: /home/anton/Desktop/coma/src/../scripts  /home/anton/Desktop/coma/build-src-Desktop_Qt_5_15_2_GCC_64bit-Debug  /home/anton/Desktop/coma/src/3rdParty
+-- debug mode
+-- Target name - linux64
+-- QT version - 5.15.2
+-- not a debug mode
+-- Qt version: 5
+-- QtGui found
+-- QtWidgets found
+-- LimeReport directory: /home/anton/Desktop/coma/src/../include/LimeReport
+-- Conan: checking conan executable
+-- Conan: Found program /usr/local/bin/conan
+-- Conan: Version found Conan version 1.45.0
+
+-- Conan executing: /usr/local/bin/conan install . --install-folder /home/anton/Desktop/coma/build-src-Desktop_Qt_5_15_2_GCC_64bit-Debug --build missing --settings build_type=Release --settings compiler=gcc --settings compiler.version=10 --settings compiler.libcxx=libstdc++11
+Configuration:
+[settings]
+arch=x86_64
+arch_build=x86_64
+build_type=Release
+compiler=gcc
+compiler.libcxx=libstdc++11
+compiler.version=10
+os=Linux
+os_build=Linux
+[options]
+[build_requires]
+[env]
+
+conanfile.txt: Installing package
+Requirements
+    libpng/1.6.37 from 'conancenter' - Cache
+    zlib/1.2.11 from 'conancenter' - Cache
+Packages
+    libpng/1.6.37:d5b3dc27faecfb4eb94086722000dd65bb9e6bff - Cache
+    zlib/1.2.11:19729b9559f3ae196cad45cb2b97468ccb75dcd1 - Cache
+
+Installing (downloading, building) binaries...
+zlib/1.2.11: Already installed!
+libpng/1.6.37: Already installed!
+conanfile.txt: Generator cmake_find_package created FindPNG.cmake
+conanfile.txt: Generator cmake_find_package created FindZLIB.cmake
+conanfile.txt: Generator txt created conanbuildinfo.txt
+conanfile.txt: Aggregating env generators
+conanfile.txt: Generated conaninfo.txt
+conanfile.txt: Generated graphinfo
+-- QXlsx directory: /home/anton/Desktop/coma/src/../include/QXlsx
+-- Looking for C++ include QXlsx/xlsxdocument.h
+-- Looking for C++ include QXlsx/xlsxdocument.h - not found
+-- Did not build QXlsx correctly as cannot find xlsxdocument.h. Will build it.
+-- Populating qcustomplot_src
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/anton/Desktop/coma/build-src-Desktop_Qt_5_15_2_GCC_64bit-Debug/qcustomplot_src-subbuild
+ninja: no work to do.
+-- Conan: Using autogenerated Findhidapi.cmake
+-- Found hidapi: 0.10.1 (found version "0.10.1") 
+-- Library hidapi-libusb found /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-libusb.so
+-- Found: /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-libusb.so
+-- Library hidapi-hidraw found /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-hidraw.so
+-- Found: /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-hidraw.so
+-- Conan: Using autogenerated Findlibusb.cmake
+-- Found libusb: 1.0.24 (found version "1.0.24") 
+-- Library usb-1.0 found /home/anton/.conan/data/libusb/1.0.24/_/_/package/66894e0caabd4bc1fb577e687a7e20bd3c668353/lib/libusb-1.0.a
+-- Found: /home/anton/.conan/data/libusb/1.0.24/_/_/package/66894e0caabd4bc1fb577e687a7e20bd3c668353/lib/libusb-1.0.a
+-- Library hidapi-hidraw found /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-hidraw.so
+-- Found: /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-hidraw.so
+-- Library hidapi-libusb found /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-libusb.so
+-- Found: /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-libusb.so
+-- Interfaces import dirs/home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/../bin
+-- Found Git: /usr/bin/git (found version "2.30.2") 
+-- Commit short hash: f45e68e0
+-- Conan: Using autogenerated FindBoost.cmake
+-- Found Boost: 1.75.0 (found version "1.75.0") 
+-- Conan: Component 'headers' found in package 'Boost'
+-- Conan: Using autogenerated FindBoost.cmake
+-- Conan: Component 'headers' found in package 'Boost'
+-- Conan: Using autogenerated Findhidapi.cmake
+-- Library hidapi-libusb found /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-libusb.so
+-- Found: /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-libusb.so
+-- Library hidapi-hidraw found /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-hidraw.so
+-- Found: /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-hidraw.so
+-- Conan: Using autogenerated Findlibusb.cmake
+-- Library usb-1.0 found /home/anton/.conan/data/libusb/1.0.24/_/_/package/66894e0caabd4bc1fb577e687a7e20bd3c668353/lib/libusb-1.0.a
+-- Found: /home/anton/.conan/data/libusb/1.0.24/_/_/package/66894e0caabd4bc1fb577e687a7e20bd3c668353/lib/libusb-1.0.a
+-- Library hidapi-hidraw found /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-hidraw.so
+-- Found: /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-hidraw.so
+-- Library hidapi-libusb found /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-libusb.so
+-- Found: /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-libusb.so
+-- Conan: Using autogenerated Findhidapi.cmake
+-- Library hidapi-libusb found /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-libusb.so
+-- Found: /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-libusb.so
+-- Library hidapi-hidraw found /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-hidraw.so
+-- Found: /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-hidraw.so
+-- Conan: Using autogenerated Findlibusb.cmake
+-- Library usb-1.0 found /home/anton/.conan/data/libusb/1.0.24/_/_/package/66894e0caabd4bc1fb577e687a7e20bd3c668353/lib/libusb-1.0.a
+-- Found: /home/anton/.conan/data/libusb/1.0.24/_/_/package/66894e0caabd4bc1fb577e687a7e20bd3c668353/lib/libusb-1.0.a
+-- Library hidapi-hidraw found /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-hidraw.so
+-- Found: /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-hidraw.so
+-- Library hidapi-libusb found /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-libusb.so
+-- Found: /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-libusb.so
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/anton/Desktop/coma/build-src-Desktop_Qt_5_15_2_GCC_64bit-Debug
+Elapsed time: 00:40.
+
+Running /opt/Qt/Tools/CMake/bin/cmake -S /home/anton/Desktop/coma/src -B /home/anton/Desktop/coma/build-src-Desktop_Qt_5_15_2_GCC_64bit-Debug -DBUILD_WITH_ALISE:BOOL=ON in /home/anton/Desktop/coma/build-src-Desktop_Qt_5_15_2_GCC_64bit-Debug.
+-- MSVC_C_ARCHITECTURE_ID: 
+-- Target architecture - x86_64
+-- Linux
+-- Cached target arch: linux64
+-- Current target arch: linux64
+-- Sysroot: 
+-- Current user directory for conan: /home/anton
+-- Modules dir: /home/anton/Desktop/coma/src/../scripts  /home/anton/Desktop/coma/build-src-Desktop_Qt_5_15_2_GCC_64bit-Debug  /home/anton/Desktop/coma/src/3rdParty
+-- debug mode
+-- Target name - linux64
+-- QT version - 5.15.2
+-- not a debug mode
+-- Qt version: 5
+-- QtGui found
+-- QtWidgets found
+-- LimeReport directory: /home/anton/Desktop/coma/src/../include/LimeReport
+-- Conan: checking conan executable
+-- Conan: Found program /usr/local/bin/conan
+-- Conan: Version found Conan version 1.45.0
+
+-- Conan executing: /usr/local/bin/conan install . --install-folder /home/anton/Desktop/coma/build-src-Desktop_Qt_5_15_2_GCC_64bit-Debug --build missing --settings build_type=Release --settings compiler=gcc --settings compiler.version=10 --settings compiler.libcxx=libstdc++11
+Configuration:
+[settings]
+arch=x86_64
+arch_build=x86_64
+build_type=Release
+compiler=gcc
+compiler.libcxx=libstdc++11
+compiler.version=10
+os=Linux
+os_build=Linux
+[options]
+[build_requires]
+[env]
+
+conanfile.txt: Installing package
+Requirements
+    libpng/1.6.37 from 'conancenter' - Cache
+    zlib/1.2.11 from 'conancenter' - Cache
+Packages
+    libpng/1.6.37:d5b3dc27faecfb4eb94086722000dd65bb9e6bff - Cache
+    zlib/1.2.11:19729b9559f3ae196cad45cb2b97468ccb75dcd1 - Cache
+
+Installing (downloading, building) binaries...
+zlib/1.2.11: Already installed!
+libpng/1.6.37: Already installed!
+conanfile.txt: Generator cmake_find_package created FindPNG.cmake
+conanfile.txt: Generator cmake_find_package created FindZLIB.cmake
+conanfile.txt: Generator txt created conanbuildinfo.txt
+conanfile.txt: Aggregating env generators
+conanfile.txt: Generated conaninfo.txt
+conanfile.txt: Generated graphinfo
+-- QXlsx directory: /home/anton/Desktop/coma/src/../include/QXlsx
+-- Did not build QXlsx correctly as cannot find xlsxdocument.h. Will build it.
+-- Populating qcustomplot_src
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/anton/Desktop/coma/build-src-Desktop_Qt_5_15_2_GCC_64bit-Debug/qcustomplot_src-subbuild
+ninja: no work to do.
+-- Conan: Using autogenerated Findhidapi.cmake
+-- Library hidapi-libusb found /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-libusb.so
+-- Found: /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-libusb.so
+-- Library hidapi-hidraw found /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-hidraw.so
+-- Found: /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-hidraw.so
+-- Conan: Using autogenerated Findlibusb.cmake
+-- Library usb-1.0 found /home/anton/.conan/data/libusb/1.0.24/_/_/package/66894e0caabd4bc1fb577e687a7e20bd3c668353/lib/libusb-1.0.a
+-- Found: /home/anton/.conan/data/libusb/1.0.24/_/_/package/66894e0caabd4bc1fb577e687a7e20bd3c668353/lib/libusb-1.0.a
+-- Library hidapi-hidraw found /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-hidraw.so
+-- Found: /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-hidraw.so
+-- Library hidapi-libusb found /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-libusb.so
+-- Found: /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-libusb.so
+-- Interfaces import dirs/home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/../bin
+-- Commit short hash: f45e68e0
+-- Conan: Using autogenerated FindZeroMQ.cmake
+-- Found ZeroMQ: 4.3.4 (found version "4.3.4") 
+-- Library zmq found /home/anton/.conan/data/zeromq/4.3.4/_/_/package/f82fdc91e67fbd8a7f4bc1f5da7b149fbeed4137/lib/libzmq.a
+-- Found: /home/anton/.conan/data/zeromq/4.3.4/_/_/package/f82fdc91e67fbd8a7f4bc1f5da7b149fbeed4137/lib/libzmq.a
+-- Conan: Using autogenerated Findlibsodium.cmake
+-- Found libsodium: 1.0.18 (found version "1.0.18") 
+-- Library sodium found /home/anton/.conan/data/libsodium/1.0.18/_/_/package/e03f457862ba5f36ec0923b7985e45e83edff11f/lib/libsodium.a
+-- Found: /home/anton/.conan/data/libsodium/1.0.18/_/_/package/e03f457862ba5f36ec0923b7985e45e83edff11f/lib/libsodium.a
+-- Library zmq found /home/anton/.conan/data/zeromq/4.3.4/_/_/package/f82fdc91e67fbd8a7f4bc1f5da7b149fbeed4137/lib/libzmq.a
+-- Found: /home/anton/.conan/data/zeromq/4.3.4/_/_/package/f82fdc91e67fbd8a7f4bc1f5da7b149fbeed4137/lib/libzmq.a
+-- Conan: Using autogenerated Findcppzmq.cmake
+-- Found cppzmq: 4.7.1 (found version "4.7.1") 
+-- Dependency ZeroMQ already found
+-- ALISE
+-- Conan: Adjusting output directories
+-- Conan: Using cmake targets configuration
+-- Library protoc found /home/anton/.conan/data/protobuf/3.17.1/_/_/package/743717ea6fefbda10f96b18fde0adbf093af5f63/lib/libprotoc.a
+-- Library protobuf found /home/anton/.conan/data/protobuf/3.17.1/_/_/package/743717ea6fefbda10f96b18fde0adbf093af5f63/lib/libprotobuf.a
+-- Library z found /home/anton/.conan/data/zlib/1.2.11/_/_/package/19729b9559f3ae196cad45cb2b97468ccb75dcd1/lib/libz.a
+-- Conan: Adjusting default RPATHs Conan policies
+-- Conan: Adjusting language standard
+-- Current conanbuildinfo.cmake directory: /home/anton/Desktop/coma/build-src-Desktop_Qt_5_15_2_GCC_64bit-Debug/protos
+-- Conan: Compiler GCC>=5, checking major version 10
+-- Conan: Checking correct version: 10
+-- Conan: Using autogenerated FindProtobuf.cmake
+-- Found Protobuf: 3.17.1 (found version "3.17.1") 
+-- Library protoc found /home/anton/.conan/data/protobuf/3.17.1/_/_/package/743717ea6fefbda10f96b18fde0adbf093af5f63/lib/libprotoc.a
+-- Skipping already existing target: CONAN_LIB::protobuf_protoc
+-- Found: /home/anton/.conan/data/protobuf/3.17.1/_/_/package/743717ea6fefbda10f96b18fde0adbf093af5f63/lib/libprotoc.a
+-- Library protobuf found /home/anton/.conan/data/protobuf/3.17.1/_/_/package/743717ea6fefbda10f96b18fde0adbf093af5f63/lib/libprotobuf.a
+-- Skipping already existing target: CONAN_LIB::protobuf_protobuf
+-- Found: /home/anton/.conan/data/protobuf/3.17.1/_/_/package/743717ea6fefbda10f96b18fde0adbf093af5f63/lib/libprotobuf.a
+-- Conan: Using autogenerated FindZLIB.cmake
+-- Found ZLIB: 1.2.11 (found version "1.2.11") 
+-- Library z found /home/anton/.conan/data/zlib/1.2.11/_/_/package/19729b9559f3ae196cad45cb2b97468ccb75dcd1/lib/libz.a
+-- Found: /home/anton/.conan/data/zlib/1.2.11/_/_/package/19729b9559f3ae196cad45cb2b97468ccb75dcd1/lib/libz.a
+-- Library protobuf found /home/anton/.conan/data/protobuf/3.17.1/_/_/package/743717ea6fefbda10f96b18fde0adbf093af5f63/lib/libprotobuf.a
+-- Found: /home/anton/.conan/data/protobuf/3.17.1/_/_/package/743717ea6fefbda10f96b18fde0adbf093af5f63/lib/libprotobuf.a
+-- Library protoc found /home/anton/.conan/data/protobuf/3.17.1/_/_/package/743717ea6fefbda10f96b18fde0adbf093af5f63/lib/libprotoc.a
+-- Found: /home/anton/.conan/data/protobuf/3.17.1/_/_/package/743717ea6fefbda10f96b18fde0adbf093af5f63/lib/libprotoc.a
+-- Proto files: protos.proto
+-- Generated srcs: /home/anton/Desktop/coma/build-src-Desktop_Qt_5_15_2_GCC_64bit-Debug/protos/protos/protos.pb.cc
+-- Generated hdrs: /home/anton/Desktop/coma/build-src-Desktop_Qt_5_15_2_GCC_64bit-Debug/protos/protos/protos.pb.h
+-- PROTOBUF_GENERATED/home/anton/Desktop/coma/build-src-Desktop_Qt_5_15_2_GCC_64bit-Debug/protos/protos
+-- CONAN_INCLUDE_DIRS_PROTOBUF/home/anton/.conan/data/protobuf/3.17.1/_/_/package/743717ea6fefbda10f96b18fde0adbf093af5f63/include
+-- /home/anton/.conan/data/protobuf/3.17.1/_/_/package/743717ea6fefbda10f96b18fde0adbf093af5f63/bin/protoc
+-- Generated srcs: /home/anton/Desktop/coma/build-src-Desktop_Qt_5_15_2_GCC_64bit-Debug/protos/protos/protos.pb.cc
+-- Generated hdrs: /home/anton/Desktop/coma/build-src-Desktop_Qt_5_15_2_GCC_64bit-Debug/protos/protos/protos.pb.cc
+-- Conan: Using autogenerated FindBoost.cmake
+-- Conan: Component 'headers' found in package 'Boost'
+-- Conan: Using autogenerated FindBoost.cmake
+-- Conan: Component 'headers' found in package 'Boost'
+-- Conan: Using autogenerated Findhidapi.cmake
+-- Library hidapi-libusb found /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-libusb.so
+-- Found: /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-libusb.so
+-- Library hidapi-hidraw found /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-hidraw.so
+-- Found: /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-hidraw.so
+-- Conan: Using autogenerated Findlibusb.cmake
+-- Library usb-1.0 found /home/anton/.conan/data/libusb/1.0.24/_/_/package/66894e0caabd4bc1fb577e687a7e20bd3c668353/lib/libusb-1.0.a
+-- Found: /home/anton/.conan/data/libusb/1.0.24/_/_/package/66894e0caabd4bc1fb577e687a7e20bd3c668353/lib/libusb-1.0.a
+-- Library hidapi-hidraw found /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-hidraw.so
+-- Found: /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-hidraw.so
+-- Library hidapi-libusb found /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-libusb.so
+-- Found: /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-libusb.so
+-- Conan: Using autogenerated Findhidapi.cmake
+-- Library hidapi-libusb found /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-libusb.so
+-- Found: /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-libusb.so
+-- Library hidapi-hidraw found /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-hidraw.so
+-- Found: /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-hidraw.so
+-- Conan: Using autogenerated Findlibusb.cmake
+-- Library usb-1.0 found /home/anton/.conan/data/libusb/1.0.24/_/_/package/66894e0caabd4bc1fb577e687a7e20bd3c668353/lib/libusb-1.0.a
+-- Found: /home/anton/.conan/data/libusb/1.0.24/_/_/package/66894e0caabd4bc1fb577e687a7e20bd3c668353/lib/libusb-1.0.a
+-- Library hidapi-hidraw found /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-hidraw.so
+-- Found: /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-hidraw.so
+-- Library hidapi-libusb found /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-libusb.so
+-- Found: /home/anton/.conan/data/hidapi/0.10.1/_/_/package/36f3958252e96153a591b2c0ae3741b20846a416/lib/libhidapi-libusb.so
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/anton/Desktop/coma/build-src-Desktop_Qt_5_15_2_GCC_64bit-Debug
+Elapsed time: 00:02.
+ 
