@@ -1,4 +1,4 @@
 auto eth1
 	iface eth1 inet static
-        address 172.16.30.90
+        address 172.16.30.46
 	netmask 255.255.254.0
