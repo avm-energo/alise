@@ -2,6 +2,7 @@
 
 #include "helper.h"
 
+#include <QtDebug>
 #include <QDateTime>
 #include <QTimer>
 #include <arpa/inet.h>
@@ -80,8 +81,10 @@ void TimeSyncronizer::setSystemTime(const timespec &systemTime)
 
     clock_settime(CLOCK_REALTIME, &systemTime); // set current datetime
     QProcess *myProcess = new QProcess(this); // set datetime to RTC
+    qInfo() << "HWClock is starting...";
     myProcess->start(program, arguments);
     myProcess->waitForFinished();
+    qInfo() << "HWClock exited with code: " << myProcess->exitCode() << " and status: " << myProcess->exitStatus();
 }
 
 int ntpdStatus()
