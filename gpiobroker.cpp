@@ -67,7 +67,7 @@ void GpioBroker::checkPowerUnit()
     blk.data.resize(sizeof(AVTUK_CCU::Main));
     AVTUK_CCU::Main str;
 
-    str.PWRIN = status1 ^ (status2 << 1);
+    str.PWRIN = status1 | (status2 << 1);
     str.resetReq = false;
     std::memcpy(blk.data.data(), &str, sizeof(AVTUK_CCU::Main));
     blk.ID = AVTUK_CCU::MainBlock;
