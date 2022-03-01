@@ -45,6 +45,7 @@ template <typename T> void ZeroPublisher::appendToQueue(const std::string &id, c
 
 void ZeroPublisher::publishTime(const timespec time)
 {
+    qDebug() << "Time has been added to output queue: " << time.tv_sec;
     google::protobuf::Timestamp protoTime;
     protoTime.set_seconds(time.tv_sec);
     protoTime.set_nanos(time.tv_nsec);
@@ -53,6 +54,7 @@ void ZeroPublisher::publishTime(const timespec time)
 
 void ZeroPublisher::publishPowerStatus(const AVTUK_CCU::Main powerStatus)
 {
+    qDebug() << "PowerStatus has been added to output queue: " << powerStatus.PWRIN << ", resetReq: " << powerStatus.resetReq;
     alise::PowerStatus protoPower;
     protoPower.set_pwrin(powerStatus.PWRIN);
     appendToQueue(sonica, protoPower);
@@ -73,6 +75,7 @@ void ZeroPublisher::publishBlock(const DataTypes::BlockStruct blk)
 
 void ZeroPublisher::publishHello(const QString id, const quint32 code)
 {
+    qDebug() << "HelloReply has been added to output queue: " << id << ", code: " << code;
     alise::HelloReply helloReply;
     helloReply.set_message(code + 1);
     appendToQueue(id.toStdString(), helloReply);
@@ -80,6 +83,7 @@ void ZeroPublisher::publishHello(const QString id, const quint32 code)
 
 void ZeroPublisher::publishNtpStatus(bool status)
 {
+    qDebug() << "NtpStatus has been added to output queue: " << status;
     alise::NtpStatus ntpStatus;
     ntpStatus.set_isntpenabled(status);
     appendToQueue(admin, ntpStatus);
@@ -89,7 +93,7 @@ void ZeroPublisher::send(itemType &str)
 {
     zmq::message_t identity(str.first);
     zmq::message_t msg(str.second);
-    qInfo() << "Send message to: {" << str.first.c_str() << "}, with payload: {" << str.second.c_str() << "}";
+//    qInfo() << "Send message to: {" << str.first.c_str() << "}, with payload: {" << str.second.c_str() << "}";
     _worker.send(identity, zmq::send_flags::sndmore);
     _worker.send(msg, zmq::send_flags::none);
 }

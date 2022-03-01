@@ -2,7 +2,7 @@
 
 #include "helper.h"
 
-#include <QDebug>
+#include <QtDebug>
 #include <QDateTime>
 #include <QTimer>
 #include <arpa/inet.h>
@@ -14,6 +14,9 @@
 #include <sys/socket.h>
 #include <sys/time.h>
 #include <sys/timex.h>
+
+#include <QProcess>
+
 #define NTP_PORT 123
 
 /* This program uses an NTP mode 6 control message, which is the
@@ -73,7 +76,15 @@ timespec TimeSyncronizer::systemTime() const
 
 void TimeSyncronizer::setSystemTime(const timespec &systemTime)
 {
-    clock_settime(CLOCK_REALTIME, &systemTime);
+    QString program = "/usr/sbin/hwclock";
+    QStringList arguments { "-w" };
+
+    clock_settime(CLOCK_REALTIME, &systemTime); // set current datetime
+    QProcess *myProcess = new QProcess(this); // set datetime to RTC
+    qInfo() << "HWClock is starting...";
+    myProcess->start(program, arguments);
+    myProcess->waitForFinished();
+    qInfo() << "HWClock exited with code: " << myProcess->exitCode() << " and status: " << myProcess->exitStatus();
 }
 
 int ntpdStatus()
@@ -357,7 +368,7 @@ bool TimeSyncronizer::ntpStatus() const
 {
     ntptimeval time;
     int status = ntp_gettime(&time);
-    qDebug() << "NTP Status: " + status;
+    qDebug() << "NTP Status: " << status;
     switch (status)
     {
     case TIME_OK:

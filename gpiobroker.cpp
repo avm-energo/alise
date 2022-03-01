@@ -50,7 +50,7 @@ GpioBroker::GpioBroker(QObject *parent) : QObject(parent)
     chip2.open(std::to_string(2));
     {
         auto line = chip2.get_line(ResetPin.offset);
-        line.request({ PROGNAME, ::gpiod::line_request::DIRECTION_OUTPUT, 0 });
+        line.request({ PROGNAME, ::gpiod::line_request::DIRECTION_INPUT, 0 });
     }
     chip3.open(std::to_string(3));
     {
@@ -68,8 +68,7 @@ void GpioBroker::checkPowerUnit()
     blk.data.resize(sizeof(AVTUK_CCU::Main));
     AVTUK_CCU::Main str;
 
-    // TODO Проверить то ли сдвигаем
-    str.PWRIN = status1 ^ (status2 << 1);
+    str.PWRIN = status1 | (status2 << 1);
     qDebug() << "PWRIN: " << str.PWRIN;
     str.resetReq = false;
     std::memcpy(blk.data.data(), &str, sizeof(AVTUK_CCU::Main));
@@ -84,39 +83,44 @@ void GpioBroker::setIndication(alise::Health_Code code)
     QObject::disconnect(&m_gpioTimer, &QTimer::timeout, nullptr, nullptr);
     chip1.get_line(LedPin.offset).set_value(blinkStatus);
 
-    if (noBooter)
-    {
-        m_gpioTimer.setInterval(BlinkTimeout::small);
-        noBooter = !noBooter;
-    }
+//    if (noBooter)
+//    {
+//        m_gpioTimer.setInterval(BlinkTimeout::small);
+//        noBooter = !noBooter;
+//    }
 
     switch (code)
     {
     case alise::Health_Code_Startup:
     {
         m_gpioTimer.setInterval(BlinkTimeout::small);
-        QObject::connect(&m_gpioTimer, &QTimer::timeout, this, [&status = blinkStatus, &chip = chip1] {
-            chip.get_line(LedPin.offset).set_value(status);
-            status = !status;
-        });
+//        QObject::connect(&m_gpioTimer, &QTimer::timeout, this, [&status = blinkStatus, &chip = chip1] {
+//            chip.get_line(LedPin.offset).set_value(status);
+//            status = !status;
+//        });
         break;
     }
     case alise::Health_Code_Work:
     {
         m_gpioTimer.setInterval(BlinkTimeout::big);
-        QObject::connect(&m_gpioTimer, &QTimer::timeout, this, [&status = blinkStatus, &chip = chip1] {
-            chip.get_line(LedPin.offset).set_value(status);
-            status = !status;
-        });
+//        QObject::connect(&m_gpioTimer, &QTimer::timeout, this, [&status = blinkStatus, &chip = chip1] {
+//            chip.get_line(LedPin.offset).set_value(status);
+//            status = !status;
+//        });
         break;
     }
     default:
     {
-        m_gpioTimer.setInterval(BlinkTimeout::small);
-        currentMode = BlinkMode::big;
-        QObject::connect(&m_gpioTimer, &QTimer::timeout, this, [=] { blinker(code); });
+        m_gpioTimer.setInterval(BlinkTimeout::verysmall);
+//        currentMode = BlinkMode::verysmall;
+//        QObject::connect(&m_gpioTimer, &QTimer::timeout, this, [=] { blinker(code); });
+        break;
     }
     }
+    QObject::connect(&m_gpioTimer, &QTimer::timeout, this, [&status = blinkStatus, &chip = chip1] {
+        chip.get_line(LedPin.offset).set_value(status);
+        status = !status;
+    });
     m_gpioTimer.start();
 }
 
@@ -159,7 +163,6 @@ void GpioBroker::reset()
         blk.data.resize(sizeof(AVTUK_CCU::Main));
         AVTUK_CCU::Main str;
 
-        // TODO Проверить то ли сдвигаем
         str.PWRIN = status1 | (status2 << 1);
         str.resetReq = true;
         std::memcpy(blk.data.data(), &str, sizeof(AVTUK_CCU::Main));
@@ -168,15 +171,15 @@ void GpioBroker::reset()
     }
 }
 
-void GpioBroker::blinker(int code)
+/*void GpioBroker::blinker(int code)
 {
 
     switch (currentMode)
     {
     case BlinkMode::big:
     {
-
-        if ((shortBlink / 2) == 1 && !(shortBlink % 2))
+        if ((shortBlink / 2) == 1)
+//        if ((shortBlink / 2) == 1 && !(shortBlink % 2))
         {
             shortBlink = 0;
             m_gpioTimer.setInterval(BlinkTimeout::small);
@@ -189,8 +192,8 @@ void GpioBroker::blinker(int code)
     }
     case BlinkMode::small:
     {
-
-        if ((shortBlink / 2) == code && !(shortBlink % 2))
+        if ((shortBlink / 2) == code)
+//        if ((shortBlink / 2) == code && !(shortBlink % 2))
         {
             shortBlink = 0;
             m_gpioTimer.setInterval(BlinkTimeout::big);
@@ -206,7 +209,7 @@ void GpioBroker::blinker(int code)
     chip1.get_line(LedPin.offset).set_value(blinkStatus);
 
     blinkStatus = !blinkStatus;
-}
+} */
 
 void GpioBroker::criticalBlinking()
 {
