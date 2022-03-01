@@ -2,6 +2,7 @@
 
 #include "helper.h"
 
+#include <QDebug>
 #include <QDateTime>
 #include <QTimer>
 #include <arpa/inet.h>
@@ -356,6 +357,7 @@ bool TimeSyncronizer::ntpStatus() const
 {
     ntptimeval time;
     int status = ntp_gettime(&time);
+    qDebug() << "NTP Status: " + status;
     switch (status)
     {
     case TIME_OK:

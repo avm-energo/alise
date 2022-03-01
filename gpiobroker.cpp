@@ -63,12 +63,14 @@ void GpioBroker::checkPowerUnit()
 {
     auto status1 = chip0.get_line(PowerStatusPin0.offset).get_value();
     auto status2 = chip3.get_line(PowerStatusPin1.offset).get_value();
+    qDebug() << "PWR status 1: " << status1 << ", PWR status 2: " << status2;
     DataTypes::BlockStruct blk;
     blk.data.resize(sizeof(AVTUK_CCU::Main));
     AVTUK_CCU::Main str;
 
     // TODO Проверить то ли сдвигаем
     str.PWRIN = status1 ^ (status2 << 1);
+    qDebug() << "PWRIN: " << str.PWRIN;
     str.resetReq = false;
     std::memcpy(blk.data.data(), &str, sizeof(AVTUK_CCU::Main));
     blk.ID = AVTUK_CCU::MainBlock;
@@ -158,7 +160,7 @@ void GpioBroker::reset()
         AVTUK_CCU::Main str;
 
         // TODO Проверить то ли сдвигаем
-        str.PWRIN = status1 ^ (status2 << 1);
+        str.PWRIN = status1 | (status2 << 1);
         str.resetReq = true;
         std::memcpy(blk.data.data(), &str, sizeof(AVTUK_CCU::Main));
         blk.ID = AVTUK_CCU::MainBlock;
