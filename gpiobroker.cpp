@@ -68,7 +68,7 @@ void GpioBroker::checkPowerUnit()
     blk.data.resize(sizeof(AVTUK_CCU::Main));
     AVTUK_CCU::Main str;
 
-    str.PWRIN = status1 | (status2 << 1);
+    str.PWRIN = status2 | (status1 << 1);
     qDebug() << "PWRIN: " << str.PWRIN;
     str.resetReq = false;
     std::memcpy(blk.data.data(), &str, sizeof(AVTUK_CCU::Main));
@@ -79,7 +79,8 @@ void GpioBroker::checkPowerUnit()
 void GpioBroker::setIndication(alise::Health_Code code)
 {
     m_gpioTimer.stop();
-    shortBlink = blinkStatus = 0;
+//    shortBlink = 0;
+    blinkStatus = 0;
     QObject::disconnect(&m_gpioTimer, &QTimer::timeout, nullptr, nullptr);
     chip1.get_line(LedPin.offset).set_value(blinkStatus);
 
@@ -163,7 +164,7 @@ void GpioBroker::reset()
         blk.data.resize(sizeof(AVTUK_CCU::Main));
         AVTUK_CCU::Main str;
 
-        str.PWRIN = status1 | (status2 << 1);
+        str.PWRIN = status2 | (status1 << 1);
         str.resetReq = true;
         std::memcpy(blk.data.data(), &str, sizeof(AVTUK_CCU::Main));
         blk.ID = AVTUK_CCU::MainBlock;

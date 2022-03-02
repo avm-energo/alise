@@ -38,7 +38,7 @@ public:
 private:
 //    bool noBooter = true;
     bool blinkStatus = true;
-    int shortBlink = 0;
+//    int shortBlink = 0;
     int resetCounter = 0;
 //    BlinkMode currentMode = BlinkMode::big;
 
