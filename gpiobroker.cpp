@@ -25,7 +25,7 @@ GpioBroker::GpioBroker(QObject *parent) : QObject(parent)
     QObject::connect(&m_healthQueryTimeoutTimer, &QTimer::timeout, this, &GpioBroker::criticalBlinking);
     QObject::connect(&m_resetTimer, &QTimer::timeout, this, &GpioBroker::reset);
     m_timer.start();
-    m_gpioTimer.start();
+//    m_gpioTimer.start();
     m_resetTimer.start();
     m_healthQueryTimeoutTimer.start();
 #ifdef TEST_INDICATOR
@@ -60,11 +60,8 @@ GpioBroker::GpioBroker(QObject *parent) : QObject(parent)
         line.request({ PROGNAME, ::gpiod::line_request::DIRECTION_INPUT, 0 });
     }
     chip1.get_line(LedPin.offset).set_value(blinkStatus);
-    m_gpioTimer.setInterval(BlinkTimeout::verysmall);
-    QObject::connect(&m_gpioTimer, &QTimer::timeout, this, [&status = blinkStatus, &chip = chip1] {
-        chip.get_line(LedPin.offset).set_value(status);
-        status = !status;
-    });
+    criticalBlinking();
+    QObject::connect(&m_gpioTimer, &QTimer::timeout, this, &GpioBroker::blink);
     m_gpioTimer.start();
 }
 
@@ -87,9 +84,9 @@ void GpioBroker::checkPowerUnit()
 
 void GpioBroker::setIndication(alise::Health_Code code)
 {
-    m_gpioTimer.stop();
-    blinkStatus = 0;
-    QObject::disconnect(&m_gpioTimer, &QTimer::timeout, nullptr, nullptr);
+//    m_gpioTimer.stop();
+//    blinkStatus = 0;
+//    QObject::disconnect(&m_gpioTimer, &QTimer::timeout, nullptr, nullptr);
 
     switch (code)
     {
@@ -161,4 +158,10 @@ void GpioBroker::reset()
 void GpioBroker::criticalBlinking()
 {
     m_gpioTimer.setInterval(BlinkTimeout::verysmall);
+}
+
+void GpioBroker::blink()
+{
+    chip1.get_line(LedPin.offset).set_value(blinkStatus);
+    blinkStatus = !blinkStatus;
 }
