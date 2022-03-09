@@ -101,7 +101,7 @@ void ZeroPublisher::send(itemType &str)
 {
     zmq::message_t identity(str.first);
     zmq::message_t msg(str.second);
-//    qInfo() << "Send message to: {" << str.first.c_str() << "}, with payload: {" << str.second.c_str() << "}";
+    qInfo() << "Send message to: {" << str.first.c_str() << "}, with payload: {" << str.second.c_str() << "}";
     _worker.send(identity, zmq::send_flags::sndmore);
     _worker.send(msg, zmq::send_flags::none);
 }
