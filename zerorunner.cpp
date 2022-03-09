@@ -24,6 +24,10 @@ void ZeroRunner::runServer()
     auto new_sub = UniquePointer<ZeroSubscriber>(new ZeroSubscriber(ctx_, ZMQ_DEALER));
     auto new_pub = UniquePointer<ZeroPublisher>(new ZeroPublisher(ctx_, ZMQ_DEALER));
 
+    QTimer *tmr = new QTimer;
+    tmr->setInterval(helloRequestInterval);
+    connect(tmr, &QTimer::timeout, new_pub.get(), &ZeroPublisher::publishHealthQuery);
+
     connect(new_sub.get(), &ZeroSubscriber::helloReceived, new_pub.get(), &ZeroPublisher::publishHello,
         Qt::DirectConnection);
     connect(new_sub.get(), &ZeroSubscriber::timeReceived, this, &ZeroRunner::timeReceived);
@@ -55,6 +59,7 @@ void ZeroRunner::runServer()
     auto controller = std::unique_ptr<std::thread>(new std::thread([&] { polling(); }));
 
     controller->detach();
+    tmr->start();
     qInfo() << "ZeroRunner started";
 }
 

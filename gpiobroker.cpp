@@ -20,12 +20,14 @@ GpioBroker::GpioBroker(QObject *parent) : QObject(parent)
     m_timer.setInterval(1000);
     m_resetTimer.setInterval(100);
     m_gpioTimer.setInterval(50);
+    m_healthQueryTimeoutTimer.setInterval(2500);
     QObject::connect(&m_timer, &QTimer::timeout, this, &GpioBroker::checkPowerUnit);
-    QObject::connect(&m_gpioTimer, &QTimer::timeout, this, &GpioBroker::criticalBlinking);
+    QObject::connect(&m_healthQueryTimeoutTimer, &QTimer::timeout, this, &GpioBroker::criticalBlinking);
     QObject::connect(&m_resetTimer, &QTimer::timeout, this, &GpioBroker::reset);
     m_timer.start();
     m_gpioTimer.start();
     m_resetTimer.start();
+    m_healthQueryTimeoutTimer.start();
 #ifdef TEST_INDICATOR
     QTimer *testTimer = new QTimer(this);
     testTimer->setInterval(70009);
@@ -57,6 +59,13 @@ GpioBroker::GpioBroker(QObject *parent) : QObject(parent)
         auto line = chip3.get_line(PowerStatusPin1.offset);
         line.request({ PROGNAME, ::gpiod::line_request::DIRECTION_INPUT, 0 });
     }
+    chip1.get_line(LedPin.offset).set_value(blinkStatus);
+    m_gpioTimer.setInterval(BlinkTimeout::verysmall);
+    QObject::connect(&m_gpioTimer, &QTimer::timeout, this, [&status = blinkStatus, &chip = chip1] {
+        chip.get_line(LedPin.offset).set_value(status);
+        status = !status;
+    });
+    m_gpioTimer.start();
 }
 
 void GpioBroker::checkPowerUnit()
@@ -79,50 +88,27 @@ void GpioBroker::checkPowerUnit()
 void GpioBroker::setIndication(alise::Health_Code code)
 {
     m_gpioTimer.stop();
-//    shortBlink = 0;
     blinkStatus = 0;
     QObject::disconnect(&m_gpioTimer, &QTimer::timeout, nullptr, nullptr);
-    chip1.get_line(LedPin.offset).set_value(blinkStatus);
-
-//    if (noBooter)
-//    {
-//        m_gpioTimer.setInterval(BlinkTimeout::small);
-//        noBooter = !noBooter;
-//    }
 
     switch (code)
     {
     case alise::Health_Code_Startup:
     {
         m_gpioTimer.setInterval(BlinkTimeout::small);
-//        QObject::connect(&m_gpioTimer, &QTimer::timeout, this, [&status = blinkStatus, &chip = chip1] {
-//            chip.get_line(LedPin.offset).set_value(status);
-//            status = !status;
-//        });
         break;
     }
     case alise::Health_Code_Work:
     {
         m_gpioTimer.setInterval(BlinkTimeout::big);
-//        QObject::connect(&m_gpioTimer, &QTimer::timeout, this, [&status = blinkStatus, &chip = chip1] {
-//            chip.get_line(LedPin.offset).set_value(status);
-//            status = !status;
-//        });
         break;
     }
     default:
     {
         m_gpioTimer.setInterval(BlinkTimeout::verysmall);
-//        currentMode = BlinkMode::verysmall;
-//        QObject::connect(&m_gpioTimer, &QTimer::timeout, this, [=] { blinker(code); });
         break;
     }
     }
-    QObject::connect(&m_gpioTimer, &QTimer::timeout, this, [&status = blinkStatus, &chip = chip1] {
-        chip.get_line(LedPin.offset).set_value(status);
-        status = !status;
-    });
-    m_gpioTimer.start();
 }
 
 void GpioBroker::rebootMyself()
@@ -172,49 +158,7 @@ void GpioBroker::reset()
     }
 }
 
-/*void GpioBroker::blinker(int code)
-{
-
-    switch (currentMode)
-    {
-    case BlinkMode::big:
-    {
-        if ((shortBlink / 2) == 1)
-//        if ((shortBlink / 2) == 1 && !(shortBlink % 2))
-        {
-            shortBlink = 0;
-            m_gpioTimer.setInterval(BlinkTimeout::small);
-            currentMode = BlinkMode::small;
-            break;
-        }
-
-        m_gpioTimer.setInterval(BlinkTimeout::big);
-        break;
-    }
-    case BlinkMode::small:
-    {
-        if ((shortBlink / 2) == code)
-//        if ((shortBlink / 2) == code && !(shortBlink % 2))
-        {
-            shortBlink = 0;
-            m_gpioTimer.setInterval(BlinkTimeout::big);
-            currentMode = BlinkMode::big;
-            break;
-        }
-
-        m_gpioTimer.setInterval(BlinkTimeout::small);
-        break;
-    }
-    }
-    ++shortBlink;
-    chip1.get_line(LedPin.offset).set_value(blinkStatus);
-
-    blinkStatus = !blinkStatus;
-} */
-
 void GpioBroker::criticalBlinking()
 {
-    auto line = chip1.get_line(LedPin.offset);
-    line.set_value(blinkStatus);
-    blinkStatus = !blinkStatus;
+    m_gpioTimer.setInterval(BlinkTimeout::verysmall);
 }

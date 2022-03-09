@@ -10,6 +10,7 @@
 namespace runner
 {
 constexpr uint32_t timeout = 300000;
+constexpr quint32 helloRequestInterval = 2000;
 
 class ZeroRunner : public QObject
 {

@@ -89,6 +89,14 @@ void ZeroPublisher::publishNtpStatus(bool status)
     appendToQueue(admin, ntpStatus);
 }
 
+void ZeroPublisher::publishHealthQuery()
+{
+    qDebug() << "HealthQuery has been added to output queue";
+    alise::HealthQuery query;
+    query.set_query(true);
+    appendToQueue(sonica, query);
+}
+
 void ZeroPublisher::send(itemType &str)
 {
     zmq::message_t identity(str.first);

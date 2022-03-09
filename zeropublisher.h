@@ -43,6 +43,7 @@ public slots:
     void publishBlock(const DataTypes::BlockStruct blk);
     void publishHello(const QString id, const quint32 code);
     void publishNtpStatus(bool status);
+    void publishHealthQuery();
 
 private:
     zmq::context_t &_ctx;

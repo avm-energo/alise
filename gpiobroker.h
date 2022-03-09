@@ -8,12 +8,6 @@
 #include <gpiod.hpp>
 class GpioBroker : public QObject
 {
-//    enum class BlinkMode
-//    {
-//        verysmall,
-//        small,
-//        big
-//    };
     enum BlinkTimeout
     {
         verysmall = 50,
@@ -36,17 +30,13 @@ public:
     void rebootMyself();
 
 private:
-//    bool noBooter = true;
     bool blinkStatus = true;
-//    int shortBlink = 0;
     int resetCounter = 0;
-//    BlinkMode currentMode = BlinkMode::big;
 
     QTimer m_timer;
     QTimer m_gpioTimer;
-    QTimer m_resetTimer;
+    QTimer m_resetTimer, m_healthQueryTimeoutTimer;
     void reset();
-//    void blinker(int code);
     void criticalBlinking();
 
     ::gpiod::chip chip0, chip1, chip2, chip3;
