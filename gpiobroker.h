@@ -40,6 +40,9 @@ private:
     void criticalBlinking();
 
     ::gpiod::chip chip0, chip1, chip2, chip3;
+
+private slots:
+    void blink();
 };
 
 #endif // GPIOBROKER_H
