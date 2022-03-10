@@ -7,6 +7,7 @@
 #include <memory>
 #include <random>
 #include <thread>
+#include <config.h>
 
 ZeroPublisher::ZeroPublisher(zmq::context_t &ctx, int sock_type, QObject *parent)
     : QObject(parent), _ctx(ctx), _worker(_ctx, sock_type)
@@ -77,7 +78,7 @@ void ZeroPublisher::publishHello(const QString id, const quint32 code)
 {
     qDebug() << "HelloReply has been added to output queue: " << id << ", code: " << code;
     alise::HelloReply helloReply;
-    helloReply.set_message(code + 1);
+    helloReply.set_message(COMAVERSION);
     appendToQueue(id.toStdString(), helloReply);
 }
 
