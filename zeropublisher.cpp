@@ -49,7 +49,7 @@ void ZeroPublisher::publishTime(const timespec time)
     google::protobuf::Timestamp protoTime;
     protoTime.set_seconds(time.tv_sec);
     protoTime.set_nanos(time.tv_nsec);
-    appendToQueue(admin, protoTime);
+    appendToQueue(sonicacore, protoTime);
 }
 
 void ZeroPublisher::publishPowerStatus(const AVTUK_CCU::Main powerStatus)
@@ -57,7 +57,7 @@ void ZeroPublisher::publishPowerStatus(const AVTUK_CCU::Main powerStatus)
     qDebug() << "PowerStatus has been added to output queue: " << powerStatus.PWRIN << ", resetReq: " << powerStatus.resetReq;
     alise::PowerStatus protoPower;
     protoPower.set_pwrin(powerStatus.PWRIN);
-    appendToQueue(sonica, protoPower);
+    appendToQueue(sonicablock, protoPower);
 }
 
 void ZeroPublisher::publishBlock(const DataTypes::BlockStruct blk)
@@ -86,7 +86,7 @@ void ZeroPublisher::publishNtpStatus(bool status)
     qDebug() << "NtpStatus has been added to output queue: " << status;
     alise::NtpStatus ntpStatus;
     ntpStatus.set_isntpenabled(status);
-    appendToQueue(admin, ntpStatus);
+    appendToQueue(sonicacore, ntpStatus);
 }
 
 void ZeroPublisher::publishHealthQuery()
@@ -94,7 +94,7 @@ void ZeroPublisher::publishHealthQuery()
     qDebug() << "HealthQuery has been added to output queue";
     alise::HealthQuery query;
     query.set_query(true);
-    appendToQueue(sonica, query);
+    appendToQueue(sonicacore, query);
 }
 
 void ZeroPublisher::send(itemType &str)
