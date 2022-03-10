@@ -95,7 +95,7 @@ void ZeroPublisher::publishHealthQuery()
     qDebug() << "HealthQuery has been added to output queue";
     alise::HealthQuery query;
     query.set_query(true);
-    appendToQueue(sonicacore, query);
+    appendToQueue(booter, query);
 }
 
 void ZeroPublisher::send(itemType &str)
