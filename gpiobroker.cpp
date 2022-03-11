@@ -92,20 +92,27 @@ void GpioBroker::setIndication(alise::Health_Code code)
     {
     case alise::Health_Code_Startup:
     {
-        m_gpioTimer.setInterval(BlinkTimeout::small);
+        if (m_currentBlinkingPeriod == BlinkTimeout::small)
+            return;
+        m_currentBlinkingPeriod = BlinkTimeout::small;
         break;
     }
     case alise::Health_Code_Work:
     {
-        m_gpioTimer.setInterval(BlinkTimeout::big);
+        if (m_currentBlinkingPeriod == BlinkTimeout::big)
+            return;
+        m_currentBlinkingPeriod = BlinkTimeout::big;
         break;
     }
     default:
     {
-        m_gpioTimer.setInterval(BlinkTimeout::verysmall);
+        if (m_currentBlinkingPeriod == BlinkTimeout::verysmall)
+            return;
+        m_currentBlinkingPeriod = BlinkTimeout::verysmall;
         break;
     }
     }
+    m_gpioTimer.setInterval(m_currentBlinkingPeriod);
 }
 
 void GpioBroker::rebootMyself()

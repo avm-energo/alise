@@ -36,6 +36,7 @@ private:
     QTimer m_timer;
     QTimer m_gpioTimer;
     QTimer m_resetTimer, m_healthQueryTimeoutTimer;
+    int m_currentBlinkingPeriod;
     void reset();
     void criticalBlinking();
 
