@@ -20,7 +20,7 @@ GpioBroker::GpioBroker(QObject *parent) : QObject(parent)
     m_timer.setInterval(1000);
     m_resetTimer.setInterval(100);
     m_gpioTimer.setInterval(50);
-    m_healthQueryTimeoutTimer.setInterval(2500);
+    m_healthQueryTimeoutTimer.setInterval(4000);
     QObject::connect(&m_timer, &QTimer::timeout, this, &GpioBroker::checkPowerUnit);
     QObject::connect(&m_healthQueryTimeoutTimer, &QTimer::timeout, this, &GpioBroker::criticalBlinking);
     QObject::connect(&m_resetTimer, &QTimer::timeout, this, &GpioBroker::reset);
@@ -87,7 +87,7 @@ void GpioBroker::setIndication(alise::Health_Code code)
 //    m_gpioTimer.stop();
 //    blinkStatus = 0;
 //    QObject::disconnect(&m_gpioTimer, &QTimer::timeout, nullptr, nullptr);
-
+    m_healthQueryTimeoutTimer.start();
     switch (code)
     {
     case alise::Health_Code_Startup:
