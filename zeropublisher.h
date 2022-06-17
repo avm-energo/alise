@@ -1,6 +1,6 @@
 #pragma once
 #include "../gen/datatypes.h"
-#include "../gen/modules.h"
+#include "avtukccu.h"
 
 #include <QMutex>
 #include <QObject>

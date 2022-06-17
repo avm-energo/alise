@@ -1,6 +1,6 @@
 #include "recovery.h"
 
-#include "../gen/modules.h"
+#include "avtukccu.h"
 
 #include <QDebug>
 #include <QDir>

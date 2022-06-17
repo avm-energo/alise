@@ -42,6 +42,7 @@ find_package(cppzmq REQUIRED)
 
 set(SOURCES
     main.cpp
+    avtukccu.h
     timesyncronizer.cpp
     timesyncronizer.h
     helper.h
