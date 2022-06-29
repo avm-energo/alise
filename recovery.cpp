@@ -106,8 +106,10 @@ void Recovery::restartNetwork()
     myProcess->waitForFinished();
 }
 
-void Recovery::receiveBlock(const DataTypes::BlockStruct blk)
+// void Recovery::receiveBlock(const DataTypes::BlockStruct blk)
+void Recovery::receiveBlock(const QVariant &msg)
 {
+    auto blk = msg.value<DataTypes::BlockStruct>();
     switch (blk.data.size())
     {
     case sizeof(AVTUK_CCU::Main):

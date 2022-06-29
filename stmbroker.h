@@ -1,5 +1,6 @@
 #pragma once
-#include "../gen/datatypes.h"
+
+#include "../gen/datamanager/typesproxy.h"
 #include "avtukccu.h"
 #include "protos.pb.h"
 
@@ -27,25 +28,16 @@ public /*slots*/:
 
 private:
     AVTUK_CCU::Indication transform(alise::Health_Code code) const;
-    timespec transform(google::protobuf::Timestamp timestamp) const
-    {
-        timespec temp;
-        temp.tv_nsec = timestamp.nanos();
-        temp.tv_sec = timestamp.seconds();
-        return temp;
-    }
+    timespec transform(google::protobuf::Timestamp timestamp) const;
+
     // Controller m_controller;
     Protocom *m_interface;
     QTimer m_timer;
+    UniquePointer<DataTypesProxy> proxyBS, proxyBStr;
+
 #ifdef TEST_INDICATOR
     QTimer m_testTimer;
-
 #endif
-    void printbs(const DataTypes::BitStringStruct &st)
-    {
-        std::cout << "BitString {"
-                  << "Addr:" << st.sigAdr << ","
-                  << "Val:" << st.sigVal << ","
-                  << "Qual:" << st.sigQuality << " }" << std::endl;
-    }
+
+    void printbs(const DataTypes::BitStringStruct &st);
 };

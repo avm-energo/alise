@@ -13,9 +13,9 @@ Q_DECLARE_METATYPE(AVTUK_CCU::Indication);
 
 #define LOG_PROTOBUF
 
-constexpr char booter[] = "sb"; // booter
+constexpr char booter[] = "sb";      // booter
 constexpr char sonicablock[] = "sc"; // core block
-constexpr char sonicacore[] = "sa"; // core
+constexpr char sonicacore[] = "sa";  // core
 
 // template <typename T> void appendToQueue(std::string &&id, const T &paylod);
 
@@ -38,9 +38,9 @@ public:
 
 signals:
 public slots:
-    void publishTime(const timespec time);
+    void publishTime(const QVariant &msg);
     void publishPowerStatus(const AVTUK_CCU::Main powerStatus);
-    void publishBlock(const DataTypes::BlockStruct blk);
+    void publishBlock(const QVariant &msg);
     void publishHello(const QString id, const quint32 code);
     void publishNtpStatus(bool status);
     void publishHealthQuery();

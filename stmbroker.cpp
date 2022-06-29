@@ -1,20 +1,21 @@
 #include "stmbroker.h"
 
-#include "../gen/board.h"
-#include "../gen/datamanager.h"
 #include "../gen/helper.h"
 #include "../gen/stdfunc.h"
 #include "../interfaces/baseinterface.h"
 #include "../interfaces/protocom.h"
 #include "../interfaces/usbhidportinfo.h"
+#include "../module/board.h"
 #include "controller.h"
 #include "helper.h"
 #include "timesyncronizer.h"
 
 #include <QRandomGenerator>
 
-StmBroker::StmBroker(QObject *parent) : QObject(parent)
+StmBroker::StmBroker(QObject *parent) : QObject(parent), proxyBS(new DataTypesProxy), proxyBStr(new DataTypesProxy)
 {
+    proxyBS->RegisterType<DataTypes::BlockStruct>();
+    proxyBStr->RegisterType<DataTypes::BitStringStruct>();
 }
 
 bool StmBroker::connectToStm()
@@ -42,20 +43,25 @@ bool StmBroker::connectToStm()
         return false;
     }
     const auto &board = Board::GetInstance();
-    const auto &manager = DataManager::GetInstance();
-    QObject::connect(&manager, &DataManager::bitStringReceived, &board, &Board::update);
-    QObject::connect(&manager, &DataManager::blockReceived, this, [](const auto bs) { qDebug() << bs; });
+    QObject::connect(proxyBStr.get(), &DataTypesProxy::DataStorable, &board, &Board::update);
+    QObject::connect(proxyBS.get(), &DataTypesProxy::DataStorable, this,
+        //[](const auto bs) {
+        [](const QVariant &msg) {
+            auto bs = msg.value<DataTypes::BlockStruct>();
+            qDebug() << bs;
+        });
+
     m_timer.setInterval(1000);
+
 #ifdef TEST_INDICATOR
     m_testTimer.setInterval(10000);
     QObject::connect(&m_testTimer, &QTimer::timeout, this,
         [this] { setIndication(static_cast<alise::Health_Code>(QRandomGenerator::global()->bounded(0, 8))); });
     m_testTimer.start();
 #endif
+
     m_timer.start();
-
     QObject::connect(&m_timer, &QTimer::timeout, this, &StmBroker::checkPowerUnit);
-
     return true;
 }
 
@@ -138,4 +144,20 @@ AVTUK_CCU::Indication StmBroker::transform(alise::Health_Code code) const
     default:
         return transform(alise::Health_Code_SettingsError);
     }
+}
+
+timespec StmBroker::transform(google::protobuf::Timestamp timestamp) const
+{
+    timespec temp;
+    temp.tv_nsec = timestamp.nanos();
+    temp.tv_sec = timestamp.seconds();
+    return temp;
+}
+
+void StmBroker::printbs(const DataTypes::BitStringStruct &st)
+{
+    std::cout << "BitString {"
+              << "Addr:" << st.sigAdr << ","
+              << "Val:" << st.sigVal << ","
+              << "Qual:" << st.sigQuality << " }" << std::endl;
 }

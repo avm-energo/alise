@@ -1,6 +1,5 @@
 #include "zerorunner.h"
 
-#include "../gen/datamanager.h"
 #include "../gen/stdfunc.h"
 #include "timesyncronizer.h"
 
@@ -10,8 +9,23 @@
 #include <fstream>
 #include <iostream>
 #include <thread>
+
 namespace runner
 {
+
+ZeroRunner::ZeroRunner(QObject *parent)
+    : QObject(parent)
+    , ctx_(1)
+    , frontend_(ctx_, ZMQ_ROUTER)
+    , backendSub_(ctx_, ZMQ_DEALER)
+    , backendPub_(ctx_, ZMQ_DEALER)
+    , proxyBS(new DataTypesProxy)
+    , proxyTS(new DataTypesProxy)
+{
+    proxyBS->RegisterType<DataTypes::BlockStruct>();
+    proxyTS->RegisterType<timespec>();
+}
+
 void ZeroRunner::runServer()
 {
     qRegisterMetaType<ZeroSubscriber::healthType>("healthType");
@@ -24,7 +38,7 @@ void ZeroRunner::runServer()
     auto new_sub = UniquePointer<ZeroSubscriber>(new ZeroSubscriber(ctx_, ZMQ_DEALER));
     auto new_pub = UniquePointer<ZeroPublisher>(new ZeroPublisher(ctx_, ZMQ_DEALER));
 
-    QTimer *tmr = new QTimer;
+    auto tmr = new QTimer;
     tmr->setInterval(helloRequestInterval);
     connect(tmr, &QTimer::timeout, new_pub.get(), &ZeroPublisher::publishHealthQuery);
 
@@ -44,12 +58,12 @@ void ZeroRunner::runServer()
     }));
 
     auto publisher = std::unique_ptr<std::thread>(new std::thread([&, worker = std::move(new_pub)] {
-        const auto &manager = DataManager::GetInstance();
-        connect(&manager, &DataManager::timeReceived, worker.get(), &ZeroPublisher::publishTime, Qt::DirectConnection);
+        connect(proxyTS.get(), &DataTypesProxy::DataStorable, worker.get(), &ZeroPublisher::publishTime,
+            Qt::DirectConnection);
         connect(
             this, &ZeroRunner::publishNtpStatus, worker.get(), &ZeroPublisher::publishNtpStatus, Qt::DirectConnection);
-        connect(
-            &manager, &DataManager::blockReceived, worker.get(), &ZeroPublisher::publishBlock, Qt::DirectConnection);
+        connect(proxyBS.get(), &DataTypesProxy::DataStorable, worker.get(), &ZeroPublisher::publishBlock,
+            Qt::DirectConnection);
         worker->work();
     }));
 
@@ -114,7 +128,6 @@ void ZeroRunner::polling()
 
     } catch (std::exception &e)
     {
-
         qDebug() << "Exception: " << e.what();
         return;
     }

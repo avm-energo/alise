@@ -3,11 +3,11 @@
 #include "protos.pb.h"
 
 #include <QDebug>
+#include <config.h>
 #include <functional>
 #include <memory>
 #include <random>
 #include <thread>
-#include <config.h>
 
 ZeroPublisher::ZeroPublisher(zmq::context_t &ctx, int sock_type, QObject *parent)
     : QObject(parent), _ctx(ctx), _worker(_ctx, sock_type)
@@ -44,8 +44,10 @@ template <typename T> void ZeroPublisher::appendToQueue(const std::string &id, c
     _waiter.wakeOne();
 }
 
-void ZeroPublisher::publishTime(const timespec time)
+// void ZeroPublisher::publishTime(const timespec &time)
+void ZeroPublisher::publishTime(const QVariant &msg)
 {
+    auto time = msg.value<timespec>();
     qDebug() << "Time has been added to output queue: " << time.tv_sec;
     google::protobuf::Timestamp protoTime;
     protoTime.set_seconds(time.tv_sec);
@@ -55,14 +57,17 @@ void ZeroPublisher::publishTime(const timespec time)
 
 void ZeroPublisher::publishPowerStatus(const AVTUK_CCU::Main powerStatus)
 {
-    qDebug() << "PowerStatus has been added to output queue: " << powerStatus.PWRIN << ", resetReq: " << powerStatus.resetReq;
+    qDebug() << "PowerStatus has been added to output queue: " << powerStatus.PWRIN
+             << ", resetReq: " << powerStatus.resetReq;
     alise::PowerStatus protoPower;
     protoPower.set_pwrin(powerStatus.PWRIN);
     appendToQueue(sonicablock, protoPower);
 }
 
-void ZeroPublisher::publishBlock(const DataTypes::BlockStruct blk)
+// void ZeroPublisher::publishBlock(const DataTypes::BlockStruct &blk)
+void ZeroPublisher::publishBlock(const QVariant &msg)
 {
+    auto blk = msg.value<DataTypes::BlockStruct>();
     switch (blk.data.size())
     {
     case sizeof(AVTUK_CCU::Main):

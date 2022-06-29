@@ -1,4 +1,5 @@
 #pragma once
+#include "../gen/datamanager/typesproxy.h"
 #include "protos.pb.h"
 #include "zeropublisher.h"
 #include "zerosubscriber.h"
@@ -16,21 +17,17 @@ class ZeroRunner : public QObject
 {
     Q_OBJECT
 public:
-    ZeroRunner(QObject *parent = nullptr)
-        : QObject(parent)
-        , ctx_(1)
-        , frontend_(ctx_, ZMQ_ROUTER)
-        , backendSub_(ctx_, ZMQ_DEALER)
-        , backendPub_(ctx_, ZMQ_DEALER)
-    {
-    }
     enum
     {
         kMaxThread = 1
     };
+
+    ZeroRunner(QObject *parent = nullptr);
+
 public slots:
     void runServer();
     void stopServer();
+
 signals:
     // void publishPowerStatus(AVTUK_14::Main powerStatus);
     void publishNtpStatus(bool);
@@ -50,5 +47,8 @@ private:
     zmq::socket_t frontend_;
     zmq::socket_t backendSub_;
     zmq::socket_t backendPub_;
+
+    UniquePointer<DataTypesProxy> proxyBS, proxyTS;
 };
+
 }

@@ -9,7 +9,9 @@ class Recovery : public QObject
 public:
     Recovery(QObject *parent = nullptr);
 
-    void receiveBlock(const DataTypes::BlockStruct blk);
+public slots:
+    void receiveBlock(const QVariant &msg);
+
 signals:
     void rebootReq();
 
@@ -25,4 +27,5 @@ private:
     void restartNetwork();
     bool resetInit = false;
 };
+
 #endif // RECOVERY_H
