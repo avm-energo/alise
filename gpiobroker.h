@@ -1,6 +1,6 @@
 #ifndef GPIOBROKER_H
 #define GPIOBROKER_H
-#include "../gen/modules.h"
+
 #include "protos.pb.h"
 
 #include <QObject>

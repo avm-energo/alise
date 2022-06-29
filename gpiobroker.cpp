@@ -1,6 +1,7 @@
 #include "gpiobroker.h"
 
-#include "../gen/datamanager.h"
+#include "../gen/datamanager/datamanager.h"
+#include "avtukccu.h"
 #include "../gen/error.h"
 
 #include <QDebug>
@@ -79,7 +80,7 @@ void GpioBroker::checkPowerUnit()
     str.resetReq = false;
     std::memcpy(blk.data.data(), &str, sizeof(AVTUK_CCU::Main));
     blk.ID = AVTUK_CCU::MainBlock;
-    DataManager::addSignalToOutList(DataTypes::SignalTypes::Block, blk);
+    DataManager::GetInstance().addSignalToOutList(blk);
 }
 
 void GpioBroker::setIndication(alise::Health_Code code)
@@ -158,7 +159,7 @@ void GpioBroker::reset()
         str.resetReq = true;
         std::memcpy(blk.data.data(), &str, sizeof(AVTUK_CCU::Main));
         blk.ID = AVTUK_CCU::MainBlock;
-        DataManager::addSignalToOutList(DataTypes::SignalTypes::Block, blk);
+        DataManager::GetInstance().addSignalToOutList(blk);
     }
 }
 
