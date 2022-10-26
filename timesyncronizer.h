@@ -2,6 +2,7 @@
 
 #include <QObject>
 #include <ctime>
+
 class TimeSyncronizer : public QObject
 {
     Q_OBJECT

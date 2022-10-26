@@ -5,12 +5,12 @@
 #elif defined(AVTUK_NO_STM)
 #include "gpiobroker.h"
 #endif
-#include "../gen/datamanager/typesproxy.h"
 #include "timesyncronizer.h"
 #include "zerorunner.h"
 
 #include <QObject>
 #include <QThread>
+#include <gen/datamanager/typesproxy.h>
 
 class Controller : public QObject
 {

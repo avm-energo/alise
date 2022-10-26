@@ -1,12 +1,12 @@
 #include "zerorunner.h"
 
-#include "../gen/stdfunc.h"
 #include "timesyncronizer.h"
 
 #include <QDebug>
 #include <QMutexLocker>
 #include <QTimer>
 #include <fstream>
+#include <gen/stdfunc.h>
 #include <iostream>
 #include <thread>
 

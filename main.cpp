@@ -1,11 +1,11 @@
 
 #include "../comaversion/comaversion.h"
-#include "../gen/logger.h"
-#include "../gen/stdfunc.h"
 #include "controller.h"
 
 #include <QCoreApplication>
 #include <config.h>
+#include <gen/logger.h>
+#include <gen/stdfunc.h>
 
 #ifdef AVTUK_NO_STM
 void listPins();
@@ -41,8 +41,8 @@ int main(int argc, char *argv[])
     }
 
     StdFunc::Init();
-    Logging::writeStart();
-    qInstallMessageHandler(Logging::messageHandler);
+    Logger::writeStart();
+    qInstallMessageHandler(Logger::messageHandler);
     Controller controller;
     if (!controller.launch())
         return 13;

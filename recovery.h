@@ -1,7 +1,7 @@
 #ifndef RECOVERY_H
 #define RECOVERY_H
 
-#include "../gen/datatypes.h"
+#include <gen/datatypes.h>
 
 class Recovery : public QObject
 {

@@ -1,10 +1,10 @@
 #include "zerosubscriber.h"
 
-#include "../gen/error.h"
-
 #include <QCoreApplication>
 #include <QDebug>
 #include <QString>
+#include <gen/error.h>
+
 ZeroSubscriber::ZeroSubscriber(zmq::context_t &ctx, int sock_type, QObject *parent)
     : QObject(parent), _ctx(ctx), _worker(_ctx, sock_type)
 {

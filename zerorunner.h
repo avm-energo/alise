@@ -1,11 +1,11 @@
 #pragma once
-#include "../gen/datamanager/typesproxy.h"
 #include "protos.pb.h"
 #include "zeropublisher.h"
 #include "zerosubscriber.h"
 
 #include <QMutex>
 #include <QObject>
+#include <gen/datamanager/typesproxy.h>
 #include <zmq.hpp>
 
 namespace runner

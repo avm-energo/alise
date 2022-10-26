@@ -1,7 +1,5 @@
 #include "stmbroker.h"
 
-#include "../gen/helper.h"
-#include "../gen/stdfunc.h"
 #include "../interfaces/baseinterface.h"
 #include "../interfaces/protocom.h"
 #include "../interfaces/usbhidportinfo.h"
@@ -11,6 +9,8 @@
 #include "timesyncronizer.h"
 
 #include <QRandomGenerator>
+#include <gen/helper.h>
+#include <gen/stdfunc.h>
 
 StmBroker::StmBroker(QObject *parent) : QObject(parent), proxyBS(new DataTypesProxy), proxyBStr(new DataTypesProxy)
 {

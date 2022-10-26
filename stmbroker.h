@@ -1,11 +1,11 @@
 #pragma once
 
-#include "../gen/datamanager/typesproxy.h"
 #include "avtukccu.h"
 #include "protos.pb.h"
 
 #include <QObject>
 #include <QTimer>
+#include <gen/datamanager/typesproxy.h>
 
 //#define TEST_INDICATOR
 

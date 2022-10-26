@@ -1,10 +1,10 @@
 #pragma once
-#include "../gen/datatypes.h"
 #include "avtukccu.h"
 
 #include <QMutex>
 #include <QObject>
 #include <QWaitCondition>
+#include <gen/datatypes.h>
 #include <queue>
 #include <vector>
 #include <zmq.hpp>

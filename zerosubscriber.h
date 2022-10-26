@@ -1,10 +1,10 @@
 #pragma once
-#include "../gen/datatypes.h"
 #include "protos.pb.h"
 
 #include <QMutex>
 #include <QObject>
 #include <QWaitCondition>
+#include <gen/datatypes.h>
 #include <vector>
 #include <zmq.hpp>
 
