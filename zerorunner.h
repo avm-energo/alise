@@ -25,7 +25,7 @@ public:
     ZeroRunner(QObject *parent = nullptr);
 
 public slots:
-    void runServer();
+    void runServer(int port);
     void stopServer();
 
 signals:
