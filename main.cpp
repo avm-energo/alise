@@ -43,8 +43,10 @@ int main(int argc, char *argv[])
     StdFunc::Init();
     Logger::writeStart();
     qInstallMessageHandler(Logger::messageHandler);
-    Controller controller;
-    if (!controller.launch())
+    Controller booterController, coreController;
+    if (!booterController.launch(5556))
+        return 13;
+    if (!coreController.launch(5555))
         return 13;
     std::cout << "Enter the event loop" << std::endl;
     return a.exec();

@@ -57,7 +57,7 @@ Controller::~Controller()
 {
 }
 
-bool Controller::launch()
+bool Controller::launch(int port)
 {
 #if defined(AVTUK_STM)
     if (!m_stmBroker.connectToStm())
@@ -83,7 +83,7 @@ bool Controller::launch()
     timeSync.systemTime();
 #endif
 
-    worker->runServer();
+    worker->runServer(port);
     return true;
 }
 

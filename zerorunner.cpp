@@ -26,12 +26,12 @@ ZeroRunner::ZeroRunner(QObject *parent)
     proxyTS->RegisterType<timespec>();
 }
 
-void ZeroRunner::runServer()
+void ZeroRunner::runServer(int port)
 {
     qRegisterMetaType<ZeroSubscriber::healthType>("healthType");
     qRegisterMetaType<timespec>();
     qRegisterMetaType<AVTUK_CCU::Main>();
-    frontend_.bind("tcp://*:5555");
+    frontend_.bind("tcp://*:" + std::to_string(port));
     backendSub_.bind("inproc://backendSub");
     backendPub_.bind("inproc://backendPub");
 
