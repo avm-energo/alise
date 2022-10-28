@@ -1,8 +1,8 @@
 #include "gpiobroker.h"
 
-#include "../gen/datamanager/datamanager.h"
+#include <gen/datamanager/datamanager.h>
 #include "avtukccu.h"
-#include "../gen/error.h"
+#include <gen/error.h>
 
 #include <QDebug>
 #include <QRandomGenerator>
