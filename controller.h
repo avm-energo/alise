@@ -1,12 +1,19 @@
 #pragma once
 #include "recovery.h"
-#if defined(AVTUK_STM)
-#include "stmbroker.h"
-#elif defined(AVTUK_NO_STM)
-#include "gpiobroker.h"
-#endif
 #include "timesyncronizer.h"
 #include "zerorunner.h"
+
+// clang-format off
+#if defined(AVTUK_STM)
+    #include "stmbroker.h"
+    using deviceType = StmBroker;
+#elif defined(AVTUK_NO_STM)
+    #include "gpiobroker.h"
+    using deviceType = GpioBroker;
+#else
+    using deviceType = void;
+#endif
+// clang-format on
 
 #include <QObject>
 #include <QThread>
@@ -15,13 +22,8 @@
 class Controller : public QObject
 {
 public:
-#if defined(AVTUK_STM)
-    using deviceType = StmBroker;
-#elif defined(AVTUK_NO_STM)
-    using deviceType = GpioBroker;
-#endif
-    explicit Controller(QObject *parent = nullptr) noexcept;
-    explicit Controller(std::string addr, QObject *parent = nullptr) noexcept;
+    explicit Controller(deviceType *devBroker, QObject *parent = nullptr) noexcept;
+    explicit Controller(std::string addr, deviceType *devBroker, QObject *parent = nullptr) noexcept;
 
     ~Controller() override;
 
@@ -32,7 +34,7 @@ signals:
 
 private:
     runner::ZeroRunner *worker;
-    deviceType m_stmBroker;
+    deviceType *deviceBroker;
     TimeSyncronizer timeSync;
     Recovery recovery;
     int syncCounter = 0;

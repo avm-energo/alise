@@ -5,14 +5,14 @@
 constexpr int minSecs = 60;
 constexpr int hourSecs = minSecs * minSecs;
 
-Controller::Controller(QObject *parent) noexcept : Controller("0.0.0.0", parent)
+Controller::Controller(deviceType *devBroker, QObject *parent) noexcept : Controller("0.0.0.0", devBroker, parent)
 {
 }
 
-Controller::Controller(std::string addr, QObject *parent) noexcept
+Controller::Controller(std::string addr, deviceType *devBroker, QObject *parent) noexcept
     : QObject(parent)
     , worker(new runner::ZeroRunner(this))
-    , m_stmBroker({})
+    , deviceBroker(devBroker)
     , proxyBS(new DataTypesProxy)
     , proxyTS(new DataTypesProxy)
 {
@@ -20,13 +20,13 @@ Controller::Controller(std::string addr, QObject *parent) noexcept
     proxyBS->RegisterType<DataTypes::BlockStruct>();
     proxyTS->RegisterType<timespec>();
 
-    connect(worker, &runner::ZeroRunner::healthReceived, &m_stmBroker, &deviceType::setIndication);
+    connect(worker, &runner::ZeroRunner::healthReceived, deviceBroker, &deviceType::setIndication);
     // NOTE avtuk will be rebooted
-    connect(&recovery, &Recovery::rebootReq, &m_stmBroker, &deviceType::rebootMyself);
+    connect(&recovery, &Recovery::rebootReq, deviceBroker, &deviceType::rebootMyself);
 
 #if defined(AVTUK_STM)
-    connect(worker, &runner::ZeroRunner::timeReceived, &m_stmBroker, &deviceType::setTime);
-    connect(worker, &runner::ZeroRunner::timeRequest, &m_stmBroker, &deviceType::getTime);
+    connect(worker, &runner::ZeroRunner::timeReceived, deviceBroker, &deviceType::setTime);
+    connect(worker, &runner::ZeroRunner::timeRequest, deviceBroker, &deviceType::getTime);
 #elif defined(AVTUK_NO_STM)
     connect(worker, &runner::ZeroRunner::timeRequest, &timeSync, //
         [&] {
@@ -46,7 +46,7 @@ Controller::Controller(std::string addr, QObject *parent) noexcept
         if (syncCounter == minSecs)
         {
 #if defined(AVTUK_STM)
-            m_stmBroker.setTime(timeSync.systemTime());
+            deviceBroker->setTime(timeSync.systemTime());
 #endif
             syncCounter = 0;
         }
@@ -60,7 +60,7 @@ Controller::~Controller()
 bool Controller::launch(int port)
 {
 #if defined(AVTUK_STM)
-    if (!m_stmBroker.connectToStm())
+    if (!deviceBroker->connectToStm())
     {
         delete worker;
         return false;
@@ -78,7 +78,7 @@ bool Controller::launch(int port)
         Qt::DirectConnection);
 
 #if defined(AVTUK_STM)
-    m_stmBroker.getTime();
+    deviceBroker->getTime();
 #elif defined(AVTUK_NO_STM)
     timeSync.systemTime();
 #endif

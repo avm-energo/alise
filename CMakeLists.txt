@@ -60,13 +60,14 @@ set(SOURCES
 
 if (AVTUK-14)
     list(APPEND SOURCES
-        stmbroker.cpp
-        stmbroker.h)
+         stmbroker.cpp
+         stmbroker.h)
 elseif  (AVTUK-12)
     list(APPEND SOURCES
-        gpiobroker.cpp
-        gpiobroker.h)
+         gpiobroker.cpp
+         gpiobroker.h)
 endif()
+
 add_executable(${PROJECT_NAME} ${SOURCES})
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${CONAN_INCLUDE_DIRS_CPPZMQ})

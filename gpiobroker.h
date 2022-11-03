@@ -6,6 +6,7 @@
 #include <QObject>
 #include <QTimer>
 #include <gpiod.hpp>
+
 class GpioBroker : public QObject
 {
     enum BlinkTimeout
