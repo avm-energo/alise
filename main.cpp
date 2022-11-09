@@ -6,6 +6,8 @@
 #include <config.h>
 #include <gen/logger.h>
 #include <gen/stdfunc.h>
+#include <iostream>
+#include <memory>
 
 #ifdef AVTUK_NO_STM
 void listPins();
@@ -43,7 +45,8 @@ int main(int argc, char *argv[])
     StdFunc::Init();
     Logger::writeStart();
     qInstallMessageHandler(Logger::messageHandler);
-    Controller booterController, coreController;
+    auto devBroker = std::unique_ptr<deviceType>(new deviceType);
+    Controller booterController(devBroker.get()), coreController(devBroker.get());
     if (!booterController.launch(5556))
         return 13;
     if (!coreController.launch(5555))
