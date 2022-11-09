@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
     }
 
     StdFunc::Init();
-    Logger::writeStart();
+    Logger::writeStart("/usr/sonica/alise/logs/alise.log");
     qInstallMessageHandler(Logger::messageHandler);
     auto devBroker = std::unique_ptr<deviceType>(new deviceType);
     Controller booterController(devBroker.get()), coreController(devBroker.get());
