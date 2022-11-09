@@ -61,7 +61,7 @@ void ZeroPublisher::publishPowerStatus(const AVTUK_CCU::Main powerStatus)
              << ", resetReq: " << powerStatus.resetReq;
     alise::PowerStatus protoPower;
     protoPower.set_pwrin(powerStatus.PWRIN);
-    appendToQueue(sonicablock, protoPower);
+    appendToQueue(sonicacore, protoPower);
 }
 
 // void ZeroPublisher::publishBlock(const DataTypes::BlockStruct &blk)
