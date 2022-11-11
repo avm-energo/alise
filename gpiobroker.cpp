@@ -91,6 +91,7 @@ void GpioBroker::setIndication(alise::Health_Code code)
 //    m_gpioTimer.stop();
 //    blinkStatus = 0;
 //    QObject::disconnect(&m_gpioTimer, &QTimer::timeout, nullptr, nullptr);
+    qDebug() << "Setting indication: " << code;
     m_healthQueryTimeoutTimer.start();
     switch (code)
     {
@@ -131,6 +132,7 @@ void GpioBroker::getTime()
 
 void GpioBroker::rebootMyself()
 {
+    qDebug() << "Rebooting...";
     m_timer.stop();
     m_gpioTimer.stop();
     m_resetTimer.stop();
@@ -142,6 +144,7 @@ void GpioBroker::rebootMyself()
 void GpioBroker::reset()
 {
     QMutexLocker locker(&_mutex);
+    qDebug() << "Reset interface settings...";
     bool value = !chip2.get_line(ResetPin.offset).get_value();
 
     if (value)
