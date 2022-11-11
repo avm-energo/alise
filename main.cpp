@@ -43,6 +43,7 @@ int main(int argc, char *argv[])
 
     QSettings::setPath(QSettings::IniFormat, QSettings::SystemScope, "/root/sonica/alise/settings");
     QSettings settings("settings.ini", QSettings::IniFormat);
+    qInfo() << "Reading settings from: " << settings.fileName();
     int logcounter = settings.value("counter", "1").toInt();
     settings.setValue("counter", ++logcounter);
     QString logFileName = settings.value("logfile", "/root/sonica/alise/logs/alise.log").toString();
