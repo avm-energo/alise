@@ -1,6 +1,7 @@
 #pragma once
 
 #include "avtukccu.h"
+#include "gen/stdfunc.h"
 #include "protos.pb.h"
 
 #include <QObject>

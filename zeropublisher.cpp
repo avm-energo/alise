@@ -25,6 +25,7 @@ void ZeroPublisher::work()
             checkQueue();
             _waiter.wait(&_mutex);
         }
+        qDebug() << "Exited from worker loop";
     } catch (std::exception &e)
     {
         qDebug() << "Exception: " << e.what();

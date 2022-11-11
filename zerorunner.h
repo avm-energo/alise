@@ -1,4 +1,5 @@
 #pragma once
+#include "gen/stdfunc.h"
 #include "protos.pb.h"
 #include "zeropublisher.h"
 #include "zerosubscriber.h"

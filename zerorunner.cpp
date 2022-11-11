@@ -1,12 +1,12 @@
 #include "zerorunner.h"
 
+#include "gen/stdfunc.h"
 #include "timesyncronizer.h"
 
 #include <QDebug>
 #include <QMutexLocker>
 #include <QTimer>
 #include <fstream>
-#include <gen/stdfunc.h>
 #include <iostream>
 #include <thread>
 
@@ -38,6 +38,7 @@ void ZeroRunner::runServer(int port)
     auto new_sub = UniquePointer<ZeroSubscriber>(new ZeroSubscriber(ctx_, ZMQ_DEALER));
     auto new_pub = UniquePointer<ZeroPublisher>(new ZeroPublisher(ctx_, ZMQ_DEALER));
 
+    // periodically check the connection
     auto tmr = new QTimer;
     tmr->setInterval(helloRequestInterval);
     connect(tmr, &QTimer::timeout, new_pub.get(), &ZeroPublisher::publishHealthQuery);

@@ -5,7 +5,6 @@
 #include <QCoreApplication>
 #include <config.h>
 #include <gen/logger.h>
-#include <gen/stdfunc.h>
 #include <iostream>
 #include <memory>
 
@@ -42,14 +41,21 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    StdFunc::Init();
-    Logger::writeStart("/usr/sonica/alise/logs/alise.log");
+    QSettings::setPath(QSettings::IniFormat, QSettings::SystemScope, "/root/sonica/alise/settings");
+    QSettings settings("settings.ini", QSettings::IniFormat);
+    QString logFileName = settings.value("logfile", "/root/sonica/alise/logs/alise.log").toString();
+    QString logLevel = settings.value("Loglevel", "Info").toString();
+    int portCore = settings.value("CorePort", "5555").toInt();
+    int portBooter = settings.value("BooterPort", "5556").toInt();
+    Logger::writeStart(logFileName);
+    Logger::setLogLevel(logLevel);
     qInstallMessageHandler(Logger::messageHandler);
-    auto devBroker = std::unique_ptr<deviceType>(new deviceType);
-    Controller booterController(devBroker.get()), coreController(devBroker.get());
-    if (!booterController.launch(5556))
+    auto devCoreBroker = std::unique_ptr<deviceType>(new deviceType);
+    auto devBooterBroker = std::unique_ptr<deviceType>(new deviceType);
+    Controller booterController(devBooterBroker.get()), coreController(devCoreBroker.get());
+    if (!booterController.launch(portBooter))
         return 13;
-    if (!coreController.launch(5555))
+    if (!coreController.launch(portCore))
         return 13;
     std::cout << "Enter the event loop" << std::endl;
     return a.exec();
