@@ -5,6 +5,7 @@
 
 #include <QObject>
 #include <QTimer>
+#include <QMutex>
 #include <gpiod.hpp>
 
 class GpioBroker : public QObject
@@ -33,6 +34,7 @@ public:
 private:
     bool blinkStatus = true;
     int resetCounter = 0;
+    QMutex _mutex;
 
     QTimer m_timer;
     QTimer m_gpioTimer;

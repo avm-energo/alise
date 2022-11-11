@@ -2,9 +2,10 @@
 
 #include "helper.h"
 
-#include <QtDebug>
 #include <QDateTime>
+#include <QProcess>
 #include <QTimer>
+#include <QtDebug>
 #include <arpa/inet.h>
 #include <cstdio>
 #include <cstdlib>
@@ -14,8 +15,6 @@
 #include <sys/socket.h>
 #include <sys/time.h>
 #include <sys/timex.h>
-
-#include <QProcess>
 
 #define NTP_PORT 123
 
@@ -46,6 +45,8 @@
 #define MMASK 0x20      /* bit mask for the more bit in Status Byte2 */
 #define PAYLOADSIZE 468 /* size in bytes of the message payload string */
 
+#define NTPSTATUSPERIOD 3000
+
 void printts(const timespec &st)
 {
     auto datetime = QDateTime::fromMSecsSinceEpoch(((st.tv_sec * 1000) + (st.tv_nsec / 1.0e6)));
@@ -56,7 +57,7 @@ void printts(const timespec &st)
 TimeSyncronizer::TimeSyncronizer(QObject *parent) : QObject(parent)
 {
     QTimer *timer = new QTimer(this);
-    timer->setInterval(1000);
+    timer->setInterval(NTPSTATUSPERIOD);
     connect(timer, &QTimer::timeout, this, [this] { emit ntpStatusChanged(ntpStatus()); });
     timer->start();
 }
@@ -80,7 +81,7 @@ void TimeSyncronizer::setSystemTime(const timespec &systemTime)
     QStringList arguments { "-w" };
 
     clock_settime(CLOCK_REALTIME, &systemTime); // set current datetime
-    QProcess *myProcess = new QProcess(this); // set datetime to RTC
+    QProcess *myProcess = new QProcess(this);   // set datetime to RTC
     qInfo() << "HWClock is starting...";
     myProcess->start(program, arguments);
     myProcess->waitForFinished();

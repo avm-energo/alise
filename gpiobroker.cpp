@@ -68,6 +68,7 @@ GpioBroker::GpioBroker(QObject *parent) : QObject(parent)
 
 void GpioBroker::checkPowerUnit()
 {
+    QMutexLocker locker(&_mutex);
     auto status1 = chip0.get_line(PowerStatusPin0.offset).get_value();
     auto status2 = chip3.get_line(PowerStatusPin1.offset).get_value();
     qDebug() << "PWR status 1: " << status1 << ", PWR status 2: " << status2;
@@ -85,6 +86,8 @@ void GpioBroker::checkPowerUnit()
 
 void GpioBroker::setIndication(alise::Health_Code code)
 {
+    QMutexLocker locker(&_mutex);
+
 //    m_gpioTimer.stop();
 //    blinkStatus = 0;
 //    QObject::disconnect(&m_gpioTimer, &QTimer::timeout, nullptr, nullptr);
@@ -116,6 +119,16 @@ void GpioBroker::setIndication(alise::Health_Code code)
     m_gpioTimer.setInterval(m_currentBlinkingPeriod);
 }
 
+void GpioBroker::setTime(timespec time)
+{
+
+}
+
+void GpioBroker::getTime()
+{
+
+}
+
 void GpioBroker::rebootMyself()
 {
     m_timer.stop();
@@ -128,6 +141,7 @@ void GpioBroker::rebootMyself()
 
 void GpioBroker::reset()
 {
+    QMutexLocker locker(&_mutex);
     bool value = !chip2.get_line(ResetPin.offset).get_value();
 
     if (value)

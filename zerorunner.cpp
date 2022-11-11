@@ -45,6 +45,7 @@ void ZeroRunner::runServer(int port)
 
     connect(new_sub.get(), &ZeroSubscriber::helloReceived, new_pub.get(), &ZeroPublisher::publishHello,
         Qt::DirectConnection);
+
     connect(new_sub.get(), &ZeroSubscriber::timeReceived, this, &ZeroRunner::timeReceived);
 
     auto timeSync = UniquePointer<TimeSyncronizer>(new TimeSyncronizer);

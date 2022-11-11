@@ -30,6 +30,7 @@ public /*slots*/:
 private:
     AVTUK_CCU::Indication transform(alise::Health_Code code) const;
     timespec transform(google::protobuf::Timestamp timestamp) const;
+    QMutex _mutex;
 
     // Controller m_controller;
     Protocom *m_interface;

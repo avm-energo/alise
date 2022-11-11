@@ -66,12 +66,14 @@ bool StmBroker::connectToStm()
 
 void StmBroker::checkPowerUnit()
 {
+    QMutexLocker locker(&_mutex);
     Q_CHECK_PTR(m_interface);
     m_interface->writeCommand(Queries::QUSB_ReqBlkData, AVTUK_CCU::MainBlock);
 }
 
 void StmBroker::setIndication(alise::Health_Code code)
 {
+    QMutexLocker locker(&_mutex);
     const auto indication = transform(code);
     DataTypes::BlockStruct block;
     block.ID = AVTUK_CCU::IndicationBlock;
@@ -83,12 +85,14 @@ void StmBroker::setIndication(alise::Health_Code code)
 
 void StmBroker::setTime(timespec time)
 {
+    QMutexLocker locker(&_mutex);
     Q_CHECK_PTR(m_interface);
     m_interface->writeTime(time);
 }
 
 void StmBroker::getTime()
 {
+    QMutexLocker locker(&_mutex);
     Q_CHECK_PTR(m_interface);
     m_interface->reqTime();
 }

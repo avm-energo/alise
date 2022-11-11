@@ -50,9 +50,8 @@ int main(int argc, char *argv[])
     Logger::writeStart(logFileName);
     Logger::setLogLevel(logLevel);
     qInstallMessageHandler(Logger::messageHandler);
-    auto devCoreBroker = std::unique_ptr<deviceType>(new deviceType);
-    auto devBooterBroker = std::unique_ptr<deviceType>(new deviceType);
-    Controller booterController(devBooterBroker.get()), coreController(devCoreBroker.get());
+    auto devBroker = std::unique_ptr<deviceType>(new deviceType);
+    Controller booterController(devBroker.get()), coreController(devBroker.get());
     if (!booterController.launch(portBooter))
         return 13;
     if (!coreController.launch(portCore))
