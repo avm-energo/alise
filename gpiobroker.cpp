@@ -2,6 +2,7 @@
 
 #include <gen/datamanager/datamanager.h>
 #include "avtukccu.h"
+#include "aliseconstants.h"
 #include <gen/error.h>
 
 #include <QDebug>
@@ -18,12 +19,16 @@ constexpr GpioBroker::GpioPin ResetPin { 2, 6 };
 
 GpioBroker::GpioBroker(QObject *parent) : QObject(parent)
 {
-    m_timer.setInterval(1000);
-    m_resetTimer.setInterval(100);
-    m_gpioTimer.setInterval(50);
-    m_healthQueryTimeoutTimer.setInterval(4000);
+    qDebug() << "GPIO Broker created";
+    m_timer.setInterval(AliseConstants::PowerCheckPeriod());
+    m_resetTimer.setInterval(AliseConstants::ResetCheckPeriod());
+    m_gpioTimer.setInterval(AliseConstants::GpioBlinkCheckPeriod());
+    m_healthQueryTimeoutTimer.setInterval(AliseConstants::HealthQueryPeriod());
     QObject::connect(&m_timer, &QTimer::timeout, this, &GpioBroker::checkPowerUnit);
-    QObject::connect(&m_healthQueryTimeoutTimer, &QTimer::timeout, this, &GpioBroker::criticalBlinking);
+    QObject::connect(&m_healthQueryTimeoutTimer, &QTimer::timeout, [&] {
+        qDebug() << "Health Query Timeout";
+        criticalBlinking();
+    } );
     QObject::connect(&m_resetTimer, &QTimer::timeout, this, &GpioBroker::reset);
     m_timer.start();
 //    m_gpioTimer.start();
@@ -31,7 +36,7 @@ GpioBroker::GpioBroker(QObject *parent) : QObject(parent)
     m_healthQueryTimeoutTimer.start();
 #ifdef TEST_INDICATOR
     QTimer *testTimer = new QTimer(this);
-    testTimer->setInterval(70009);
+    testTimer->setInterval(AliseConstants::TestRandomHealthIndicatorModePeriod());
     QObject::connect(testTimer, &QTimer::timeout, this, [this] {
         auto random = static_cast<alise::Health_Code>(QRandomGenerator::global()->bounded(0, 8));
         qDebug() << "Random:" << random;
@@ -97,23 +102,23 @@ void GpioBroker::setIndication(alise::Health_Code code)
     {
     case alise::Health_Code_Startup:
     {
-        if (m_currentBlinkingPeriod == BlinkTimeout::small)
+        if (m_currentBlinkingPeriod == AliseConstants::SonicaStartingBlinkPeriod())
             return;
-        m_currentBlinkingPeriod = BlinkTimeout::small;
+        m_currentBlinkingPeriod = AliseConstants::SonicaStartingBlinkPeriod();
         break;
     }
     case alise::Health_Code_Work:
     {
-        if (m_currentBlinkingPeriod == BlinkTimeout::big)
+        if (m_currentBlinkingPeriod == AliseConstants::SonicaNormalBlinkPeriod())
             return;
-        m_currentBlinkingPeriod = BlinkTimeout::big;
+        m_currentBlinkingPeriod = AliseConstants::SonicaNormalBlinkPeriod();
         break;
     }
     default:
     {
-        if (m_currentBlinkingPeriod == BlinkTimeout::verysmall)
+        if(m_currentBlinkingPeriod == AliseConstants::FailureBlinkPeriod())
             return;
-        m_currentBlinkingPeriod = BlinkTimeout::verysmall;
+        m_currentBlinkingPeriod = AliseConstants::FailureBlinkPeriod();
         break;
     }
     }
@@ -182,7 +187,7 @@ void GpioBroker::reset()
 
 void GpioBroker::criticalBlinking()
 {
-    m_gpioTimer.setInterval(BlinkTimeout::verysmall);
+    m_gpioTimer.setInterval(AliseConstants::FailureBlinkPeriod());
 }
 
 void GpioBroker::blink()

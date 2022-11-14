@@ -56,7 +56,9 @@ set(SOURCES
     zerosubscriber.h
     ${AVTUK_MODULE_PATH}/interfaces.qrc
     recovery.cpp
-    recovery.h)
+    recovery.h
+    aliseconstants.cpp
+    aliseconstants.h)
 
 if (AVTUK-14)
     list(APPEND SOURCES
@@ -112,6 +114,9 @@ install(FILES ${SERVICE_OUT} DESTINATION share)
 if (REQUIRED_SERVICE_PATH)
     install(FILES ${SERVICE_PATH_NAME} DESTINATION share)
 endif()
+
+install(FILES settings.ini DESTINATION /root/sonica/alise/settings)
+
 # Configure the scripts that are executed by the DEB.
 # This could be done without going through the rigmarole of
 # using configures, but I don't want to hard-code the name

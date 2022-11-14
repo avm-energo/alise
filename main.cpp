@@ -1,5 +1,6 @@
 
 #include "../comaversion/comaversion.h"
+#include "aliseconstants.h"
 #include "controller.h"
 
 #include <QCoreApplication>
@@ -42,12 +43,19 @@ int main(int argc, char *argv[])
     }
 
     QSettings settings("/root/sonica/alise/settings/settings.ini", QSettings::IniFormat);
-    int logcounter = settings.value("counter", "1").toInt();
+    int logcounter = settings.value("Test/counter", "1").toInt();
     settings.setValue("counter", ++logcounter);
-    QString logFileName = settings.value("logfile", "/root/sonica/alise/logs/alise.log").toString();
-    QString logLevel = settings.value("Loglevel", "Info").toString();
-    int portCore = settings.value("CorePort", "5555").toInt();
-    int portBooter = settings.value("BooterPort", "5556").toInt();
+    QString logFileName = settings.value("Logs/logfile", "/root/sonica/alise/logs/alise.log").toString();
+    QString logLevel = settings.value("Logs/Loglevel", "Info").toString();
+    int portCore = settings.value("Main/CorePort", "5555").toInt();
+    int portBooter = settings.value("Main/BooterPort", "5556").toInt();
+    AliseConstants::setFailureBlinkPeriod(settings.value("Timers/FailureBlink", "50").toInt());
+    AliseConstants::setSonicaStartingBlinkPeriod(settings.value("Timers/StartingBlink", "250").toInt());
+    AliseConstants::setSonicaNormalBlinkPeriod(settings.value("Timers/NormalBlink", "500").toInt());
+    AliseConstants::setPowerCheckPeriod(settings.value("Timers/PowerCheckPeriod", "1000").toInt());
+    AliseConstants::setResetCheckPeriod(settings.value("Timers/ResetCheckPeriod", "1000").toInt());
+    AliseConstants::setHealthQueryPeriod(settings.value("Timers/HealthQueryPeriod", "4000").toInt());
+    AliseConstants::setGpioBlinkPeriod(settings.value("Timers/GpioBlinkPeriod", "50").toInt());
     Logger::writeStart(logFileName);
     Logger::setLogLevel(logLevel);
     qInstallMessageHandler(Logger::messageHandler);

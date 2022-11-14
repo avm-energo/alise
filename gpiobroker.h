@@ -10,13 +10,6 @@
 
 class GpioBroker : public QObject
 {
-    enum BlinkTimeout
-    {
-        verysmall = 50,
-        small = 125,
-        big = 500
-    };
-
 public:
     struct GpioPin
     {
