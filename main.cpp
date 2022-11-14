@@ -41,9 +41,7 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    QSettings::setPath(QSettings::IniFormat, QSettings::SystemScope, "/root/sonica/alise/settings");
-    QSettings settings("settings.ini", QSettings::IniFormat);
-    qInfo() << "Reading settings from: " << settings.fileName();
+    QSettings settings("/root/sonica/alise/settings/settings.ini", QSettings::IniFormat);
     int logcounter = settings.value("counter", "1").toInt();
     settings.setValue("counter", ++logcounter);
     QString logFileName = settings.value("logfile", "/root/sonica/alise/logs/alise.log").toString();
@@ -53,6 +51,7 @@ int main(int argc, char *argv[])
     Logger::writeStart(logFileName);
     Logger::setLogLevel(logLevel);
     qInstallMessageHandler(Logger::messageHandler);
+    qInfo() << "Reading settings from: " << settings.fileName();
     auto devBroker = std::unique_ptr<deviceType>(new deviceType);
     Controller booterController(devBroker.get()), coreController(devBroker.get());
     if (!booterController.launch(portBooter))
