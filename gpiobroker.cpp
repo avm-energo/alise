@@ -27,11 +27,11 @@ GpioBroker::GpioBroker(QObject *parent) : QObject(parent)
     QObject::connect(&m_timer, &QTimer::timeout, this, &GpioBroker::checkPowerUnit);
     QObject::connect(&m_healthQueryTimeoutTimer, &QTimer::timeout, [&] {
         qDebug() << "Health Query Timeout";
+
         criticalBlinking();
     } );
     QObject::connect(&m_resetTimer, &QTimer::timeout, this, &GpioBroker::reset);
     m_timer.start();
-//    m_gpioTimer.start();
     m_resetTimer.start();
     m_healthQueryTimeoutTimer.start();
 #ifdef TEST_INDICATOR
@@ -93,9 +93,6 @@ void GpioBroker::setIndication(alise::Health_Code code)
 {
     QMutexLocker locker(&_mutex);
 
-//    m_gpioTimer.stop();
-//    blinkStatus = 0;
-//    QObject::disconnect(&m_gpioTimer, &QTimer::timeout, nullptr, nullptr);
     qDebug() << "Setting indication: " << code;
     m_healthQueryTimeoutTimer.start();
     switch (code)
@@ -188,6 +185,7 @@ void GpioBroker::reset()
 void GpioBroker::criticalBlinking()
 {
     m_gpioTimer.setInterval(AliseConstants::FailureBlinkPeriod());
+    m_currentBlinkingPeriod = AliseConstants::FailureBlinkPeriod();
 }
 
 void GpioBroker::blink()
