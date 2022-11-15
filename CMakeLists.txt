@@ -115,7 +115,9 @@ if (REQUIRED_SERVICE_PATH)
     install(FILES ${SERVICE_PATH_NAME} DESTINATION share)
 endif()
 
-install(FILES settings.ini DESTINATION /root/sonica/alise/settings)
+if (NOT EXISTS /root/sonica/alise/settings/settings.ini)
+    install(FILES settings.ini DESTINATION /root/sonica/alise/settings)
+endif ()
 
 # Configure the scripts that are executed by the DEB.
 # This could be done without going through the rigmarole of
