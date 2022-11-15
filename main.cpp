@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
 
     QSettings settings("/root/sonica/alise/settings/settings.ini", QSettings::IniFormat);
     int logcounter = settings.value("Test/counter", "1").toInt();
-    settings.setValue("counter", ++logcounter);
+    settings.setValue("Test/counter", ++logcounter);
     QString logFileName = settings.value("Logs/logfile", "/root/sonica/alise/logs/alise.log").toString();
     QString logLevel = settings.value("Logs/Loglevel", "Info").toString();
     int portCore = settings.value("Main/CorePort", "5555").toInt();
