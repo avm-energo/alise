@@ -1,11 +1,9 @@
 project(alise VERSION 1.1.430)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(Qt5Core)
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
+find_package(QT NAMES Qt6 Qt5)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Xml REQUIRED)
 
 if (AVTUK-14)
@@ -20,20 +18,17 @@ elseif  (AVTUK-12)
     endif()
 endif()
 
-if (NOT ( EXISTS "${CMAKE_CURRENT_BINARY_DIR}/conanbuildinfo.txt" AND ${CACHED_PROJECT_TARGET_NAME} STREQUAL ${PROJECT_TARGET_NAME}))
+message(STATUS "Conan settings: ${settings}")
 
-    execute_process(
-        COMMAND ${CMAKE_COMMAND} -E env
-            CONAN_USER_HOME=${USER_DIRECTORY} ${CONAN_EXEC} install . --profile ${CONAN_PROFILE} -g cmake -g cmake_find_package -s arch=${CONAN_TARGET_NAME} -s arch_build=${CONAN_TARGET_NAME} -if ${CMAKE_CURRENT_BINARY_DIR} --build=missing
-        RESULT_VARIABLE CMD_ERROR_CODE
-        OUTPUT_VARIABLE CMD_OUTPUT
-        ERROR_VARIABLE CMD_ERROR
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    )
-    message(STATUS "Init conan for " ${PROJECT_TARGET_NAME})
-    message(STATUS "CMD_ERROR_CODE: ${CMD_ERROR} with  ${CMD_OUTPUT} and ${CMD_ERROR}")
+conan_cmake_configure(
+    REQUIRES cppzmq/4.7.1
+    GENERATORS cmake_find_package)
 
-endif()
+conan_cmake_install(
+  PATH_OR_REFERENCE .
+  BUILD missing
+  REMOTE conancenter
+  SETTINGS ${settings})
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_BINARY_DIR}")
 
@@ -71,7 +66,6 @@ elseif  (AVTUK-12)
 endif()
 
 add_executable(${PROJECT_NAME} ${SOURCES})
-
 target_include_directories(${PROJECT_NAME} PUBLIC ${CONAN_INCLUDE_DIRS_CPPZMQ})
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROTOS_GENERATED_DIR})
 
@@ -85,11 +79,10 @@ endif()
 if (AVTUK-12)
     target_link_libraries(${PROJECT_NAME} ${GPIODCXX_LIBRARY})
 endif()
-target_link_libraries(${PROJECT_NAME}  gen comaversion protos Qt5::Core Qt5::Xml pthread ZeroMQ::libzmq-static cppzmq::cppzmq)
+target_link_libraries(${PROJECT_NAME} gen comaversion protos Qt5::Core Qt5::Xml pthread ZeroMQ::libzmq-static cppzmq::cppzmq)
 
 
-install(TARGETS ${PROJECT_NAME}
-)
+install(TARGETS ${PROJECT_NAME})
 
 ###### DEB PACKAGE SECTION ######
 
