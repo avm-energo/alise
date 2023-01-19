@@ -1,14 +1,15 @@
 #include "gpiobroker.h"
 
-#include <gen/datamanager/datamanager.h>
 #include "avtukccu.h"
 #include "aliseconstants.h"
-#include <gen/error.h>
 
-#include <QDebug>
-#include <QRandomGenerator>
 #include <config.h>
 #include <cstdlib>
+#include <gen/datamanager/datamanager.h>
+#include <gen/datatypes.h>
+#include <gen/error.h>
+#include <QDebug>
+#include <QRandomGenerator>
 #include <sys/reboot.h>
 #include <unistd.h>
 

@@ -7,6 +7,7 @@
 #include <QObject>
 #include <QTimer>
 #include <gen/datamanager/typesproxy.h>
+#include <gen/datatypes.h>
 
 //#define TEST_INDICATOR
 
