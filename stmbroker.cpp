@@ -1,6 +1,5 @@
 #include "stmbroker.h"
 
-#include "../interfaces/baseinterface.h"
 #include "../interfaces/protocom.h"
 #include "../interfaces/usbhidportinfo.h"
 #include "../module/board.h"
@@ -68,7 +67,7 @@ void StmBroker::checkPowerUnit()
 {
     QMutexLocker locker(&_mutex);
     Q_CHECK_PTR(m_interface);
-    m_interface->writeCommand(Queries::QUSB_ReqBlkData, AVTUK_CCU::MainBlock);
+    m_interface->writeCommand(Interface::Commands::C_ReqBlkData, AVTUK_CCU::MainBlock);
 }
 
 void StmBroker::setIndication(alise::Health_Code code)
@@ -80,7 +79,7 @@ void StmBroker::setIndication(alise::Health_Code code)
     block.data.resize(sizeof(decltype(indication)));
     memcpy(block.data.data(), &indication, sizeof(indication));
     qDebug() << block;
-    m_interface->writeCommand(Queries::QC_WriteUserValues, QVariant::fromValue(block));
+    m_interface->writeCommand(Interface::Commands::C_WriteUserValues, QVariant::fromValue(block));
 }
 
 void StmBroker::setTime(timespec time)
@@ -99,7 +98,7 @@ void StmBroker::getTime()
 
 void StmBroker::rebootMyself()
 {
-    m_interface->writeCommand(Queries::QUSB_Reboot, 0xff);
+    m_interface->writeCommand(Interface::Commands::C_Reboot, 0xff);
 }
 
 AVTUK_CCU::Indication StmBroker::transform(alise::Health_Code code) const
