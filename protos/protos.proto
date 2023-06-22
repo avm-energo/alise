@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+//import "google/protobuf/empty.proto";
+import "google/protobuf/any.proto";
+import "google/protobuf/timestamp.proto";
+
+package alise;
+
+//reply HelloReply
+message HelloRequest {
+  uint32 message = 1;
+}
+
+message HelloReply {
+  string message = 1;
+}
+
+//reply Timestamp
+message TimeRequest {
+}
+
+message NtpStatus {
+  bool isNtpEnabled = 1;
+}
+
+message HealthQuery {
+  bool query = 1;
+}
+
+
+// | Наименование           | Описание                                               | Режим индикации                                       |
+// | ---------------------- | ------------------------------------------------------ | ----------------------------------------------------- |
+// | Работа (R)             | Штатный режим работы                                   | Постоянное мигание с частотой 1 Гц (1 раз в секунду)  |
+// | Запуск (S)             | Сервер запускается                                     | Постоянное мигание с частотой 4 Гц (4 раза в секунду) |
+// | Обновление (U)         | Выполняется обновление ПО, можно вынимать карту памяти | 2 коротких, 1 длинный                                 |
+// | Отказ запуска (FR)     | Сервер не смог запуститься причина не известна         | 3 коротких, 1 длинный                                 |
+// | Нет проекта (FE)       | Рабочий проект не найден                               | 4 коротких, 1 длинный                                 |
+// | Ошибка проекта (FP)    | В проекте найдены блоки которые отсутствуют в ПО       | 5 коротких, 1 длинный                                 |
+// | Отсутствие ПО (FW)     | В контроллере отсутствует валидное ПО                  | 6 коротких, 1 длинный                                 |
+// | Ошибка загрузчика (FB) | Загрузчик не смог запустить сервер                     | 7 коротких, 1 длинный                                 |
+// | Ошибка настроек (FS)   | Файл настроек не найден                                | 8 коротких, 1 длинный                                 |
+
+
+message Health {
+// Health code as proposal
+  enum Code {
+  Startup = 0;
+  Work = 1;  
+  Update = 2;
+  StartupFail = 3;
+  NoProject= 4;
+  ProjectError = 5;
+  NoFirmware = 6;
+  BootloaderError = 7;
+  SettingsError = 8;
+  }
+  Code code = 1;
+  string Desc = 2;
+}  
+
+message PowerStatus {
+  uint32 PWRIN = 1;
+}
+
+message PackedMessage {
+  string message = 1;
+  google.protobuf.Any content = 2;
+}

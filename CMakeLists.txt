@@ -1,15 +1,19 @@
-project(alise VERSION 1.1.430)
+cmake_minimum_required(VERSION 3.18)
+project(alise VERSION 1.2.0)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(PROTOS_GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
 find_package(QT NAMES Qt6 Qt5)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Xml REQUIRED)
 
-if (AVTUK-14)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
+if (ALISE_STM)
     set(AVTUK_MODULE_PATH avtuk-14)
     add_compile_definitions(AVTUK_STM)
-elseif  (AVTUK-12)
+else()
     set(AVTUK_MODULE_PATH avtuk-12)
     add_compile_definitions(AVTUK_NO_STM)
     find_library(GPIODCXX_LIBRARY NAMES libgpiodcxx.so)
@@ -17,6 +21,19 @@ elseif  (AVTUK-12)
       message(FATAL_ERROR "gpiod library not found. Install apt install libgpiod-dev")
     endif()
 endif()
+
+include(gen)
+
+# Downloading conan CMake script and using for autodetecting
+if(NOT EXISTS "${CMAKE_BINARY_DIR}/conan.cmake")
+  message(STATUS "Downloading conan.cmake from https://github.com/conan-io/cmake-conan")
+  file(DOWNLOAD "https://raw.githubusercontent.com/conan-io/cmake-conan/0.18.1/conan.cmake"
+                "${CMAKE_BINARY_DIR}/conan.cmake"
+                EXPECTED_HASH SHA256=5cdb3042632da3efff558924eecefd580a0e786863a857ca097c3d1d43df5dcd
+                TLS_VERIFY ON)
+endif()
+
+include(${CMAKE_BINARY_DIR}/conan.cmake)
 
 message(STATUS "Conan settings: ${settings}")
 
@@ -55,38 +72,36 @@ set(SOURCES
     aliseconstants.cpp
     aliseconstants.h)
 
-if (AVTUK-14)
+if (ALISE_STM)
     list(APPEND SOURCES
          stmbroker.cpp
          stmbroker.h)
-elseif  (AVTUK-12)
+ else()
     list(APPEND SOURCES
          gpiobroker.cpp
          gpiobroker.h)
 endif()
 
 add_executable(${PROJECT_NAME} ${SOURCES})
+add_subdirectory(protos)
 target_include_directories(${PROJECT_NAME} PUBLIC ${CONAN_INCLUDE_DIRS_CPPZMQ})
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROTOS_GENERATED_DIR})
 
 configure_file(${CMAKE_SOURCE_DIR}/cconfig.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h @ONLY)
 
-message(STATUS ALISE ${protos_DIR})
-if (AVTUK-14)
+if (ALISE_STM)
     ##WARNING Link interfaces before gen (!)
     target_link_libraries(${PROJECT_NAME} interfaces)
-endif()
-if (AVTUK-12)
+else()
     target_link_libraries(${PROJECT_NAME} ${GPIODCXX_LIBRARY})
 endif()
 target_link_libraries(${PROJECT_NAME} gen comaversion protos Qt5::Core Qt5::Xml pthread ZeroMQ::libzmq-static cppzmq::cppzmq)
-
 
 install(TARGETS ${PROJECT_NAME})
 
 ###### DEB PACKAGE SECTION ######
 
-if (AVTUK-14)
+if (ALISE_STM)
     set(REQUIRED_SERVICE_PATH)
 endif()
 # Configure the service file so that it knows where the
