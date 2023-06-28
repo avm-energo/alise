@@ -52,7 +52,7 @@ endif()
 
 set(gitCommitCounter ${COMMIT_COUNT})
 configure_file(version.h.in ${CMAKE_CURRENT_BINARY_DIR}/gversion.h @ONLY)
-add_library(${PROJECT_NAME} STATIC comaversion.h comaversion.cpp)
+add_library(${PROJECT_NAME} STATIC gitversion.cpp gitversion.h)
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::Core)

@@ -35,10 +35,10 @@
 /* ------------------------------------------------------------------------*/
 /* value of Byte1 and Byte2 in the ntpmsg       */
 #define B1VAL 0x16 /* VN = 2, Mode = 6 */
-#define B2VAL                                                                                                          \
-    2                   /* Response = 0; ( this makes the packet a command )                                           \
-                           Error    = 0;                                                                               \
-                           More     = 0;                                                                               \
+#define B2VAL                                                                  \
+  2                     /* Response = 0; ( this makes the packet a command )   \
+                           Error    = 0;                                       \
+                           More     = 0;                                       \
                            Op Code  = 2 (read variables command) */
 #define RMASK 0x80      /* bit mask for the response bit in Status Byte2 */
 #define EMASK 0x40      /* bit mask for the error bit in Status Byte2 */
@@ -47,67 +47,65 @@
 
 #define NTPSTATUSPERIOD 3000
 
-void printts(const timespec &st)
-{
-    auto datetime = QDateTime::fromMSecsSinceEpoch(((st.tv_sec * 1000) + (st.tv_nsec / 1.0e6)));
-    std::cout << datetime.toString().toStdString().c_str() << std::endl;
-    std::cout << st << std::endl;
+void printts(const timespec &st) {
+  auto datetime = QDateTime::fromMSecsSinceEpoch(
+      ((st.tv_sec * 1000) + (st.tv_nsec / 1.0e6)));
+  std::cout << datetime.toString().toStdString().c_str() << std::endl;
+  std::cout << st << std::endl;
 }
 
-TimeSyncronizer::TimeSyncronizer(QObject *parent) : QObject(parent)
-{
-    QTimer *timer = new QTimer(this);
-    timer->setInterval(NTPSTATUSPERIOD);
-    connect(timer, &QTimer::timeout, this, [this] { emit ntpStatusChanged(ntpStatus()); });
-    timer->start();
+TimeSyncronizer::TimeSyncronizer(QObject *parent) : QObject(parent) {
+  QTimer *timer = new QTimer(this);
+  timer->setInterval(NTPSTATUSPERIOD);
+  connect(timer, &QTimer::timeout, this,
+          [this] { emit ntpStatusChanged(ntpStatus()); });
+  timer->start();
 }
 
-void TimeSyncronizer::handleTime(const timespec time)
-{
-    printts(time);
-    setSystemTime(time);
+TimeSyncronizer::~TimeSyncronizer() {}
+
+void TimeSyncronizer::handleTime(const timespec time) {
+  printts(time);
+  setSystemTime(time);
 }
 
-timespec TimeSyncronizer::systemTime() const
-{
-    timespec time;
-    clock_gettime(CLOCK_REALTIME, &time);
-    return time;
+timespec TimeSyncronizer::systemTime() const {
+  timespec time;
+  clock_gettime(CLOCK_REALTIME, &time);
+  return time;
 }
 
-void TimeSyncronizer::setSystemTime(const timespec &systemTime)
-{
-    QString program = "/usr/sbin/hwclock";
-    QStringList arguments { "-w" };
+void TimeSyncronizer::setSystemTime(const timespec &systemTime) {
+  QString program = "/usr/sbin/hwclock";
+  QStringList arguments{"-w"};
 
-    clock_settime(CLOCK_REALTIME, &systemTime); // set current datetime
-    QProcess *myProcess = new QProcess(this);   // set datetime to RTC
-    qInfo() << "HWClock is starting...";
-    myProcess->start(program, arguments);
-    myProcess->waitForFinished();
-    qInfo() << "HWClock exited with code: " << myProcess->exitCode() << " and status: " << myProcess->exitStatus();
+  clock_settime(CLOCK_REALTIME, &systemTime); // set current datetime
+  QProcess *myProcess = new QProcess(this);   // set datetime to RTC
+  qInfo() << "HWClock is starting...";
+  myProcess->start(program, arguments);
+  myProcess->waitForFinished();
+  qInfo() << "HWClock exited with code: " << myProcess->exitCode()
+          << " and status: " << myProcess->exitStatus();
 }
 
-bool TimeSyncronizer::ntpStatus() const
-{
-    ntptimeval time;
-    int status = ntp_gettime(&time);
-    qDebug() << "NTP Status: " << status;
-    switch (status)
-    {
-    case TIME_OK:
-        return true;
-    case TIME_INS:
-        return true;
-    case TIME_DEL:
-        return true;
-    case TIME_OOP:
-        return true;
-    case TIME_WAIT:
-        return true;
-    case TIME_ERROR:
-    default:
-        return false;
-        // return !ntpdStatus();
-    }
+bool TimeSyncronizer::ntpStatus() const {
+  ntptimeval time;
+  int status = ntp_gettime(&time);
+  qDebug() << "NTP Status: " << status;
+  switch (status) {
+  case TIME_OK:
+    return true;
+  case TIME_INS:
+    return true;
+  case TIME_DEL:
+    return true;
+  case TIME_OOP:
+    return true;
+  case TIME_WAIT:
+    return true;
+  case TIME_ERROR:
+  default:
+    return false;
+    // return !ntpdStatus();
+  }
 }

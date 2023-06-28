@@ -3,7 +3,7 @@ project(alise VERSION 1.2.0)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(PROTOS_GENERATED_DIR ${CMAKE_CURRENT_BINARY_DIR})
+set(CMAKE_AUTOMOC ON)
 
 find_package(QT NAMES Qt6 Qt5)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Xml REQUIRED)
@@ -39,6 +39,7 @@ message(STATUS "Conan settings: ${settings}")
 
 conan_cmake_configure(
     REQUIRES cppzmq/4.7.1
+    REQUIRES protobuf/3.17.1
     GENERATORS cmake_find_package)
 
 conan_cmake_install(
@@ -51,6 +52,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_BINARY_DIR}")
 
 find_package(ZeroMQ REQUIRED)
 find_package(cppzmq REQUIRED)
+find_package(Protobuf REQUIRED)
 
 set(SOURCES
     main.cpp
@@ -70,7 +72,8 @@ set(SOURCES
     recovery.cpp
     recovery.h
     aliseconstants.cpp
-    aliseconstants.h)
+    aliseconstants.h
+    protos/protos.proto)
 
 if (ALISE_STM)
     list(APPEND SOURCES
@@ -82,10 +85,15 @@ if (ALISE_STM)
          gpiobroker.h)
 endif()
 
+
 add_executable(${PROJECT_NAME} ${SOURCES})
-add_subdirectory(protos)
+add_subdirectory(gitversion)
 target_include_directories(${PROJECT_NAME} PUBLIC ${CONAN_INCLUDE_DIRS_CPPZMQ})
-target_include_directories(${PROJECT_NAME} PUBLIC ${PROTOS_GENERATED_DIR})
+
+protobuf_generate(
+    LANGUAGE cpp
+    TARGET ${PROJECT_NAME}
+    PROTOS ${PROJECT_SOURCE_DIR}/protos/protos.proto)
 
 configure_file(${CMAKE_SOURCE_DIR}/cconfig.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h @ONLY)
 
@@ -95,7 +103,7 @@ if (ALISE_STM)
 else()
     target_link_libraries(${PROJECT_NAME} ${GPIODCXX_LIBRARY})
 endif()
-target_link_libraries(${PROJECT_NAME} gen comaversion protos Qt5::Core Qt5::Xml pthread ZeroMQ::libzmq-static cppzmq::cppzmq)
+target_link_libraries(${PROJECT_NAME} gen Qt5::Core Qt5::Xml pthread gitversion ZeroMQ::libzmq-static cppzmq::cppzmq protobuf::libprotobuf)
 
 install(TARGETS ${PROJECT_NAME})
 
