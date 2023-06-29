@@ -1,24 +1,21 @@
 #include "stmbroker.h"
 
-#include "../interfaces/protocom.h"
-#include "../interfaces/usbhidportinfo.h"
-#include "../module/board.h"
 #include "controller.h"
 #include "helper.h"
+#include "interfaces/protocom.h"
+#include "interfaces/usbhidport.h"
 #include "timesyncronizer.h"
 
 #include <QRandomGenerator>
 #include <gen/helper.h>
 
-StmBroker::StmBroker(QObject *parent) : QObject(parent), proxyBS(new DataTypesProxy), proxyBStr(new DataTypesProxy)
+StmBroker::StmBroker(QObject *parent) : QObject(parent)
 {
-    proxyBS->RegisterType<DataTypes::BlockStruct>();
-    proxyBStr->RegisterType<DataTypes::BitStringStruct>();
 }
 
 bool StmBroker::connectToStm()
 {
-    const auto devices = UsbHidPortInfo::devicesFound(0x0483);
+    const auto devices = UsbHidPort::devicesFound(0x0483);
     if (devices.isEmpty())
     {
         std::cout << "No devices" << std::endl;
@@ -40,8 +37,6 @@ bool StmBroker::connectToStm()
         std::cout << "Couldn't connect" << std::endl;
         return false;
     }
-    const auto &board = Board::GetInstance();
-    QObject::connect(proxyBStr.get(), &DataTypesProxy::DataStorable, &board, &Board::update);
     QObject::connect(proxyBS.get(), &DataTypesProxy::DataStorable, this,
         //[](const auto bs) {
         [](const QVariant &msg) {
@@ -154,12 +149,4 @@ timespec StmBroker::transform(google::protobuf::Timestamp timestamp) const
     temp.tv_nsec = timestamp.nanos();
     temp.tv_sec = timestamp.seconds();
     return temp;
-}
-
-void StmBroker::printbs(const DataTypes::BitStringStruct &st)
-{
-    std::cout << "BitString {"
-              << "Addr:" << st.sigAdr << ","
-              << "Val:" << st.sigVal << ","
-              << "Qual:" << st.sigQuality << " }" << std::endl;
 }

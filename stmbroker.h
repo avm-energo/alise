@@ -1,13 +1,13 @@
 #pragma once
 
 #include "avtukccu.h"
-#include "gen/stdfunc.h"
-#include "protos.pb.h"
+#include "protos/protos.pb.h"
 
 #include <QObject>
 #include <QTimer>
 #include <gen/datamanager/typesproxy.h>
 #include <gen/datatypes.h>
+#include <gen/stdfunc.h>
 
 //#define TEST_INDICATOR
 
@@ -41,6 +41,4 @@ private:
 #ifdef TEST_INDICATOR
     QTimer m_testTimer;
 #endif
-
-    void printbs(const DataTypes::BitStringStruct &st);
 };

@@ -88,6 +88,7 @@ endif()
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 add_subdirectory(gitversion)
+add_subdirectory(interfaces)
 target_include_directories(${PROJECT_NAME} PUBLIC ${CONAN_INCLUDE_DIRS_CPPZMQ})
 
 protobuf_generate(
