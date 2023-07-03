@@ -3,22 +3,15 @@
 #include <iostream>
 
 constexpr int minSecs = 60;
-constexpr int hourSecs = minSecs * minSecs;
 
 Controller::Controller(deviceType *devBroker, QObject *parent) noexcept : Controller("0.0.0.0", devBroker, parent)
 {
 }
 
 Controller::Controller(std::string addr, deviceType *devBroker, QObject *parent) noexcept
-    : QObject(parent)
-    , worker(new runner::ZeroRunner(this))
-    , deviceBroker(devBroker)
-    , proxyBS(new DataTypesProxy)
-    , proxyTS(new DataTypesProxy)
+    : QObject(parent), worker(new runner::ZeroRunner(this)), deviceBroker(devBroker)
 {
     Q_UNUSED(addr);
-    proxyBS->RegisterType<DataTypes::BlockStruct>();
-    proxyTS->RegisterType<timespec>();
 
     connect(worker, &runner::ZeroRunner::healthReceived, deviceBroker, &deviceType::setIndication);
     // NOTE avtuk will be rebooted

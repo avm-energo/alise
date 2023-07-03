@@ -6,10 +6,10 @@ FetchContent_Declare(
   GIT_TAG        origin/alice-buster
 )
 
-if(BUILD_WITH_ALISE)
+#if(BUILD_WITH_ALISE)
   set(GEN_STATIC ON)
-else()
-  set(GEN_STATIC OFF)
-endif()
+#else()
+#  set(GEN_STATIC OFF)
+#endif()
 
 FetchContent_MakeAvailable(gen)
