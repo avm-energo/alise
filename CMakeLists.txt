@@ -39,7 +39,7 @@ message(STATUS "Conan settings: ${settings}")
 
 conan_cmake_configure(
     REQUIRES cppzmq/4.7.1
-    REQUIRES protobuf/3.17.1
+    REQUIRES protobuf/3.16.0
     GENERATORS cmake_find_package)
 
 conan_cmake_install(
