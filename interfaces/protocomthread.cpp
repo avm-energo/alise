@@ -117,7 +117,7 @@ void ProtocomThread::parseRequest(const CommandStruct &cmdStr)
         if (cmdStr.arg1.canConvert<DataTypes::BlockStruct>())
         {
             DataTypes::BlockStruct bs = cmdStr.arg1.value<DataTypes::BlockStruct>();
-            ba = StdFunc::ArrayFromNumber(bs.ID);
+            ba = StdFunc::ArrayFromNumber(static_cast<quint8>(bs.ID));
             ba.append(bs.data);
             writeBlock(protoCommandMap.value(cmdStr.command), ba);
         }

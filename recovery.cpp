@@ -115,6 +115,7 @@ void Recovery::restartNetwork()
 void Recovery::receiveBlock(const QVariant &msg)
 {
     auto blk = msg.value<DataTypes::BlockStruct>();
+    qDebug() << "Block received, ID: " << blk.ID << ", data: " << blk.data;
     switch (blk.data.size())
     {
     case sizeof(AVTUK_CCU::Main):
