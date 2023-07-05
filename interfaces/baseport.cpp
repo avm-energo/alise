@@ -103,7 +103,10 @@ void BasePort::writeDataSync(const QByteArray &ba)
             if (success)
                 writeLog(ba.toHex(), Interface::Direction::ToDevice);
             else
+            {
+                writeLog("Error while writing to port", Interface::Direction::NoDirection);
                 status = Error::Msg::WriteError;
+            }
         }
         else
             status = Error::Msg::NullDataError;

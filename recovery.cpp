@@ -16,6 +16,7 @@ Recovery::Recovery(QObject *parent) : QObject(parent)
 
 void Recovery::eth0()
 {
+    qDebug() << "[Recovery] Eth0";
     if (!QFile::exists(":/network/eth0"))
     {
         qCritical() << "No eth0 recovery";
@@ -40,6 +41,8 @@ void Recovery::eth0()
 #if defined(AVTUK_NO_STM)
 void Recovery::eth1()
 {
+    qDebug() << "[Recovery] Eth1";
+
     if (!QFile::exists(":/network/eth1"))
     {
         qCritical() << "No eth1 recovery";
@@ -65,6 +68,7 @@ void Recovery::eth1()
 #if defined(AVTUK_STM)
 void Recovery::eth2()
 {
+    qDebug() << "[Recovery] Eth2";
     if (!QFile::exists(":/network/eth2"))
     {
         qCritical() << "No eth2 recovery";
@@ -89,6 +93,7 @@ void Recovery::eth2()
 #endif
 void Recovery::sync()
 {
+    qDebug() << "[Recovery] SYNC";
     QString program = "sync";
     QProcess *myProcess = new QProcess(this);
     myProcess->setProgram(program);
@@ -98,7 +103,7 @@ void Recovery::sync()
 
 void Recovery::restartNetwork()
 {
-    qInfo() << "Restarting network";
+    qInfo() << "[Recovery] Restarting network";
     QString program = "/etc/init.d/networking";
     QStringList arguments { "restart" };
     QProcess *myProcess = new QProcess(this);
@@ -116,6 +121,8 @@ void Recovery::receiveBlock(const QVariant &msg)
     {
         AVTUK_CCU::Main mainBlock;
         memcpy(&mainBlock, blk.data.data(), sizeof(mainBlock));
+        qDebug() << "[Recovery] Main block has been received from MCU, reset is: " << mainBlock.resetReq
+                 << ", PWRIN: " << mainBlock.PWRIN;
         if (mainBlock.resetReq && (!resetInit))
         {
             eth0();
