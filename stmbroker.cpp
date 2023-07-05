@@ -68,10 +68,13 @@ void StmBroker::checkPowerUnit()
 void StmBroker::setIndication(alise::Health_Code code)
 {
     QMutexLocker locker(&_mutex);
-    const auto indication = transform(code);
+    const AVTUK_CCU::Indication indication = transform(code);
+    qDebug() << "Indication is: cnt1: " << indication.PulseCnt1 << ", freq1: " << indication.PulseFreq1
+             << ", cnt2: " << indication.PulseCnt2 << ", freq2: " << indication.PulseFreq2;
     DataTypes::BlockStruct block;
     block.ID = AVTUK_CCU::IndicationBlock;
-    block.data.resize(sizeof(decltype(indication)));
+    block.data.resize(sizeof(indication));
+    qDebug() << "Sizeof indication block: " << sizeof(indication);
     memcpy(block.data.data(), &indication, sizeof(indication));
     qDebug() << block;
     m_interface->writeCommand(Interface::Commands::C_WriteUserValues, QVariant::fromValue(block));
