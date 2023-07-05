@@ -18,6 +18,7 @@ ProtocomThread::ProtocomThread(QObject *parent) : BaseInterfaceThread(parent)
 {
     isFirstBlock = true;
     m_longBlockChunks.clear();
+    connect(this, &ProtocomThread::sendDataToPort, this, [&](QByteArray ba) { writeLog(ba, Interface::ToDevice); });
 }
 
 ProtocomThread::~ProtocomThread()
@@ -132,6 +133,9 @@ void ProtocomThread::parseResponse()
 {
     using namespace Proto;
     using namespace DataTypes;
+#ifdef PROTOCOM_DEBUG
+    qDebug("Start parse response");
+#endif
     quint32 addr = m_currentCommand.arg1.toUInt();
     switch (m_responseReceived)
     {
