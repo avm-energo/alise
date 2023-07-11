@@ -6,11 +6,16 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
 
 option(ALISE_STM "Build with STM32 support" OFF)
+option(ALISE_LOCALDEBUG "Local debug on PC" OFF)
 
 find_package(QT NAMES Qt6 Qt5)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Xml REQUIRED)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
+if (ALISE_LOCALDEBUG)
+    add_compile_definitions(ALISE_LOCALDEBUG)
+endif()
 
 if (ALISE_STM)
     set(AVTUK_MODULE_PATH avtuk-14)

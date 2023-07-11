@@ -11,10 +11,14 @@
 
 StmBroker::StmBroker(QObject *parent) : QObject(parent)
 {
+    m_status = false;
+    m_currentHealthCode = alise::Health_Code_SettingsError;
 }
 
 bool StmBroker::connectToStm()
 {
+#ifndef ALISE_LOCALDEBUG
+    m_status = false;
     const auto devices = UsbHidPort::devicesFound(0x0483);
     if (devices.isEmpty())
     {
@@ -55,18 +59,26 @@ bool StmBroker::connectToStm()
 
     m_timer.start();
     QObject::connect(&m_timer, &QTimer::timeout, this, &StmBroker::checkPowerUnit);
+#endif
+    m_status = true;
     return true;
 }
 
 void StmBroker::checkPowerUnit()
 {
+#ifndef ALISE_LOCALDEBUG
     QMutexLocker locker(&_mutex);
     Q_CHECK_PTR(m_interface);
     m_interface->writeCommand(Interface::Commands::C_ReqBlkData, AVTUK_CCU::MainBlock);
+#endif
 }
 
 void StmBroker::setIndication(alise::Health_Code code)
 {
+#ifndef ALISE_LOCALDEBUG
+    if (code == m_currentHealthCode)
+        return;
+    m_currentHealthCode = code;
     QMutexLocker locker(&_mutex);
     const AVTUK_CCU::Indication indication = transform(code);
     qDebug() << "Indication is: cnt1: " << indication.PulseCnt1 << ", freq1: " << indication.PulseFreq1
@@ -78,25 +90,37 @@ void StmBroker::setIndication(alise::Health_Code code)
     memcpy(block.data.data(), &indication, sizeof(indication));
     qDebug() << block;
     m_interface->writeCommand(Interface::Commands::C_WriteUserValues, QVariant::fromValue(block));
+#endif
+}
+
+bool StmBroker::status()
+{
+    return m_status;
 }
 
 void StmBroker::setTime(timespec time)
 {
+#ifndef ALISE_LOCALDEBUG
     QMutexLocker locker(&_mutex);
     Q_CHECK_PTR(m_interface);
     m_interface->writeTime(time);
+#endif
 }
 
 void StmBroker::getTime()
 {
+#ifndef ALISE_LOCALDEBUG
     QMutexLocker locker(&_mutex);
     Q_CHECK_PTR(m_interface);
     m_interface->reqTime();
+#endif
 }
 
 void StmBroker::rebootMyself()
 {
+#ifndef ALISE_LOCALDEBUG
     m_interface->writeCommand(Interface::Commands::C_Reboot, 0xff);
+#endif
 }
 
 AVTUK_CCU::Indication StmBroker::transform(alise::Health_Code code) const
