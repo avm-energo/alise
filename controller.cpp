@@ -52,13 +52,16 @@ Controller::~Controller()
 
 bool Controller::launch(int port)
 {
-#if defined(AVTUK_STM)
-    if (!deviceBroker->connectToStm())
-    {
-        delete worker;
-        return false;
-    }
-#endif
+    /*#if defined(AVTUK_STM)
+        if (deviceBroker->status() != StmBroker::Statuses::CONNECTED)
+        {
+            if (!deviceBroker->connectToStm())
+            {
+                delete worker;
+                return false;
+            }
+        }
+    #endif */
     auto connectionTimeSync = std::shared_ptr<QMetaObject::Connection>(new QMetaObject::Connection);
     *connectionTimeSync = connect(
         proxyTS.get(), &DataTypesProxy::DataStorable, &timeSync,

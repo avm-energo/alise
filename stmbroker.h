@@ -23,6 +23,7 @@ public:
 public /*slots*/:
     void checkPowerUnit();
     void setIndication(alise::Health_Code code);
+    bool status();
 
     void setTime(timespec time);
     void getTime();
@@ -32,11 +33,13 @@ private:
     AVTUK_CCU::Indication transform(alise::Health_Code code) const;
     timespec transform(google::protobuf::Timestamp timestamp) const;
     QMutex _mutex;
+    bool m_status;
 
     // Controller m_controller;
     Protocom *m_interface;
     QTimer m_timer;
     UniquePointer<DataTypesProxy> proxyBS, proxyBStr;
+    int m_currentHealthCode;
 
 #ifdef TEST_INDICATOR
     QTimer m_testTimer;
