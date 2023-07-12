@@ -7,6 +7,7 @@
 #include <QMutexLocker>
 #include <QTimer>
 #include <fstream>
+#include <gen/datatypes.h>
 #include <iostream>
 #include <thread>
 

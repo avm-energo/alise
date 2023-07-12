@@ -5,7 +5,6 @@
 
 #include <QObject>
 #include <QWaitCondition>
-#include <gen/datatypes.h>
 
 namespace Interface
 {

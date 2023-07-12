@@ -65,9 +65,6 @@ class BaseInterface : public QObject
 
     Q_PROPERTY(State state READ state WRITE setState NOTIFY stateChanged)
 
-protected:
-    using FileFormat = DataTypes::FileFormat;
-
 public:
     /// BaseInterface has its own memory manager
     /// because it can be created and deleted

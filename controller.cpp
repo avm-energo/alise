@@ -1,5 +1,6 @@
 #include "controller.h"
 
+#include <gen/datatypes.h>
 #include <iostream>
 
 constexpr int minSecs = 60;

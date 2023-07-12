@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QProcess>
+#include <gen/datatypes.h>
 
 constexpr char eth0path[] = "/etc/network/interfaces.d/eth0";
 constexpr char eth1path[] = "/etc/network/interfaces.d/eth1";

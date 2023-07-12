@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <config.h>
 #include <functional>
+#include <gen/datatypes.h>
 #include <memory>
 #include <random>
 #include <thread>
