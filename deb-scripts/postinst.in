@@ -1,0 +1,14 @@
+deb_install_prefix=@CPACK_PACKAGING_INSTALL_PREFIX@
+service_name=@SERVICE_NAME@
+cp $deb_install_prefix/share/$service_name /usr/lib/systemd/system/$service_name
+chmod 644 /usr/lib/systemd/system/$service_name
+systemctl daemon-reload
+
+systemctl status $service_name --no-pager || true
+
+if pgrep -x alise >/dev/null
+then
+    systemctl enable $service_name
+else
+    echo "$service_name stopped"
+fi
