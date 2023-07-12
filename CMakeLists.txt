@@ -152,13 +152,13 @@ endif ()
 # Switch this variable to TRUE to enable those logs.
 # I found this helpful while troubeshooting package upgrades.
 set(VERBOSE_LOGGING FALSE)
-set(POSTINST_IN ${CMAKE_CURRENT_LIST_DIR}/${AVTUK_MODULE_PATH}/postinst.in)
+set(POSTINST_IN ${CMAKE_CURRENT_SOURCE_DIR}/deb-scripts/postinst.in)
 set(POSTINST_OUT ${CMAKE_CURRENT_BINARY_DIR}/postinst)
 configure_file(${POSTINST_IN} ${POSTINST_OUT} @ONLY)
-set(POSTRM_IN ${CMAKE_CURRENT_LIST_DIR}/${AVTUK_MODULE_PATH}/postrm.in)
+set(POSTRM_IN ${CMAKE_CURRENT_SOURCE_DIR}/deb-scripts/postrm.in)
 set(POSTRM_OUT ${CMAKE_CURRENT_BINARY_DIR}/postrm)
 configure_file(${POSTRM_IN} ${POSTRM_OUT} @ONLY)
-set(PRERM_IN ${CMAKE_CURRENT_LIST_DIR}/${AVTUK_MODULE_PATH}/prerm.in)
+set(PRERM_IN ${CMAKE_CURRENT_SOURCE_DIR}/deb-scripts/prerm.in)
 set(PRERM_OUT ${CMAKE_CURRENT_BINARY_DIR}/prerm)
 configure_file(${PRERM_IN} ${PRERM_OUT} @ONLY)
 
