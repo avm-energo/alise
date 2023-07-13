@@ -15,15 +15,13 @@ struct Main
     bool resetReq;
 };
 
-#pragma pack(1)
 struct Indication
 {
-    uint8_t PulseCnt1;
+    uint16_t PulseCnt1;
     uint16_t PulseFreq1;
-    uint8_t PulseCnt2;
+    uint16_t PulseCnt2;
     uint16_t PulseFreq2;
 };
-#pragma pack()
 }
 
 #endif // AVTUKCCU_H

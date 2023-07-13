@@ -42,10 +42,15 @@ int main(int argc, char *argv[])
         return 0;
     }
 
+#ifdef ALISE_LOCALDEBUG
     QSettings settings("~/sonica/alise/settings/settings.ini", QSettings::IniFormat);
+    QString logFileName = settings.value("Logs/logfile", "~/sonica/alise/logs/alise.log").toString();
+#else
+    QSettings settings("/root/sonica/alise/settings/settings.ini", QSettings::IniFormat);
+    QString logFileName = settings.value("Logs/logfile", "/root/sonica/alise/logs/alise.log").toString();
+#endif
     int logcounter = settings.value("Test/counter", "1").toInt();
     settings.setValue("Test/counter", ++logcounter);
-    QString logFileName = settings.value("Logs/logfile", "~/sonica/alise/logs/alise.log").toString();
     QString logLevel = settings.value("Logs/Loglevel", "Info").toString();
     int portCore = settings.value("Main/CorePort", "5555").toInt();
     int portBooter = settings.value("Main/BooterPort", "5556").toInt();
