@@ -41,6 +41,9 @@ bool StmBroker::connectToStm()
         std::cout << "Couldn't connect" << std::endl;
         return false;
     }
+
+    proxyBS = UniquePointer<DataTypesProxy>(new DataTypesProxy());
+    proxyBS->RegisterType<DataTypes::BlockStruct>();
     QObject::connect(proxyBS.get(), &DataTypesProxy::DataStorable, this,
         //[](const auto bs) {
         [](const QVariant &msg) {

@@ -30,6 +30,9 @@ Controller::Controller(std::string addr, deviceType *devBroker, QObject *parent)
 #endif
 
     connect(worker, &runner::ZeroRunner::timeReceived, &timeSync, &TimeSyncronizer::handleTime);
+
+    proxyBS = UniquePointer<DataTypesProxy>(new DataTypesProxy());
+    proxyBS->RegisterType<DataTypes::BlockStruct>();
     connect(proxyBS.get(), &DataTypesProxy::DataStorable, &recovery, &Recovery::receiveBlock);
 
     connect(&timeSync, &TimeSyncronizer::ntpStatusChanged, worker, &runner::ZeroRunner::publishNtpStatus);
@@ -63,6 +66,12 @@ bool Controller::launch(int port)
             }
         }
     #endif */
+
+#ifdef __linux__
+    proxyTS = UniquePointer<DataTypesProxy>(new DataTypesProxy(&DataManager::GetInstance()));
+    proxyTS->RegisterType<timespec>();
+#endif
+
     auto connectionTimeSync = std::shared_ptr<QMetaObject::Connection>(new QMetaObject::Connection);
     *connectionTimeSync = connect(
         proxyTS.get(), &DataTypesProxy::DataStorable, &timeSync,
