@@ -59,6 +59,14 @@ void ZeroRunner::runServer(int port)
         worker->work();
     }));
 
+    proxyBS = UniquePointer<DataTypesProxy>(new DataTypesProxy());
+    proxyBS->RegisterType<DataTypes::BlockStruct>();
+
+#ifdef __linux__
+    proxyTS = UniquePointer<DataTypesProxy>(new DataTypesProxy(&DataManager::GetInstance()));
+    proxyTS->RegisterType<timespec>();
+#endif
+
     auto publisher = std::unique_ptr<std::thread>(new std::thread([&, worker = std::move(new_pub)] {
         connect(proxyTS.get(), &DataTypesProxy::DataStorable, worker.get(), &ZeroPublisher::publishTime,
             Qt::DirectConnection);
