@@ -20,6 +20,7 @@ int main(int argc, char *argv[])
     GitVersion gitVersion;
     QCoreApplication a(argc, argv);
     a.setApplicationVersion(QString(COMAVERSION) + "-" + gitVersion.getGitHash());
+    StdFunc::Init();
 
     QCommandLineParser parser;
     parser.setApplicationDescription("Avtuk LInux SErver");
@@ -64,7 +65,21 @@ int main(int argc, char *argv[])
     Logger::writeStart(logFileName);
     Logger::setLogLevel(logLevel);
     qInstallMessageHandler(Logger::messageHandler);
+
     qInfo() << "Reading settings from: " << settings.fileName();
+    qInfo() << "Startup information:\n=========================";
+    qInfo() << "LogLevel: " << Logger::logLevel();
+    qInfo() << "CorePort: " << portCore;
+    qInfo() << "BooterPort: " << portBooter;
+    qInfo() << "FailureBlink freq:" << 1000 / AliseConstants::FailureBlinkPeriod() << " Hz";
+    qInfo() << "StartingBlink freq:" << 1000 / AliseConstants::SonicaStartingBlinkPeriod() << " Hz";
+    qInfo() << "NormalBlink freq:" << 1000 / AliseConstants::SonicaNormalBlinkPeriod() << " Hz";
+    qInfo() << "Power check period:" << AliseConstants::PowerCheckPeriod() << " ms";
+    qInfo() << "Reset check period:" << AliseConstants::ResetCheckPeriod() << " ms";
+    qInfo() << "Health query period:" << AliseConstants::HealthQueryPeriod() << " ms";
+    qInfo() << "Gpio blink check period:" << AliseConstants::GpioBlinkCheckPeriod() << " ms";
+    qInfo() << "=========================";
+
     auto devBroker = std::unique_ptr<deviceType>(new deviceType);
 #if defined(AVTUK_STM)
     if (!devBroker->status())

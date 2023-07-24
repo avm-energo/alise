@@ -80,7 +80,10 @@ set(SOURCES
     recovery.h
     aliseconstants.cpp
     aliseconstants.h
-    protos/protos.proto)
+    protos/protos.proto
+    broker.cpp
+    broker.h
+    )
 
 if (ALISE_STM)
     list(APPEND SOURCES

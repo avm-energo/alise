@@ -111,14 +111,13 @@ void Recovery::restartNetwork()
     myProcess->waitForFinished();
 }
 
-// void Recovery::receiveBlock(const DataTypes::BlockStruct blk)
 void Recovery::receiveBlock(const QVariant &msg)
 {
     auto blk = msg.value<DataTypes::BlockStruct>();
     qDebug() << "Block received, ID: " << blk.ID << ", data: " << blk.data;
-    switch (blk.data.size())
+    switch (blk.ID)
     {
-    case sizeof(AVTUK_CCU::Main):
+    case AVTUK_CCU::MainBlock:
     {
         AVTUK_CCU::Main mainBlock;
         memcpy(&mainBlock, blk.data.data(), sizeof(mainBlock));

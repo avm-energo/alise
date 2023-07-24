@@ -13,7 +13,7 @@ Controller::Controller(std::string addr, deviceType *devBroker, QObject *parent)
 {
     Q_UNUSED(addr);
 
-    connect(worker, &runner::ZeroRunner::healthReceived, deviceBroker, &deviceType::setIndication);
+    connect(worker, &runner::ZeroRunner::healthReceived, deviceBroker, &deviceType::healthReceived);
     // NOTE avtuk will be rebooted
     connect(&recovery, &Recovery::rebootReq, deviceBroker, &deviceType::rebootMyself);
 
@@ -55,17 +55,6 @@ Controller::~Controller()
 
 bool Controller::launch(int port)
 {
-    /*#if defined(AVTUK_STM)
-        if (deviceBroker->status() != StmBroker::Statuses::CONNECTED)
-        {
-            if (!deviceBroker->connectToStm())
-            {
-                delete worker;
-                return false;
-            }
-        }
-    #endif */
-
 #ifdef __linux__
     proxyTS = UniquePointer<DataTypesProxy>(new DataTypesProxy(&DataManager::GetInstance()));
     proxyTS->RegisterType<timespec>();
