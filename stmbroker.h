@@ -1,6 +1,7 @@
 #pragma once
 
 #include "avtukccu.h"
+#include "broker.h"
 #include "protos/protos.pb.h"
 
 #include <QObject>
@@ -12,33 +13,26 @@
 
 class Protocom;
 
-class StmBroker : public QObject
+class StmBroker : public Broker
 {
-    //    Q_OBJECT
 public:
     StmBroker(QObject *parent = nullptr);
     bool connectToStm();
 
-public /*slots*/:
-    void checkPowerUnit();
-    void setIndication(alise::Health_Code code);
-    bool status();
+public slots:
+    void checkPowerUnit() override;
+    void setIndication() override;
 
-    void setTime(timespec time);
-    void getTime();
-    void rebootMyself();
+    void setTime(timespec time) override;
+    void getTime() override;
+    void rebootMyself() override;
 
 private:
-    AVTUK_CCU::Indication transform(alise::Health_Code code) const;
+    AVTUK_CCU::Indication transformBlinkPeriod() const;
     timespec transform(google::protobuf::Timestamp timestamp) const;
     QMutex _mutex;
-    bool m_status;
-
-    // Controller m_controller;
     Protocom *m_interface;
-    QTimer m_timer;
     UniquePointer<DataTypesProxy> proxyBS, proxyBStr;
-    int m_currentHealthCode;
 
 #ifdef TEST_INDICATOR
     QTimer m_testTimer;

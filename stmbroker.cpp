@@ -1,5 +1,6 @@
 #include "stmbroker.h"
 
+#include "aliseconstants.h"
 #include "controller.h"
 #include "helper.h"
 #include "interfaces/protocom.h"
@@ -9,10 +10,8 @@
 #include <QRandomGenerator>
 #include <gen/helper.h>
 
-StmBroker::StmBroker(QObject *parent) : QObject(parent)
+StmBroker::StmBroker(QObject *parent) : Broker(parent)
 {
-    m_status = false;
-    m_currentHealthCode = alise::Health_Code_SettingsError;
 }
 
 bool StmBroker::connectToStm()
@@ -51,17 +50,12 @@ bool StmBroker::connectToStm()
             qDebug() << bs;
         });
 
-    m_timer.setInterval(1000);
-
 #ifdef TEST_INDICATOR
     m_testTimer.setInterval(10000);
     QObject::connect(&m_testTimer, &QTimer::timeout, this,
         [this] { setIndication(static_cast<alise::Health_Code>(QRandomGenerator::global()->bounded(0, 8))); });
     m_testTimer.start();
 #endif
-
-    m_timer.start();
-    QObject::connect(&m_timer, &QTimer::timeout, this, &StmBroker::checkPowerUnit);
 #endif
     m_status = true;
     return true;
@@ -76,29 +70,19 @@ void StmBroker::checkPowerUnit()
 #endif
 }
 
-void StmBroker::setIndication(alise::Health_Code code)
+void StmBroker::setIndication()
 {
 #ifndef ALISE_LOCALDEBUG
-    if (code == m_currentHealthCode)
-        return;
-    m_currentHealthCode = code;
     QMutexLocker locker(&_mutex);
-    const AVTUK_CCU::Indication indication = transform(code);
+    const AVTUK_CCU::Indication indication = transformBlinkPeriod();
     qDebug() << "Indication is: cnt1: " << indication.PulseCnt1 << ", freq1: " << indication.PulseFreq1
              << ", cnt2: " << indication.PulseCnt2 << ", freq2: " << indication.PulseFreq2;
     DataTypes::BlockStruct block;
     block.ID = AVTUK_CCU::IndicationBlock;
     block.data.resize(sizeof(indication));
-    qDebug() << "Sizeof indication block: " << sizeof(indication);
     memcpy(block.data.data(), &indication, sizeof(indication));
-    qDebug() << block;
     m_interface->writeCommand(Interface::Commands::C_WriteUserValues, QVariant::fromValue(block));
 #endif
-}
-
-bool StmBroker::status()
-{
-    return m_status;
 }
 
 void StmBroker::setTime(timespec time)
@@ -126,51 +110,10 @@ void StmBroker::rebootMyself()
 #endif
 }
 
-AVTUK_CCU::Indication StmBroker::transform(alise::Health_Code code) const
+AVTUK_CCU::Indication StmBroker::transformBlinkPeriod() const
 {
-    constexpr auto maxFreq = 4000;
-    constexpr auto minFreq = 1000;
-    switch (code)
-    {
-    case alise::Health_Code_Startup:
-    {
-        return { 1, maxFreq, 0, 0 };
-    }
-    case alise::Health_Code_Work:
-    {
-        return { 1, minFreq, 0, 0 };
-    }
-    case alise::Health_Code_Update:
-    {
-        return { 1, minFreq, static_cast<uint8_t>(code), maxFreq };
-    }
-    case alise::Health_Code_StartupFail:
-    {
-        return { 1, minFreq, static_cast<uint8_t>(code), maxFreq };
-    }
-    case alise::Health_Code_NoProject:
-    {
-        return { 1, minFreq, static_cast<uint8_t>(code), maxFreq };
-    }
-    case alise::Health_Code_ProjectError:
-    {
-        return { 1, minFreq, static_cast<uint8_t>(code), maxFreq };
-    }
-    case alise::Health_Code_NoFirmware:
-    {
-        return { 1, minFreq, static_cast<uint8_t>(code), maxFreq };
-    }
-    case alise::Health_Code_BootloaderError:
-    {
-        return { 1, minFreq, static_cast<uint8_t>(code), maxFreq };
-    }
-    case alise::Health_Code_SettingsError:
-    {
-        return { 1, minFreq, static_cast<uint8_t>(code), maxFreq };
-    }
-    default:
-        return transform(alise::Health_Code_SettingsError);
-    }
+    quint16 blinkfreq = 1000 / m_currentBlinkingPeriod * 1000; // transform to mHz from ms
+    return { 1, blinkfreq, 0, 0 };
 }
 
 timespec StmBroker::transform(google::protobuf::Timestamp timestamp) const

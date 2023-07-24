@@ -18,23 +18,15 @@ constexpr GpioBroker::GpioPin PowerStatusPin1 { 3, 17 };
 constexpr GpioBroker::GpioPin LedPin { 1, 31 };
 constexpr GpioBroker::GpioPin ResetPin { 2, 6 };
 
-GpioBroker::GpioBroker(QObject *parent) : QObject(parent)
+GpioBroker::GpioBroker(QObject *parent) : Broker(parent)
 {
     qDebug() << "GPIO Broker created";
-    m_timer.setInterval(AliseConstants::PowerCheckPeriod());
     m_resetTimer.setInterval(AliseConstants::ResetCheckPeriod());
     m_gpioTimer.setInterval(AliseConstants::GpioBlinkCheckPeriod());
-    m_healthQueryTimeoutTimer.setInterval(AliseConstants::HealthQueryPeriod());
-    QObject::connect(&m_timer, &QTimer::timeout, this, &GpioBroker::checkPowerUnit);
-    QObject::connect(&m_healthQueryTimeoutTimer, &QTimer::timeout, [&] {
-        qDebug() << "Health Query Timeout";
-
-        criticalBlinking();
-    } );
     QObject::connect(&m_resetTimer, &QTimer::timeout, this, &GpioBroker::reset);
-    m_timer.start();
+    QObject::connect(&m_gpioTimer, &QTimer::timeout, this, &GpioBroker::blink);
     m_resetTimer.start();
-    m_healthQueryTimeoutTimer.start();
+    m_gpioTimer.start();
 #ifdef TEST_INDICATOR
     QTimer *testTimer = new QTimer(this);
     testTimer->setInterval(AliseConstants::TestRandomHealthIndicatorModePeriod());
@@ -67,9 +59,6 @@ GpioBroker::GpioBroker(QObject *parent) : QObject(parent)
         line.request({ PROGNAME, ::gpiod::line_request::DIRECTION_INPUT, 0 });
     }
     chip1.get_line(LedPin.offset).set_value(blinkStatus);
-    criticalBlinking();
-    QObject::connect(&m_gpioTimer, &QTimer::timeout, this, &GpioBroker::blink);
-    m_gpioTimer.start();
 }
 
 void GpioBroker::checkPowerUnit()
@@ -90,42 +79,15 @@ void GpioBroker::checkPowerUnit()
     DataManager::GetInstance().addSignalToOutList(blk);
 }
 
-void GpioBroker::setIndication(alise::Health_Code code)
+void GpioBroker::setIndication()
 {
     QMutexLocker locker(&_mutex);
-
-    qDebug() << "Setting indication: " << code;
-    m_healthQueryTimeoutTimer.start();
-    switch (code)
-    {
-    case alise::Health_Code_Startup:
-    {
-        if (m_currentBlinkingPeriod == AliseConstants::SonicaStartingBlinkPeriod())
-            return;
-        m_currentBlinkingPeriod = AliseConstants::SonicaStartingBlinkPeriod();
-        break;
-    }
-    case alise::Health_Code_Work:
-    {
-        if (m_currentBlinkingPeriod == AliseConstants::SonicaNormalBlinkPeriod())
-            return;
-        m_currentBlinkingPeriod = AliseConstants::SonicaNormalBlinkPeriod();
-        break;
-    }
-    default:
-    {
-        if(m_currentBlinkingPeriod == AliseConstants::FailureBlinkPeriod())
-            return;
-        m_currentBlinkingPeriod = AliseConstants::FailureBlinkPeriod();
-        break;
-    }
-    }
     m_gpioTimer.setInterval(m_currentBlinkingPeriod);
 }
 
 void GpioBroker::setTime(timespec time)
 {
-
+    Q_UNUSED(time)
 }
 
 void GpioBroker::getTime()
@@ -136,7 +98,6 @@ void GpioBroker::getTime()
 void GpioBroker::rebootMyself()
 {
     qDebug() << "Rebooting...";
-    m_timer.stop();
     m_gpioTimer.stop();
     m_resetTimer.stop();
     chip1.get_line(LedPin.offset).set_value(false);
@@ -181,12 +142,6 @@ void GpioBroker::reset()
         blk.ID = AVTUK_CCU::MainBlock;
         DataManager::GetInstance().addSignalToOutList(blk);
     }
-}
-
-void GpioBroker::criticalBlinking()
-{
-    m_gpioTimer.setInterval(AliseConstants::FailureBlinkPeriod());
-    m_currentBlinkingPeriod = AliseConstants::FailureBlinkPeriod();
 }
 
 void GpioBroker::blink()
