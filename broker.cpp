@@ -29,7 +29,6 @@ Broker::Broker(QObject *parent) : QObject(parent)
     });
     testTimer->start();
 #endif
-    criticalBlinking();
 }
 
 bool Broker::status()

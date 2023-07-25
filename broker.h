@@ -18,6 +18,7 @@ public:
     virtual void rebootMyself() = 0;
     virtual void setIndication() = 0;
 
+    void criticalBlinking();
     bool status();
     int m_currentBlinkingPeriod;
     bool m_status;
@@ -28,7 +29,6 @@ public slots:
 private:
     QTimer m_checkPowerTimer, m_clientTimeoutTimer;
 
-    void criticalBlinking();
 signals:
 };
 
