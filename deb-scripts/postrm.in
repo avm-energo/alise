@@ -1,7 +1,5 @@
 service_name=@SERVICE_NAME@
 
-rm /etc/systemd/system/$service_name 2>/dev/null
-rm /usr/lib/systemd/system/$service_name 2>/dev/null
 rm /lib/systemd/system/$service_name 2>/dev/null
 systemctl daemon-reload
 systemctl reset-failed
