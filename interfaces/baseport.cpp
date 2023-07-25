@@ -6,7 +6,12 @@
 BasePort::BasePort(const QString &logFilename, QObject *parent)
     : QObject(parent), m_state(Interface::State::Connect), m_log(new LogClass(this))
 {
-    m_log->Init(logFilename + "." + ::logExt);
+#ifdef ALISE_LOCALDEBUG
+    QString logFileName = "~/sonica/alise/logs/" + logFilename + "." + ::logExt;
+#else
+    QString logFileName = "/root/sonica/alise/logs/" + logFilename + "." + ::logExt;
+#endif
+    m_log->Init(logFileName + "." + ::logExt);
     m_log->WriteRaw(::logStart);
 }
 
