@@ -62,12 +62,14 @@ int main(int argc, char *argv[])
     AliseConstants::setResetCheckPeriod(settings.value("Timers/ResetCheckPeriod", "1000").toInt());
     AliseConstants::setHealthQueryPeriod(settings.value("Timers/HealthQueryPeriod", "4000").toInt());
     AliseConstants::setGpioBlinkPeriod(settings.value("Timers/GpioBlinkPeriod", "50").toInt());
+    AliseConstants::setSecondsToHardReset(settings.value("Reset/TimeToWaitForHardReset", "4").toInt());
     Logger::writeStart(logFileName);
     Logger::setLogLevel(logLevel);
     qInstallMessageHandler(Logger::messageHandler);
 
     qInfo() << "Reading settings from: " << settings.fileName();
-    qInfo() << "Startup information:\n=========================";
+    qInfo() << "Startup information:";
+    qInfo() << "=========================";
     qInfo() << "LogLevel: " << Logger::logLevel();
     qInfo() << "CorePort: " << portCore;
     qInfo() << "BooterPort: " << portBooter;
@@ -89,12 +91,11 @@ int main(int argc, char *argv[])
     }
 #endif
     Controller booterController(devBroker.get()), coreController(devBroker.get());
+    booterController.ofType(Controller::ContrTypes::IS_BOOTER);
+    coreController.ofType(Controller::ContrTypes::IS_CORE);
     booterController.launch(portBooter);
     coreController.launch(portCore);
-    //    if (!booterController.launch(portBooter))
-    //        return 13;
-    //    if (!coreController.launch(portCore))
-    //        return 13;
+
     std::cout << "Enter the event loop" << std::endl;
     return a.exec();
 }

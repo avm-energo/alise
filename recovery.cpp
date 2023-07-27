@@ -7,92 +7,42 @@
 #include <QProcess>
 #include <gen/datatypes.h>
 
-constexpr char eth0path[] = "/etc/network/interfaces.d/eth0";
-constexpr char eth1path[] = "/etc/network/interfaces.d/eth1";
-constexpr char eth2path[] = "/etc/network/interfaces.d/eth2";
+constexpr char ethPathString[] = "/etc/network/interfaces.d/eth";
+constexpr char ethResourcePathString[] = ":/network/eth";
 
-Recovery::Recovery(QObject *parent) : QObject(parent)
+RecoveryEngine::RecoveryEngine(QObject *parent) : QObject(parent)
 {
 }
 
-void Recovery::eth0()
+void RecoveryEngine::setDefEth(int ethNum)
 {
-    qDebug() << "[Recovery] Eth0";
-    if (!QFile::exists(":/network/eth0"))
+    QString ethLetter = QString::number(ethNum);
+    QString ethPath = ethPathString + ethLetter;
+    QString ethResourcePath = ethResourcePathString + ethLetter;
+    qDebug() << "[Recovery] Set default ip eth" + ethLetter;
+    if (!QFile::exists(ethResourcePath))
     {
         qCritical() << "No eth0 recovery";
         return;
     }
-    if (QFile::exists(eth0path))
+    if (QFile::exists(ethPath))
     {
-        QFile::remove(eth0path);
+        QFile::remove(ethPath);
     }
 
-    if (!QFile::copy(":/network/eth0", eth0path))
+    if (!QFile::copy(ethResourcePath, ethPath))
     {
-        qCritical() << "Couldn't copy eth0";
+        qCritical() << "Couldn't copy eth" + ethLetter;
         return;
     }
-    if (!QFile(eth0path).setPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ReadUser
+    if (!QFile(ethPath).setPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ReadUser
             | QFileDevice::ReadGroup | QFileDevice::ReadOther))
     {
-        qCritical() << "Couldn't change perm for " << eth0path;
+        qCritical() << "Couldn't change perm for " << ethPath;
     }
 }
-#if defined(AVTUK_NO_STM)
-void Recovery::eth1()
-{
-    qDebug() << "[Recovery] Eth1";
 
-    if (!QFile::exists(":/network/eth1"))
-    {
-        qCritical() << "No eth1 recovery";
-        return;
-    }
-    if (QFile::exists(eth1path))
-    {
-        QFile::remove(eth1path);
-    }
-
-    if (!QFile::copy(":/network/eth1", eth1path))
-    {
-        qCritical() << "Couldn't copy eth1";
-        return;
-    }
-    if (!QFile(eth1path).setPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ReadUser
-            | QFileDevice::ReadGroup | QFileDevice::ReadOther))
-    {
-        qCritical() << "Couldn't change perm for " << eth1path;
-    }
-}
-#endif
-#if defined(AVTUK_STM)
-void Recovery::eth2()
-{
-    qDebug() << "[Recovery] Eth2";
-    if (!QFile::exists(":/network/eth2"))
-    {
-        qCritical() << "No eth2 recovery";
-        return;
-    }
-    if (QFile::exists(eth2path))
-    {
-        QFile::remove(eth2path);
-    }
-
-    if (!QFile::copy(":/network/eth2", eth2path))
-    {
-        qCritical() << "Couldn't copy eth2";
-        return;
-    }
-    if (!QFile(eth2path).setPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ReadUser
-            | QFileDevice::ReadGroup | QFileDevice::ReadOther))
-    {
-        qCritical() << "Couldn't change perm for " << eth2path;
-    }
-}
-#endif
-void Recovery::sync()
+void RecoveryEngine::sync()
 {
     qDebug() << "[Recovery] SYNC";
     QString program = "sync";
@@ -102,7 +52,7 @@ void Recovery::sync()
     myProcess->waitForFinished();
 }
 
-void Recovery::restartNetwork()
+void RecoveryEngine::restartNetwork()
 {
     qInfo() << "[Recovery] Restarting network";
     QString program = "/etc/init.d/networking";
@@ -112,30 +62,28 @@ void Recovery::restartNetwork()
     myProcess->waitForFinished();
 }
 
-void Recovery::receiveBlock(const QVariant &msg)
+void RecoveryEngine::receiveBlock(const QVariant &msg)
 {
     auto blk = msg.value<DataTypes::BlockStruct>();
-    qDebug() << "Block received, ID: " << blk.ID << ", data: " << blk.data;
+    qDebug() << "[Recovery] <= MCU : Block ID = " << blk.ID << ", data = " << blk.data;
     switch (blk.ID)
     {
     case AVTUK_CCU::MainBlock:
     {
         AVTUK_CCU::Main mainBlock;
         memcpy(&mainBlock, blk.data.data(), sizeof(mainBlock));
-        qDebug() << "[Recovery] Main block has been received from MCU, reset is: " << mainBlock.resetReq
-                 << ", PWRIN: " << mainBlock.PWRIN;
+        //        qDebug() << "[Recovery] Main block has been received from MCU, reset is: " << mainBlock.resetReq;
         if (mainBlock.resetReq && (!resetInit))
         {
-            eth0();
+            setDefEth(0);
 #if defined(AVTUK_NO_STM)
-            eth1();
+            setDefEth(1);
 #endif
 #if defined(AVTUK_STM)
-            eth2();
+            setDefEth(2);
 #endif
             sync();
             restartNetwork();
-            sync();
             emit rebootReq();
             resetInit = true;
         }

@@ -8,7 +8,6 @@ public:
     {
         int ResetCheckPeriod;
         int PowerCheckPeriod;
-        int TestRandomHealthIndicatorModePeriod;
         int GpioBlinkCheckPeriod;
         int HealthQueryPeriod;
     };
@@ -28,6 +27,7 @@ public:
     static void setFailureBlinkPeriod(int period);
     static void setSonicaStartingBlinkPeriod(int period);
     static void setSonicaNormalBlinkPeriod(int period);
+    static void setSecondsToHardReset(int seconds);
     static int ResetCheckPeriod();
     static int PowerCheckPeriod();
     static int GpioBlinkCheckPeriod();
@@ -35,10 +35,13 @@ public:
     static int FailureBlinkPeriod();
     static int SonicaStartingBlinkPeriod();
     static int SonicaNormalBlinkPeriod();
+    static int SecondsToHardReset();
 
 private:
     static Timers _timersConstants;
     static Blinks _blinksConstants;
+    static int s_SecondsToHardReset; // really it's ResetCheckPeriod times (seconds = ResetCheckPeriod / 1000 *
+                                     // s_SecondsToHardReset)
 };
 
 #endif // ALISECONSTANTS_H

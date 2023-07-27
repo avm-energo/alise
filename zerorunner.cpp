@@ -16,7 +16,7 @@ namespace runner
 
 ZeroRunner::ZeroRunner(QObject *parent)
     : QObject(parent)
-    , ctx_(1)
+    , ctx_(1) // 1 = io_threads
     , frontend_(ctx_, ZMQ_ROUTER)
     , backendSub_(ctx_, ZMQ_DEALER)
     , backendPub_(ctx_, ZMQ_DEALER)
@@ -36,45 +36,38 @@ void ZeroRunner::runServer(int port)
     backendSub_.bind("inproc://backendSub");
     backendPub_.bind("inproc://backendPub");
 
-    auto new_sub = UniquePointer<ZeroSubscriber>(new ZeroSubscriber(ctx_, ZMQ_DEALER));
-    auto new_pub = UniquePointer<ZeroPublisher>(new ZeroPublisher(ctx_, ZMQ_DEALER));
+    m_subscriber = UniquePointer<ZeroSubscriber>(new ZeroSubscriber(ctx_, ZMQ_DEALER));
+    m_publisher = UniquePointer<ZeroPublisher>(new ZeroPublisher(ctx_, ZMQ_DEALER));
 
-    // periodically check the connection
-    auto tmr = new QTimer;
-    tmr->setInterval(helloRequestInterval);
-    connect(tmr, &QTimer::timeout, new_pub.get(), &ZeroPublisher::publishHealthQuery);
-
-    connect(new_sub.get(), &ZeroSubscriber::helloReceived, new_pub.get(), &ZeroPublisher::publishHello,
+    connect(m_subscriber.get(), &ZeroSubscriber::helloReceived, m_publisher.get(), &ZeroPublisher::publishHello,
         Qt::DirectConnection);
 
-    connect(new_sub.get(), &ZeroSubscriber::timeReceived, this, &ZeroRunner::timeReceived);
+    connect(m_subscriber.get(), &ZeroSubscriber::timeRequest, this, &ZeroRunner::timeRequest);
+    connect(m_subscriber.get(), &ZeroSubscriber::timeReceived, this, &ZeroRunner::timeReceived);
 
-    auto timeSync = UniquePointer<TimeSyncronizer>(new TimeSyncronizer);
+    connect(m_subscriber.get(), &ZeroSubscriber::healthReceived, this, &ZeroRunner::healthReceived);
 
-    connect(new_sub.get(), &ZeroSubscriber::timeReceived, timeSync.get(), &TimeSyncronizer::handleTime,
-        Qt::DirectConnection);
-
-    connect(new_sub.get(), &ZeroSubscriber::healthReceived, this, &ZeroRunner::healthReceived);
-    auto subscriber = std::unique_ptr<std::thread>(new std::thread([&, worker = std::move(new_sub)] {
-        connect(worker.get(), &ZeroSubscriber::timeRequest, this, &ZeroRunner::timeRequest);
+    auto subscriber = std::unique_ptr<std::thread>(new std::thread([&, worker = std::move(m_subscriber)] {
+        //        connect(worker.get(), &ZeroSubscriber::timeRequest, this, &ZeroRunner::timeRequest);
         worker->work();
     }));
 
-    proxyBS = UniquePointer<DataTypesProxy>(new DataTypesProxy());
-    proxyBS->RegisterType<DataTypes::BlockStruct>();
+    //    proxyBS = UniquePointer<DataTypesProxy>(new DataTypesProxy());
+    //    proxyBS->RegisterType<DataTypes::BlockStruct>();
 
-#ifdef __linux__
-    proxyTS = UniquePointer<DataTypesProxy>(new DataTypesProxy(&DataManager::GetInstance()));
-    proxyTS->RegisterType<timespec>();
-#endif
+    //#ifdef __linux__
+    //    proxyTS = UniquePointer<DataTypesProxy>(new DataTypesProxy(&DataManager::GetInstance()));
+    //    proxyTS->RegisterType<timespec>();
+    //#endif
 
-    auto publisher = std::unique_ptr<std::thread>(new std::thread([&, worker = std::move(new_pub)] {
-        connect(proxyTS.get(), &DataTypesProxy::DataStorable, worker.get(), &ZeroPublisher::publishTime,
-            Qt::DirectConnection);
-        connect(
-            this, &ZeroRunner::publishNtpStatus, worker.get(), &ZeroPublisher::publishNtpStatus, Qt::DirectConnection);
-        connect(proxyBS.get(), &DataTypesProxy::DataStorable, worker.get(), &ZeroPublisher::publishBlock,
-            Qt::DirectConnection);
+    auto publisher = std::unique_ptr<std::thread>(new std::thread([&, worker = std::move(m_publisher)] {
+        //        connect(proxyTS.get(), &DataTypesProxy::DataStorable, worker.get(), &ZeroPublisher::publishTime,
+        //            Qt::DirectConnection);
+        //        connect(
+        //            this, &ZeroRunner::publishNtpStatus, worker.get(), &ZeroPublisher::publishNtpStatus,
+        //            Qt::DirectConnection);
+        //        connect(proxyBS.get(), &DataTypesProxy::DataStorable, worker.get(), &ZeroPublisher::publishBlock,
+        //            Qt::DirectConnection);
         worker->work();
     }));
 
@@ -84,12 +77,32 @@ void ZeroRunner::runServer(int port)
     auto controller = std::unique_ptr<std::thread>(new std::thread([&] { polling(); }));
 
     controller->detach();
-    tmr->start();
     qInfo() << "ZeroRunner started";
 }
 
 void ZeroRunner::stopServer()
 {
+}
+
+void ZeroRunner::publishHealthQueryCallback()
+{
+    m_publisher.get()->publishHealthQuery();
+}
+
+void ZeroRunner::publishNtpStatus(bool status)
+{
+    m_publisher.get()->publishNtpStatus(status);
+}
+
+void ZeroRunner::publishBlock(const QVariant &msg)
+{
+    auto blk = msg.value<DataTypes::BlockStruct>();
+    m_publisher.get()->publishBlock(blk);
+}
+
+void ZeroRunner::publishTime(const QVariant &msg)
+{
+    m_publisher.get()->publishTime(msg);
 }
 
 void ZeroRunner::polling()
