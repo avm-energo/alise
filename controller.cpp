@@ -52,7 +52,7 @@ bool Controller::launch(int port)
 #if defined(AVTUK_STM)
     m_deviceBroker->getTime();
 #elif defined(AVTUK_NO_STM)
-    timeSync.systemTime();
+    m_timeSynchronizer.systemTime();
 #endif
 
     m_worker->runServer(port);
@@ -86,9 +86,9 @@ void Controller::ofType(Controller::ContrTypes type)
         connect(m_worker, &runner::ZeroRunner::timeReceived, m_deviceBroker, &deviceType::setTime);
         connect(m_worker, &runner::ZeroRunner::timeRequest, m_deviceBroker, &deviceType::getTime);
 #elif defined(AVTUK_NO_STM)
-        connect(worker, &runner::ZeroRunner::timeRequest, &timeSync, //
+        connect(m_worker, &runner::ZeroRunner::timeRequest, &m_timeSynchronizer, //
             [&] {
-                auto ts = timeSync.systemTime();
+                auto ts = m_timeSynchronizer.systemTime();
                 DataManager::GetInstance().addSignalToOutList(ts);
             });
 #endif
