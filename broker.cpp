@@ -9,14 +9,15 @@ Broker::Broker(QObject *parent) : QObject(parent)
     m_status = false;
 
     m_checkPowerTimer.setInterval(AliseConstants::PowerCheckPeriod());
+    QObject::connect(&m_checkPowerTimer, &QTimer::timeout, this, &Broker::checkPowerUnit);
+
     m_clientTimeoutTimer.setInterval(
         AliseConstants::HealthQueryPeriod() * 3); // 3 times of Health Query period without replies
-
-    QObject::connect(&m_checkPowerTimer, &QTimer::timeout, this, &Broker::checkPowerUnit);
     QObject::connect(&m_clientTimeoutTimer, &QTimer::timeout, [&] {
         qDebug() << "Health Query Timeout";
         criticalBlinking();
     });
+
     m_checkPowerTimer.start();
     m_clientTimeoutTimer.start();
 #ifdef TEST_INDICATOR

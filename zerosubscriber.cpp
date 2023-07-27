@@ -21,13 +21,14 @@ void ZeroSubscriber::work()
             zmq::message_t identity;
             zmq::message_t msg;
 
-            auto id = _worker.recv(identity);
-            qDebug() << "Received id bytes: " << id.value();
-            qDebug() << "Received id: " << identity.to_string().c_str();
-            auto ms = _worker.recv(msg);
-            qDebug() << "Received msg bytes: " << ms.value();
+            //            auto id = _worker.recv(identity);
+            //            qDebug() << "Received id bytes: " << id.value();
+            //            qDebug() << "Received id: " << identity.to_string().c_str();
+            //            auto ms = _worker.recv(msg);
+            //            qDebug() << "Received msg bytes: " << ms.value();
             std::string data(msg.to_string());
-            qDebug() << "Received msg: " << data.c_str();
+            std::string iden(identity.to_string());
+            //            qDebug() << "Received msg: " << data.c_str();
             alise::PackedMessage packedMessage;
             packedMessage.ParseFromString(data);
             const auto &messageContent = packedMessage.content();
@@ -39,7 +40,7 @@ void ZeroSubscriber::work()
                     qWarning() << Error::WriteError;
                     continue;
                 }
-                qInfo() << "Receive health:" << protoHealth->code();
+                qDebug() << "[" << iden.c_str() << "] Health <= :" << protoHealth->code();
                 emit healthReceived(protoHealth->code());
                 delete protoHealth;
             }
@@ -54,7 +55,7 @@ void ZeroSubscriber::work()
                 timespec unixTime;
                 unixTime.tv_sec = protoTime.seconds();
                 unixTime.tv_nsec = protoTime.nanos();
-                qInfo() << "Receive time:" << unixTime.tv_sec << ":" << unixTime.tv_nsec;
+                qDebug() << "[" << iden.c_str() << "] Time <= :" << unixTime.tv_sec << ":" << unixTime.tv_nsec;
                 emit timeReceived(unixTime);
             }
             else if (messageContent.Is<alise::HelloRequest>())
@@ -65,7 +66,7 @@ void ZeroSubscriber::work()
                     qWarning() << Error::WriteError;
                     continue;
                 }
-                qInfo() << "Someone said to Alise:" << helloAlise.message();
+                qDebug() << "[" << iden.c_str() << "] HelloReq <= :" << helloAlise.message();
                 emit helloReceived(QString::fromStdString(identity.to_string()), helloAlise.message());
             }
             else if (messageContent.Is<alise::TimeRequest>())
@@ -76,18 +77,18 @@ void ZeroSubscriber::work()
                     qWarning() << Error::WriteError;
                     continue;
                 }
-                qInfo() << "TimeRequested";
+                qDebug() << "[" << iden.c_str() << "] TimeReq <=";
                 emit timeRequest();
             }
             else
             {
-                qWarning() << Error::WrongType;
+                qCritical() << Error::WrongType;
             }
             QCoreApplication::processEvents();
         }
         _worker.close();
     } catch (std::exception &e)
     {
-        qInfo() << "Exception: " << e.what();
+        qCritical() << "Exception: " << e.what();
     }
 }

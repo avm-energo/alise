@@ -20,23 +20,13 @@ constexpr GpioBroker::GpioPin ResetPin { 2, 6 };
 
 GpioBroker::GpioBroker(QObject *parent) : Broker(parent)
 {
-    qDebug() << "GPIO Broker created";
+    qDebug() << "[GPIO] GPIO Broker created";
     m_resetTimer.setInterval(AliseConstants::ResetCheckPeriod());
     m_gpioTimer.setInterval(AliseConstants::GpioBlinkCheckPeriod());
     QObject::connect(&m_resetTimer, &QTimer::timeout, this, &GpioBroker::reset);
     QObject::connect(&m_gpioTimer, &QTimer::timeout, this, &GpioBroker::blink);
     m_resetTimer.start();
     m_gpioTimer.start();
-#ifdef TEST_INDICATOR
-    QTimer *testTimer = new QTimer(this);
-    testTimer->setInterval(AliseConstants::TestRandomHealthIndicatorModePeriod());
-    QObject::connect(testTimer, &QTimer::timeout, this, [this] {
-        auto random = static_cast<alise::Health_Code>(QRandomGenerator::global()->bounded(0, 8));
-        qDebug() << "Random:" << random;
-        setIndication(random);
-    });
-    testTimer->start();
-#endif
 
     chip0.open(std::to_string(0));
     {
@@ -66,13 +56,13 @@ void GpioBroker::checkPowerUnit()
     QMutexLocker locker(&_mutex);
     auto status1 = chip0.get_line(PowerStatusPin0.offset).get_value();
     auto status2 = chip3.get_line(PowerStatusPin1.offset).get_value();
-    qDebug() << "PWR status 1: " << status1 << ", PWR status 2: " << status2;
+    qDebug() << "[GPIO] PWR status 1: " << status1 << ", PWR status 2: " << status2;
     DataTypes::BlockStruct blk;
     blk.data.resize(sizeof(AVTUK_CCU::Main));
     AVTUK_CCU::Main str;
 
     str.PWRIN = status2 | (status1 << 1);
-    qDebug() << "PWRIN: " << str.PWRIN;
+    qDebug() << "[GPIO] PWRIN: " << str.PWRIN;
     str.resetReq = false;
     std::memcpy(blk.data.data(), &str, sizeof(AVTUK_CCU::Main));
     blk.ID = AVTUK_CCU::MainBlock;
@@ -96,37 +86,37 @@ void GpioBroker::getTime()
 
 void GpioBroker::rebootMyself()
 {
-    qDebug() << "Rebooting...";
+    qDebug() << "[GPIO] Rebooting...";
     m_gpioTimer.stop();
     m_resetTimer.stop();
     chip1.get_line(LedPin.offset).set_value(false);
-    sync();
     reboot(RB_AUTOBOOT);
 }
 
 void GpioBroker::reset()
 {
     QMutexLocker locker(&_mutex);
-    qDebug() << "Reset interface settings...";
     bool value = !chip2.get_line(ResetPin.offset).get_value();
 
-    if (value)
+    if (value) // button pushed, counting seconds...
     {
         resetCounter += value;
         return;
     }
+    else if (resetCounter == 0) // normal mode, there's no any button push
+        return;
 
     // soft reset (only reboot)
-    if ((resetCounter > 20) && (resetCounter <= 40))
+    if ((resetCounter > (AliseConstants::SecondsToHardReset() / 2)) && (resetCounter <= AliseConstants::SecondsToHardReset()))
     {
-        resetCounter = 0;
+        qDebug() << "[GPIO] Reboot only";
         rebootMyself();
         return;
     }
     // hard reset
-    if (resetCounter > 40)
+    if (resetCounter > AliseConstants::SecondsToHardReset())
     {
-        resetCounter = 0;
+        qDebug() << "[GPIO] Reset interface settings...";
 
         auto status1 = chip0.get_line(PowerStatusPin0.offset).get_value();
         auto status2 = chip3.get_line(PowerStatusPin1.offset).get_value();
@@ -141,6 +131,7 @@ void GpioBroker::reset()
         blk.ID = AVTUK_CCU::MainBlock;
         DataManager::GetInstance().addSignalToOutList(blk);
     }
+    resetCounter = 0;
 }
 
 void GpioBroker::blink()

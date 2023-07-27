@@ -45,70 +45,64 @@ template <typename T> void ZeroPublisher::appendToQueue(const std::string &id, c
     _waiter.wakeOne();
 }
 
-// void ZeroPublisher::publishTime(const timespec &time)
 void ZeroPublisher::publishTime(const QVariant &msg)
 {
     auto time = msg.value<timespec>();
-    qDebug() << "Time has been added to output queue: " << time.tv_sec;
     google::protobuf::Timestamp protoTime;
     protoTime.set_seconds(time.tv_sec);
     protoTime.set_nanos(time.tv_nsec);
     appendToQueue(sonicacore, protoTime);
+    qDebug() << "Time => Q : " << time.tv_sec;
 }
 
 void ZeroPublisher::publishPowerStatus(const AVTUK_CCU::Main powerStatus)
 {
-    qDebug() << "PowerStatus has been added to output queue: " << powerStatus.PWRIN
-             << ", resetReq: " << powerStatus.resetReq;
     alise::PowerStatus protoPower;
     protoPower.set_pwrin(powerStatus.PWRIN);
     appendToQueue(sonicacore, protoPower);
+    qDebug() << "Power => Q : " << powerStatus.PWRIN;
+    qDebug() << "Reset => Q : " << powerStatus.resetReq;
 }
 
-// void ZeroPublisher::publishBlock(const DataTypes::BlockStruct &blk)
-void ZeroPublisher::publishBlock(const QVariant &msg)
+void ZeroPublisher::publishBlock(const DataTypes::BlockStruct blk)
 {
-    auto blk = msg.value<DataTypes::BlockStruct>();
-    switch (blk.data.size())
-    {
-    case sizeof(AVTUK_CCU::Main):
+    if (blk.ID == AVTUK_CCU::MainBlock)
     {
         AVTUK_CCU::Main powerStatus;
         memcpy(&powerStatus, blk.data.data(), sizeof(powerStatus));
         publishPowerStatus(powerStatus);
     }
-    }
 }
 
 void ZeroPublisher::publishHello(const QString id, const quint32 code)
 {
-    qDebug() << "HelloReply has been added to output queue: " << id << ", code: " << code;
     alise::HelloReply helloReply;
     helloReply.set_message(COMAVERSION);
     appendToQueue(id.toStdString(), helloReply);
+    qDebug() << "HelloReply => Q : " << id << ", code: " << code;
 }
 
 void ZeroPublisher::publishNtpStatus(bool status)
 {
-    qDebug() << "NtpStatus has been added to output queue: " << status;
     alise::NtpStatus ntpStatus;
     ntpStatus.set_isntpenabled(status);
     appendToQueue(sonicacore, ntpStatus);
+    qDebug() << "Ntp => Q : " << status;
 }
 
 void ZeroPublisher::publishHealthQuery()
 {
-    qDebug() << "HealthQuery has been added to output queue";
     alise::HealthQuery query;
     query.set_query(true);
     appendToQueue(booter, query);
+    qDebug() << "Health => Q";
 }
 
 void ZeroPublisher::send(itemType &str)
 {
     zmq::message_t identity(str.first);
     zmq::message_t msg(str.second);
-    qDebug() << "Send message to: {" << str.first.c_str() << "}, with payload: {" << str.second.c_str() << "}";
+    //    qDebug() << "Send message to: {" << str.first.c_str() << "}, with payload: {" << str.second.c_str() << "}";
     _worker.send(identity, zmq::send_flags::sndmore);
     _worker.send(msg, zmq::send_flags::none);
 }

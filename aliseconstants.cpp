@@ -1,7 +1,8 @@
 #include "aliseconstants.h"
 
-AliseConstants::Timers AliseConstants::_timersConstants = { 1000, 1000, 70000, 50, 4000 };
+AliseConstants::Timers AliseConstants::_timersConstants = { 1000, 1000, 50, 4000 };
 AliseConstants::Blinks AliseConstants::_blinksConstants = { 50, 250, 500 };
+int AliseConstants::s_SecondsToHardReset = 4;
 
 AliseConstants::AliseConstants()
 {
@@ -42,6 +43,11 @@ void AliseConstants::setSonicaNormalBlinkPeriod(int period)
     _blinksConstants.SonicaStatusNormalBlink = period;
 }
 
+void AliseConstants::setSecondsToHardReset(int seconds)
+{
+    s_SecondsToHardReset = seconds;
+}
+
 int AliseConstants::ResetCheckPeriod()
 {
     return _timersConstants.ResetCheckPeriod;
@@ -75,4 +81,9 @@ int AliseConstants::SonicaStartingBlinkPeriod()
 int AliseConstants::SonicaNormalBlinkPeriod()
 {
     return _blinksConstants.SonicaStatusNormalBlink;
+}
+
+int AliseConstants::SecondsToHardReset()
+{
+    return s_SecondsToHardReset;
 }

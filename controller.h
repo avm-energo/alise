@@ -23,6 +23,13 @@
 class Controller : public QObject
 {
 public:
+    enum ContrTypes
+    {
+        IS_BOOTER,
+        IS_CORE,
+        IS_INCORRECT_TYPE
+    };
+
     explicit Controller(deviceType *devBroker, QObject *parent = nullptr) noexcept;
     explicit Controller(std::string addr, deviceType *devBroker, QObject *parent = nullptr) noexcept;
 
@@ -31,13 +38,17 @@ public:
     bool launch(int port);
     void shutdown();
     void syncTime(const timespec &);
+    void ofType(ContrTypes type);
 signals:
 
 private:
-    runner::ZeroRunner *worker;
-    deviceType *deviceBroker;
-    TimeSyncronizer timeSync;
-    Recovery recovery;
+    bool hasIncorrectType();
+    ContrTypes m_type;
+    runner::ZeroRunner *m_worker;
+    deviceType *m_deviceBroker;
+    QTimer *m_pingTimer;
+    TimeSyncronizer m_timeSynchronizer;
+    RecoveryEngine m_recoveryEngine;
     int syncCounter = 0;
     UniquePointer<DataTypesProxy> proxyBS, proxyTS;
 };
