@@ -15,20 +15,15 @@ void ZeroSubscriber::work()
     try
     {
         _worker.connect("inproc://backendSub");
-        // zmq::pollitem_t items[] { { static_cast<void *>(_worker), 0, ZMQ_POLLIN, 0 } };
         while (is_active)
         {
             zmq::message_t identity;
             zmq::message_t msg;
 
-            //            auto id = _worker.recv(identity);
-            //            qDebug() << "Received id bytes: " << id.value();
-            //            qDebug() << "Received id: " << identity.to_string().c_str();
-            //            auto ms = _worker.recv(msg);
-            //            qDebug() << "Received msg bytes: " << ms.value();
+            auto id = _worker.recv(identity);
+            auto ms = _worker.recv(msg);
             std::string data(msg.to_string());
             std::string iden(identity.to_string());
-            //            qDebug() << "Received msg: " << data.c_str();
             alise::PackedMessage packedMessage;
             packedMessage.ParseFromString(data);
             const auto &messageContent = packedMessage.content();
@@ -82,10 +77,8 @@ void ZeroSubscriber::work()
             }
             else
             {
-                auto id = _worker.recv(identity);
                 qDebug() << "Received id bytes: " << id.value();
                 qDebug() << "Received id: " << identity.to_string().c_str();
-                auto ms = _worker.recv(msg);
                 qDebug() << "Received msg bytes: " << ms.value();
                 qDebug() << "Received msg: " << data.c_str();
                 qCritical() << Error::WrongType;
