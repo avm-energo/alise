@@ -82,6 +82,12 @@ void ZeroSubscriber::work()
             }
             else
             {
+                auto id = _worker.recv(identity);
+                qDebug() << "Received id bytes: " << id.value();
+                qDebug() << "Received id: " << identity.to_string().c_str();
+                auto ms = _worker.recv(msg);
+                qDebug() << "Received msg bytes: " << ms.value();
+                qDebug() << "Received msg: " << data.c_str();
                 qCritical() << Error::WrongType;
             }
             QCoreApplication::processEvents();
