@@ -79,14 +79,14 @@ void Controller::ofType(Controller::ContrTypes type)
         connect(m_runner, &ZeroRunner::timeReceived, m_deviceBroker, &Broker::setTime);
         connect(m_runner, &ZeroRunner::timeRequest, m_deviceBroker, &Broker::getTime);
 #elif defined(AVTUK_NO_STM)
-        connect(m_worker, &ZerotimeRequest, &m_timeSynchronizer, //
+        connect(m_runner, &ZeroRunner::timeRequest, &m_timeSynchronizer, //
             [&] {
                 auto ts = m_timeSynchronizer.systemTime();
                 DataManager::GetInstance().addSignalToOutList(ts);
             });
 #endif
         connect(proxyTS.get(), &DataTypesProxy::DataStorable, m_runner, &ZeroRunner::publishTime, Qt::DirectConnection);
-        //    connect(&m_timeSynchronizer, &TimeSyncronizer::ntpStatusChanged, m_worker,
+        //    connect(&m_timeSynchronizer, &TimeSyncronizer::ntpStatusChanged, m_runner,
         //    &ZeropublishNtpStatus);
         connect(&m_timeSynchronizer, &TimeSyncronizer::ntpStatusChanged, this, [&](bool status) {
             m_runner->publishNtpStatus(status);

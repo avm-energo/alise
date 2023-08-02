@@ -10,19 +10,15 @@
 #include <iostream>
 #include <thread>
 
-ZeroRunner::ZeroRunner(QObject *parent)
+ZeroRunner::ZeroRunner(const QString &type, QObject *parent)
     : QObject(parent)
     , ctx_(1) // 1 = io_threads
     , frontend_(ctx_, ZMQ_ROUTER)
     , backendSub_(ctx_, ZMQ_DEALER)
     , backendPub_(ctx_, ZMQ_DEALER)
-//    , proxyBS(new DataTypesProxy)
-//    , proxyTS(new DataTypesProxy)
 {
-    //    proxyBS->RegisterType<DataTypes::BlockStruct>();
-    //    proxyTS->RegisterType<timespec>();
     m_subscriber = new ZeroSubscriber(ctx_, ZMQ_DEALER);
-    m_publisher = new ZeroPublisher(ctx_, ZMQ_DEALER);
+    m_publisher = new ZeroPublisher(type, ctx_, ZMQ_DEALER);
 }
 
 void ZeroRunner::runServer(int port)
@@ -42,29 +38,9 @@ void ZeroRunner::runServer(int port)
 
     connect(m_subscriber, &ZeroSubscriber::healthReceived, this, &ZeroRunner::healthReceived);
 
-    auto subscriber = std::unique_ptr<std::thread>(new std::thread([&] {
-        //        connect(worker, &ZeroSubscriber::timeRequest, this, &ZeroRunner::timeRequest);
-        m_subscriber->work();
-    }));
+    auto subscriber = std::unique_ptr<std::thread>(new std::thread([&] { m_subscriber->work(); }));
 
-    //    proxyBS = UniquePointer<DataTypesProxy>(new DataTypesProxy());
-    //    proxyBS->RegisterType<DataTypes::BlockStruct>();
-
-    //#ifdef __linux__
-    //    proxyTS = UniquePointer<DataTypesProxy>(new DataTypesProxy(&DataManager::GetInstance()));
-    //    proxyTS->RegisterType<timespec>();
-    //#endif
-
-    auto publisher = std::unique_ptr<std::thread>(new std::thread([&] {
-        //        connect(proxyTS, &DataTypesProxy::DataStorable, worker, &ZeroPublisher::publishTime,
-        //            Qt::DirectConnection);
-        //        connect(
-        //            this, &ZeroRunner::publishNtpStatus, worker, &ZeroPublisher::publishNtpStatus,
-        //            Qt::DirectConnection);
-        //        connect(proxyBS, &DataTypesProxy::DataStorable, worker, &ZeroPublisher::publishBlock,
-        //            Qt::DirectConnection);
-        m_publisher->work();
-    }));
+    auto publisher = std::unique_ptr<std::thread>(new std::thread([&] { m_publisher->work(); }));
 
     publisher->detach();
     subscriber->detach();
@@ -102,7 +78,6 @@ void ZeroRunner::publishTime(const QVariant &msg)
 
 void ZeroRunner::polling()
 {
-    //  proxy(frontend_, backendSub_, backendPub_);
     zmq_pollitem_t items[] = {
         { frontend_, 0, ZMQ_POLLIN, 0 },   //
         { backendPub_, 0, ZMQ_POLLIN, 0 }, //

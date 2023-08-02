@@ -12,9 +12,12 @@ ControllerFabric::ControllerFabric(QObject *parent) : QObject(parent)
 
 bool ControllerFabric::createController(Controller::ContrTypes ofType, int port)
 {
+    const QMap<Controller::ContrTypes, QString> map = { { Controller::ContrTypes::IS_BOOTER, "sb" },
+        { Controller::ContrTypes::IS_CORE, "sc" }, { Controller::ContrTypes::IS_INCORRECT_TYPE, "unk" } };
     if (!m_status)
         return false;
-    ZeroRunner *runner = new ZeroRunner(this);
+    Q_ASSERT(map.contains(ofType));
+    ZeroRunner *runner = new ZeroRunner(map[ofType], this);
     Controller *controller = new Controller(m_broker, runner, this);
     controller->ofType(ofType);
     runner->runServer(port);

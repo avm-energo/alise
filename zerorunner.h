@@ -20,7 +20,7 @@ public:
         kMaxThread = 1
     };
 
-    ZeroRunner(QObject *parent = nullptr);
+    ZeroRunner(const QString &type, QObject *parent = nullptr);
 
 public slots:
     void runServer(int port);

@@ -9,9 +9,10 @@
 #include <random>
 #include <thread>
 
-ZeroPublisher::ZeroPublisher(zmq::context_t &ctx, int sock_type, QObject *parent)
+ZeroPublisher::ZeroPublisher(const QString &type, zmq::context_t &ctx, int sock_type, QObject *parent)
     : QObject(parent), _ctx(ctx), _worker(_ctx, sock_type)
 {
+    m_type = "[ " + type + " ]";
 }
 
 void ZeroPublisher::work()
@@ -52,7 +53,7 @@ void ZeroPublisher::publishTime(const QVariant &msg)
     protoTime.set_seconds(time.tv_sec);
     protoTime.set_nanos(time.tv_nsec);
     appendToQueue(sonicacore, protoTime);
-    qDebug() << "Time => Q : " << time.tv_sec;
+    qDebug() << m_type + "Time => Q : " << time.tv_sec;
 }
 
 void ZeroPublisher::publishPowerStatus(const AVTUK_CCU::Main powerStatus)
@@ -60,8 +61,8 @@ void ZeroPublisher::publishPowerStatus(const AVTUK_CCU::Main powerStatus)
     alise::PowerStatus protoPower;
     protoPower.set_pwrin(powerStatus.PWRIN);
     appendToQueue(sonicacore, protoPower);
-    qDebug() << "Power => Q : " << powerStatus.PWRIN;
-    qDebug() << "Reset => Q : " << powerStatus.resetReq;
+    qDebug() << m_type + "Power => Q : " << powerStatus.PWRIN;
+    qDebug() << m_type + "Reset => Q : " << powerStatus.resetReq;
 }
 
 void ZeroPublisher::publishBlock(const DataTypes::BlockStruct blk)
@@ -79,7 +80,7 @@ void ZeroPublisher::publishHello(const QString id, const quint32 code)
     alise::HelloReply helloReply;
     helloReply.set_message(COMAVERSION);
     appendToQueue(id.toStdString(), helloReply);
-    qDebug() << "HelloReply => Q : " << id << ", code: " << code;
+    qDebug() << m_type + "HelloReply => Q : " << id << ", code: " << code;
 }
 
 void ZeroPublisher::publishNtpStatus(bool status)
@@ -87,7 +88,7 @@ void ZeroPublisher::publishNtpStatus(bool status)
     alise::NtpStatus ntpStatus;
     ntpStatus.set_isntpenabled(status);
     appendToQueue(sonicacore, ntpStatus);
-    qDebug() << "Ntp => Q : " << status;
+    qDebug() << m_type + "Ntp => Q : " << status;
 }
 
 void ZeroPublisher::publishHealthQuery()
@@ -95,7 +96,7 @@ void ZeroPublisher::publishHealthQuery()
     alise::HealthQuery query;
     query.set_query(true);
     appendToQueue(booter, query);
-    qDebug() << "Health => Q";
+    qDebug() << m_type + "Health => Q";
 }
 
 void ZeroPublisher::send(itemType &str)

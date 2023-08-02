@@ -16,18 +16,14 @@ Q_DECLARE_METATYPE(AVTUK_CCU::Indication);
 constexpr char booter[] = "sb";     // booter
 constexpr char sonicacore[] = "sc"; // core
 
-// template <typename T> void appendToQueue(std::string &&id, const T &paylod);
-
 class ZeroPublisher : public QObject
 {
-    //   template <typename T> friend void appendToQueue(std::string &&id, const T &paylod);
-
     Q_OBJECT
 public:
     using itemType = std::pair<std::string, std::string>;
     using queueType = std::queue<itemType>;
 
-    explicit ZeroPublisher(zmq::context_t &ctx, int sock_type, QObject *parent = nullptr);
+    explicit ZeroPublisher(const QString &type, zmq::context_t &ctx, int sock_type, QObject *parent = nullptr);
 
     void work();
     void stop()
@@ -51,6 +47,7 @@ private:
     QWaitCondition _waiter;
     bool is_active = true;
     queueType _queue;
+    QString m_type;
 
     void send(itemType &str);
     void checkQueue();

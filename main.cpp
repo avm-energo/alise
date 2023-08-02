@@ -84,18 +84,20 @@ int main(int argc, char *argv[])
 
     ControllerFabric fabric;
     if (!fabric.getStatus())
+    {
+        qCritical() << "Fabric was not created, exiting";
         return 11;
+    }
     if (!fabric.createController(Controller::ContrTypes::IS_BOOTER, portBooter))
+    {
+        qCritical() << "Booter controller was not created, exiting";
         return 12;
+    }
     if (!fabric.createController(Controller::ContrTypes::IS_CORE, portCore))
+    {
+        qCritical() << "Core controller was not created, exiting";
         return 13;
-    //    Controller booterController(devBroker.get()), coreController(devBroker.get());
-    //    booterController.ofType(Controller::ContrTypes::IS_BOOTER);
-    //    coreController.ofType(Controller::ContrTypes::IS_CORE);
-    //    if (!booterController->launch(portBooter))
-    //        return 13;
-    //    if (!coreController->launch(portCore))
-    //        return 13;
+    }
 
     std::cout << "Enter the event loop" << std::endl;
     return a.exec();

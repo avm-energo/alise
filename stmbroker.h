@@ -33,7 +33,7 @@ private:
     timespec transform(google::protobuf::Timestamp timestamp) const;
     QMutex _mutex;
     Protocom *m_interface;
-    UniquePointer<DataTypesProxy> proxyBS, proxyBStr;
+    //    UniquePointer<DataTypesProxy> proxyBS, proxyBStr;
 
 #ifdef TEST_INDICATOR
     QTimer m_testTimer;
