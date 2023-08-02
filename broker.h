@@ -12,6 +12,7 @@ class Broker : public QObject
 public:
     explicit Broker(QObject *parent = nullptr);
 
+    virtual bool connect() = 0;
     virtual void checkPowerUnit() = 0;
     virtual void setTime(timespec time) = 0;
     virtual void getTime() = 0;
@@ -19,9 +20,7 @@ public:
     virtual void setIndication() = 0;
 
     void criticalBlinking();
-    bool status();
     int m_currentBlinkingPeriod;
-    bool m_status;
 
 public slots:
     void healthReceived(alise::Health_Code code);

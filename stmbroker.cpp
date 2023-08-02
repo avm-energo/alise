@@ -14,10 +14,9 @@ StmBroker::StmBroker(QObject *parent) : Broker(parent)
 {
 }
 
-bool StmBroker::connectToStm()
+bool StmBroker::connect()
 {
 #ifndef ALISE_LOCALDEBUG
-    m_status = false;
     const auto devices = UsbHidPort::devicesFound(0x0483);
     if (devices.isEmpty())
     {
@@ -57,7 +56,6 @@ bool StmBroker::connectToStm()
     m_testTimer.start();
 #endif
 #endif
-    m_status = true;
     return true;
 }
 

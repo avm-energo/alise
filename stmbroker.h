@@ -18,7 +18,7 @@ class StmBroker : public Broker
 {
 public:
     StmBroker(QObject *parent = nullptr);
-    bool connectToStm();
+    bool connect() override;
 
 public slots:
     void checkPowerUnit() override;

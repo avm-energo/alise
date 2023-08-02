@@ -6,8 +6,6 @@
 
 Broker::Broker(QObject *parent) : QObject(parent)
 {
-    m_status = false;
-
     m_checkPowerTimer.setInterval(AliseConstants::PowerCheckPeriod());
     QObject::connect(&m_checkPowerTimer, &QTimer::timeout, this, &Broker::checkPowerUnit);
 
@@ -30,11 +28,6 @@ Broker::Broker(QObject *parent) : QObject(parent)
     });
     testTimer->start();
 #endif
-}
-
-bool Broker::status()
-{
-    return m_status;
 }
 
 void Broker::healthReceived(alise::Health_Code code)

@@ -71,6 +71,8 @@ set(SOURCES
     zerorunner.h
     controller.cpp
     controller.h
+    controllerfabric.cpp
+    controllerfabric.h
     zeropublisher.cpp
     zeropublisher.h
     zerosubscriber.cpp
