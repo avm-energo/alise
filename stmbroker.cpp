@@ -101,6 +101,18 @@ void StmBroker::rebootMyself()
 #endif
 }
 
+void StmBroker::currentIndicationReceived(const QVariant &msg)
+{
+    auto blk = msg.value<DataTypes::BlockStruct>();
+    qDebug() << "[StmBroker] <= MCU : Block ID = " << blk.ID << ", data = " << blk.data;
+    if(blk.ID == AVTUK_CCU::IndicationBlock)
+    {
+        AVTUK_CCU::Indication block;
+        memcpy(&block, blk.data.data(), sizeof(block));
+        m_currentBlinkingPeriod = 1000 / (block.PulseFreq1 / 1000);
+    }
+}
+
 AVTUK_CCU::Indication StmBroker::transformBlinkPeriod() const
 {
     quint16 blinkfreq = 1000 / m_currentBlinkingPeriod * 1000; // transform to mHz from ms

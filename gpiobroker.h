@@ -19,9 +19,11 @@ public:
     };
     GpioBroker(QObject *parent = nullptr);
     bool connect() override;
+
+public slots:
+    void currentIndicationReceived(const QVariant &) override {};
     void checkPowerUnit() override;
     void setIndication() override;
-
     void setTime(timespec time) override;
     void getTime() override;
     void rebootMyself() override;
