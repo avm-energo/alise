@@ -9,7 +9,6 @@
 
 class ZeroSubscriber : public QObject
 {
-{
     Q_OBJECT
 public:
     using healthType = alise::Health_Code;

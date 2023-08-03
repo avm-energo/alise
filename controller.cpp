@@ -1,12 +1,9 @@
 #include "controller.h"
 
-<<<<<<< HEAD
-#include <gen/datatypes.h>
-=======
 #include "aliseconstants.h"
 
 #include <QTimer>
->>>>>>> e31a3b7... [*] some controller refactoring, moving booter and core connections into switch-case [+] conffile into deb package to prevent its overwriting [*] log messages refactoring [+] Time to wait for hard reset introduced in settings [*] Recovery class refactoring
+#include <gen/datatypes.h>
 #include <iostream>
 
 constexpr int minSecs = 60;

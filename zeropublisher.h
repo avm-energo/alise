@@ -4,6 +4,7 @@
 #include <QMutex>
 #include <QObject>
 #include <QWaitCondition>
+#include <gen/datatypes.h>
 #include <queue>
 #include <vector>
 #include <zmq.hpp>
