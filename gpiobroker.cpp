@@ -21,6 +21,10 @@ constexpr GpioBroker::GpioPin ResetPin { 2, 6 };
 GpioBroker::GpioBroker(QObject *parent) : Broker(parent)
 {
     qDebug() << "[GPIO] GPIO Broker created";
+}
+
+bool GpioBroker::connect()
+{
     m_resetTimer.setInterval(AliseConstants::ResetCheckPeriod());
     m_gpioTimer.setInterval(AliseConstants::GpioBlinkCheckPeriod());
     QObject::connect(&m_resetTimer, &QTimer::timeout, this, &GpioBroker::reset);
@@ -49,6 +53,7 @@ GpioBroker::GpioBroker(QObject *parent) : Broker(parent)
         line.request({ PROGNAME, ::gpiod::line_request::DIRECTION_INPUT, 0 });
     }
     chip1.get_line(LedPin.offset).set_value(blinkStatus);
+    return true;
 }
 
 void GpioBroker::checkPowerUnit()

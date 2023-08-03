@@ -7,14 +7,12 @@
 #include <vector>
 #include <zmq.hpp>
 
-// Q_DECLARE_METATYPE(alise::Health_Code);
-
 class ZeroSubscriber : public QObject
+{
 {
     Q_OBJECT
 public:
     using healthType = alise::Health_Code;
-    // using alise::HelloReply;
     explicit ZeroSubscriber(zmq::context_t &ctx, int sock_type, QObject *parent = nullptr);
     void work();
     void stop()

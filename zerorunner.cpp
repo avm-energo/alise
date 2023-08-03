@@ -11,20 +11,15 @@
 #include <iostream>
 #include <thread>
 
-namespace runner
-{
-
-ZeroRunner::ZeroRunner(QObject *parent)
+ZeroRunner::ZeroRunner(const QString &type, QObject *parent)
     : QObject(parent)
     , ctx_(1) // 1 = io_threads
     , frontend_(ctx_, ZMQ_ROUTER)
     , backendSub_(ctx_, ZMQ_DEALER)
     , backendPub_(ctx_, ZMQ_DEALER)
-    , proxyBS(new DataTypesProxy)
-    , proxyTS(new DataTypesProxy)
 {
-    proxyBS->RegisterType<DataTypes::BlockStruct>();
-    proxyTS->RegisterType<timespec>();
+    m_subscriber = new ZeroSubscriber(ctx_, ZMQ_DEALER);
+    m_publisher = new ZeroPublisher(type, ctx_, ZMQ_DEALER);
 }
 
 void ZeroRunner::runServer(int port)
@@ -36,40 +31,17 @@ void ZeroRunner::runServer(int port)
     backendSub_.bind("inproc://backendSub");
     backendPub_.bind("inproc://backendPub");
 
-    m_subscriber = UniquePointer<ZeroSubscriber>(new ZeroSubscriber(ctx_, ZMQ_DEALER));
-    m_publisher = UniquePointer<ZeroPublisher>(new ZeroPublisher(ctx_, ZMQ_DEALER));
+    connect(
+        m_subscriber, &ZeroSubscriber::helloReceived, m_publisher, &ZeroPublisher::publishHello, Qt::DirectConnection);
 
-    connect(m_subscriber.get(), &ZeroSubscriber::helloReceived, m_publisher.get(), &ZeroPublisher::publishHello,
-        Qt::DirectConnection);
+    connect(m_subscriber, &ZeroSubscriber::timeRequest, this, &ZeroRunner::timeRequest);
+    connect(m_subscriber, &ZeroSubscriber::timeReceived, this, &ZeroRunner::timeReceived);
 
-    connect(m_subscriber.get(), &ZeroSubscriber::timeRequest, this, &ZeroRunner::timeRequest);
-    connect(m_subscriber.get(), &ZeroSubscriber::timeReceived, this, &ZeroRunner::timeReceived);
+    connect(m_subscriber, &ZeroSubscriber::healthReceived, this, &ZeroRunner::healthReceived);
 
-    connect(m_subscriber.get(), &ZeroSubscriber::healthReceived, this, &ZeroRunner::healthReceived);
+    auto subscriber = std::unique_ptr<std::thread>(new std::thread([&] { m_subscriber->work(); }));
 
-    auto subscriber = std::unique_ptr<std::thread>(new std::thread([&, worker = std::move(m_subscriber)] {
-        //        connect(worker.get(), &ZeroSubscriber::timeRequest, this, &ZeroRunner::timeRequest);
-        worker->work();
-    }));
-
-    //    proxyBS = UniquePointer<DataTypesProxy>(new DataTypesProxy());
-    //    proxyBS->RegisterType<DataTypes::BlockStruct>();
-
-    //#ifdef __linux__
-    //    proxyTS = UniquePointer<DataTypesProxy>(new DataTypesProxy(&DataManager::GetInstance()));
-    //    proxyTS->RegisterType<timespec>();
-    //#endif
-
-    auto publisher = std::unique_ptr<std::thread>(new std::thread([&, worker = std::move(m_publisher)] {
-        //        connect(proxyTS.get(), &DataTypesProxy::DataStorable, worker.get(), &ZeroPublisher::publishTime,
-        //            Qt::DirectConnection);
-        //        connect(
-        //            this, &ZeroRunner::publishNtpStatus, worker.get(), &ZeroPublisher::publishNtpStatus,
-        //            Qt::DirectConnection);
-        //        connect(proxyBS.get(), &DataTypesProxy::DataStorable, worker.get(), &ZeroPublisher::publishBlock,
-        //            Qt::DirectConnection);
-        worker->work();
-    }));
+    auto publisher = std::unique_ptr<std::thread>(new std::thread([&] { m_publisher->work(); }));
 
     publisher->detach();
     subscriber->detach();
@@ -86,28 +58,27 @@ void ZeroRunner::stopServer()
 
 void ZeroRunner::publishHealthQueryCallback()
 {
-    m_publisher.get()->publishHealthQuery();
+    m_publisher->publishHealthQuery();
 }
 
 void ZeroRunner::publishNtpStatus(bool status)
 {
-    m_publisher.get()->publishNtpStatus(status);
+    m_publisher->publishNtpStatus(status);
 }
 
 void ZeroRunner::publishBlock(const QVariant &msg)
 {
     auto blk = msg.value<DataTypes::BlockStruct>();
-    m_publisher.get()->publishBlock(blk);
+    m_publisher->publishBlock(blk);
 }
 
 void ZeroRunner::publishTime(const QVariant &msg)
 {
-    m_publisher.get()->publishTime(msg);
+    m_publisher->publishTime(msg);
 }
 
 void ZeroRunner::polling()
 {
-    //  proxy(frontend_, backendSub_, backendPub_);
     zmq_pollitem_t items[] = {
         { frontend_, 0, ZMQ_POLLIN, 0 },   //
         { backendPub_, 0, ZMQ_POLLIN, 0 }, //
@@ -159,6 +130,4 @@ void ZeroRunner::polling()
     backendPub_.close();
     backendSub_.close();
     ctx_.close();
-}
-
 }

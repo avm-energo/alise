@@ -1,6 +1,6 @@
 
 #include "aliseconstants.h"
-#include "controller.h"
+#include "controllerfabric.h"
 #include "gitversion/gitversion.h"
 
 #include <QCoreApplication>
@@ -82,19 +82,22 @@ int main(int argc, char *argv[])
     qInfo() << "Gpio blink check period:" << AliseConstants::GpioBlinkCheckPeriod() << " ms";
     qInfo() << "=========================";
 
-    auto devBroker = std::unique_ptr<deviceType>(new deviceType);
-#if defined(AVTUK_STM)
-    if (!devBroker->status())
+    ControllerFabric fabric;
+    if (!fabric.getStatus())
     {
-        if (!devBroker->connectToStm())
-            return 13;
+        qCritical() << "Fabric was not created, exiting";
+        return 11;
     }
-#endif
-    Controller booterController(devBroker.get()), coreController(devBroker.get());
-    booterController.ofType(Controller::ContrTypes::IS_BOOTER);
-    coreController.ofType(Controller::ContrTypes::IS_CORE);
-    booterController.launch(portBooter);
-    coreController.launch(portCore);
+    if (!fabric.createController(Controller::ContrTypes::IS_BOOTER, portBooter))
+    {
+        qCritical() << "Booter controller was not created, exiting";
+        return 12;
+    }
+    if (!fabric.createController(Controller::ContrTypes::IS_CORE, portCore))
+    {
+        qCritical() << "Core controller was not created, exiting";
+        return 13;
+    }
 
     std::cout << "Enter the event loop" << std::endl;
     return a.exec();

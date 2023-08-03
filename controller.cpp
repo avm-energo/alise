@@ -11,15 +11,11 @@
 
 constexpr int minSecs = 60;
 
-Controller::Controller(deviceType *devBroker, QObject *parent) noexcept : Controller("0.0.0.0", devBroker, parent)
+Controller::Controller(Broker *devBroker, ZeroRunner *runner, QObject *parent) noexcept
+    : QObject(parent), m_runner(runner), m_deviceBroker(devBroker)
 {
-}
 
-Controller::Controller(std::string addr, deviceType *devBroker, QObject *parent) noexcept
-    : QObject(parent), m_worker(new runner::ZeroRunner(this)), m_deviceBroker(devBroker)
-{
     m_type = IS_INCORRECT_TYPE;
-    Q_UNUSED(addr);
     proxyBS = UniquePointer<DataTypesProxy>(new DataTypesProxy(&DataManager::GetInstance()));
     proxyBS->RegisterType<DataTypes::BlockStruct>();
 #ifdef __linux__
@@ -32,7 +28,7 @@ Controller::~Controller()
 {
 }
 
-bool Controller::launch(int port)
+bool Controller::launch()
 {
     if (hasIncorrectType())
     {
@@ -45,11 +41,11 @@ bool Controller::launch(int port)
     m_pingTimer->setInterval(AliseConstants::HealthQueryPeriod());
 
     // publish data to zeroMQ channel common to all the controllers
-    connect(m_pingTimer, &QTimer::timeout, m_worker, &runner::ZeroRunner::publishHealthQueryCallback);
-    connect(proxyBS.get(), &DataTypesProxy::DataStorable, m_worker, &runner::ZeroRunner::publishBlock);
+    connect(m_pingTimer, &QTimer::timeout, m_runner, &ZeroRunner::publishHealthQueryCallback);
+    connect(proxyBS.get(), &DataTypesProxy::DataStorable, m_runner, &ZeroRunner::publishBlock);
 
     // RecoveryEngine: rebooting and Power Status get from MCU
-    connect(&m_recoveryEngine, &RecoveryEngine::rebootReq, m_deviceBroker, &deviceType::rebootMyself);
+    connect(&m_recoveryEngine, &RecoveryEngine::rebootReq, m_deviceBroker, &Broker::rebootMyself);
     connect(proxyBS.get(), &DataTypesProxy::DataStorable, &m_recoveryEngine, &RecoveryEngine::receiveBlock);
 
     m_pingTimer->start();
@@ -58,14 +54,12 @@ bool Controller::launch(int port)
 #elif defined(AVTUK_NO_STM)
     m_timeSynchronizer.systemTime();
 #endif
-
-    m_worker->runServer(port);
     return true;
 }
 
 void Controller::shutdown()
 {
-    QMetaObject::invokeMethod(m_worker, &runner::ZeroRunner::stopServer, Qt::DirectConnection);
+    QMetaObject::invokeMethod(m_runner, &ZeroRunner::stopServer, Qt::DirectConnection);
 }
 
 void Controller::syncTime(const timespec &)
@@ -79,29 +73,27 @@ void Controller::ofType(Controller::ContrTypes type)
     {
     case IS_BOOTER:
     {
-        connect(m_worker, &runner::ZeroRunner::healthReceived, m_deviceBroker, &deviceType::healthReceived);
+        connect(m_runner, &ZeroRunner::healthReceived, m_deviceBroker, &Broker::healthReceived);
         break;
     }
     case IS_CORE:
     {
-        connect(
-            m_worker, &runner::ZeroRunner::timeReceived, &m_timeSynchronizer, &TimeSyncronizer::printAndSetSystemTime);
+        connect(m_runner, &ZeroRunner::timeReceived, &m_timeSynchronizer, &TimeSyncronizer::printAndSetSystemTime);
 #if defined(AVTUK_STM)
-        connect(m_worker, &runner::ZeroRunner::timeReceived, m_deviceBroker, &deviceType::setTime);
-        connect(m_worker, &runner::ZeroRunner::timeRequest, m_deviceBroker, &deviceType::getTime);
+        connect(m_runner, &ZeroRunner::timeReceived, m_deviceBroker, &Broker::setTime);
+        connect(m_runner, &ZeroRunner::timeRequest, m_deviceBroker, &Broker::getTime);
 #elif defined(AVTUK_NO_STM)
-        connect(m_worker, &runner::ZeroRunner::timeRequest, &m_timeSynchronizer, //
+        connect(m_runner, &ZeroRunner::timeRequest, &m_timeSynchronizer, //
             [&] {
                 auto ts = m_timeSynchronizer.systemTime();
                 DataManager::GetInstance().addSignalToOutList(ts);
             });
 #endif
-        connect(proxyTS.get(), &DataTypesProxy::DataStorable, m_worker, &runner::ZeroRunner::publishTime,
-            Qt::DirectConnection);
-        //    connect(&m_timeSynchronizer, &TimeSyncronizer::ntpStatusChanged, m_worker,
-        //    &runner::ZeroRunner::publishNtpStatus);
+        connect(proxyTS.get(), &DataTypesProxy::DataStorable, m_runner, &ZeroRunner::publishTime, Qt::DirectConnection);
+        //    connect(&m_timeSynchronizer, &TimeSyncronizer::ntpStatusChanged, m_runner,
+        //    &ZeropublishNtpStatus);
         connect(&m_timeSynchronizer, &TimeSyncronizer::ntpStatusChanged, this, [&](bool status) {
-            m_worker->publishNtpStatus(status);
+            m_runner->publishNtpStatus(status);
             if (!status)
                 return;
             syncCounter++;

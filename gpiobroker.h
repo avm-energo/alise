@@ -18,6 +18,7 @@ public:
         int offset;
     };
     GpioBroker(QObject *parent = nullptr);
+    bool connect() override;
     void checkPowerUnit() override;
     void setIndication() override;
 

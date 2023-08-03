@@ -14,10 +14,9 @@ StmBroker::StmBroker(QObject *parent) : Broker(parent)
 {
 }
 
-bool StmBroker::connectToStm()
+bool StmBroker::connect()
 {
 #ifndef ALISE_LOCALDEBUG
-    m_status = false;
     const auto devices = UsbHidPort::devicesFound(0x0483);
     if (devices.isEmpty())
     {
@@ -41,23 +40,15 @@ bool StmBroker::connectToStm()
         return false;
     }
 
-    proxyBS = UniquePointer<DataTypesProxy>(new DataTypesProxy());
-    proxyBS->RegisterType<DataTypes::BlockStruct>();
-    QObject::connect(proxyBS.get(), &DataTypesProxy::DataStorable, this,
-        //[](const auto bs) {
-        [](const QVariant &msg) {
-            auto bs = msg.value<DataTypes::BlockStruct>();
-            qDebug() << bs;
-        });
+    //    proxyBS = UniquePointer<DataTypesProxy>(new DataTypesProxy());
+    //    proxyBS->RegisterType<DataTypes::BlockStruct>();
+    //    QObject::connect(proxyBS.get(), &DataTypesProxy::DataStorable, this,
+    //        [](const QVariant &msg) {
+    //            auto bs = msg.value<DataTypes::BlockStruct>();
+    //            qDebug() << bs;
+    //        });
 
-#ifdef TEST_INDICATOR
-    m_testTimer.setInterval(10000);
-    QObject::connect(&m_testTimer, &QTimer::timeout, this,
-        [this] { setIndication(static_cast<alise::Health_Code>(QRandomGenerator::global()->bounded(0, 8))); });
-    m_testTimer.start();
 #endif
-#endif
-    m_status = true;
     return true;
 }
 

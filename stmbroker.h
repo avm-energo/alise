@@ -17,7 +17,7 @@ class StmBroker : public Broker
 {
 public:
     StmBroker(QObject *parent = nullptr);
-    bool connectToStm();
+    bool connect() override;
 
 public slots:
     void checkPowerUnit() override;
@@ -32,7 +32,7 @@ private:
     timespec transform(google::protobuf::Timestamp timestamp) const;
     QMutex _mutex;
     Protocom *m_interface;
-    UniquePointer<DataTypesProxy> proxyBS, proxyBStr;
+    //    UniquePointer<DataTypesProxy> proxyBS, proxyBStr;
 
 #ifdef TEST_INDICATOR
     QTimer m_testTimer;

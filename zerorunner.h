@@ -9,8 +9,6 @@
 #include <gen/datamanager/typesproxy.h>
 #include <zmq.hpp>
 
-namespace runner
-{
 constexpr uint32_t timeout = 300000;
 
 class ZeroRunner : public QObject
@@ -22,7 +20,7 @@ public:
         kMaxThread = 1
     };
 
-    ZeroRunner(QObject *parent = nullptr);
+    ZeroRunner(const QString &type, QObject *parent = nullptr);
 
 public slots:
     void runServer(int port);
@@ -50,9 +48,7 @@ private:
     zmq::socket_t backendSub_;
     zmq::socket_t backendPub_;
 
-    UniquePointer<DataTypesProxy> proxyBS, proxyTS;
-    UniquePointer<ZeroSubscriber> m_subscriber;
-    UniquePointer<ZeroPublisher> m_publisher;
+    //    UniquePointer<DataTypesProxy> proxyBS, proxyTS;
+    ZeroSubscriber *m_subscriber;
+    ZeroPublisher *m_publisher;
 };
-
-} // namespace runner
