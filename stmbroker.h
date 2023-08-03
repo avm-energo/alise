@@ -23,10 +23,10 @@ public:
 public slots:
     void checkPowerUnit() override;
     void setIndication() override;
-
     void setTime(timespec time) override;
     void getTime() override;
     void rebootMyself() override;
+    void currentIndicationReceived(const QVariant &msg) override;
 
 private:
     AVTUK_CCU::Indication transformBlinkPeriod() const;
