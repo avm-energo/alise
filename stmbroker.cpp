@@ -40,14 +40,6 @@ bool StmBroker::connect()
         return false;
     }
 
-    //    proxyBS = UniquePointer<DataTypesProxy>(new DataTypesProxy());
-    //    proxyBS->RegisterType<DataTypes::BlockStruct>();
-    //    QObject::connect(proxyBS.get(), &DataTypesProxy::DataStorable, this,
-    //        [](const QVariant &msg) {
-    //            auto bs = msg.value<DataTypes::BlockStruct>();
-    //            qDebug() << bs;
-    //        });
-
 #endif
     return true;
 }
