@@ -21,6 +21,7 @@ public:
 
 public slots:
     void checkPowerUnit() override;
+    void checkIndication() override;
     void setIndication() override;
     void setTime(timespec time) override;
     void getTime() override;

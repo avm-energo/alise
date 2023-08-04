@@ -6,6 +6,8 @@
 #include <QObject>
 #include <QTimer>
 
+constexpr int checkIndicationPeriod = 2000;
+
 class Broker : public QObject
 {
     Q_OBJECT
@@ -19,6 +21,7 @@ public:
 
 public slots:
     void healthReceived(alise::Health_Code code);
+    virtual void checkIndication() = 0;
     virtual void checkPowerUnit() = 0;
     virtual void setTime(timespec time) = 0;
     virtual void getTime() = 0;
@@ -27,7 +30,7 @@ public slots:
     virtual void currentIndicationReceived(const QVariant &msg) = 0;
 
 private:
-    QTimer m_checkPowerTimer, m_clientTimeoutTimer;
+    QTimer checkPowerTimer, m_clientTimeoutTimer;
 
 signals:
 };

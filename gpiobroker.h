@@ -22,6 +22,7 @@ public:
 
 public slots:
     void currentIndicationReceived(const QVariant &) override {};
+    void checkIndication() override {};
     void checkPowerUnit() override;
     void setIndication() override;
     void setTime(timespec time) override;
