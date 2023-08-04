@@ -43,6 +43,7 @@ bool Controller::launch()
     // RecoveryEngine: rebooting and Power Status get from MCU
     connect(&m_recoveryEngine, &RecoveryEngine::rebootReq, m_deviceBroker, &Broker::rebootMyself);
     connect(proxyBS.get(), &DataTypesProxy::DataStorable, &m_recoveryEngine, &RecoveryEngine::receiveBlock);
+    connect(proxyBS.get(), &DataTypesProxy::DataStorable, m_deviceBroker, &Broker::currentIndicationReceived);
 
     m_pingTimer->start();
 #if defined(AVTUK_STM)

@@ -61,6 +61,15 @@ void StmBroker::checkPowerUnit()
 #endif
 }
 
+void StmBroker::checkIndication()
+{
+#ifndef ALISE_LOCALDEBUG
+    QMutexLocker locker(&_mutex);
+    Q_CHECK_PTR(m_interface);
+    m_interface->writeCommand(Interface::Commands::C_ReqBlkData, AVTUK_CCU::IndicationBlock);
+#endif
+}
+
 void StmBroker::setIndication()
 {
 #ifndef ALISE_LOCALDEBUG
@@ -105,7 +114,7 @@ void StmBroker::currentIndicationReceived(const QVariant &msg)
 {
     auto blk = msg.value<DataTypes::BlockStruct>();
     qDebug() << "[StmBroker] <= MCU : Block ID = " << blk.ID << ", data = " << blk.data;
-    if(blk.ID == AVTUK_CCU::IndicationBlock)
+    if (blk.ID == AVTUK_CCU::IndicationBlock)
     {
         AVTUK_CCU::Indication block;
         memcpy(&block, blk.data.data(), sizeof(block));
