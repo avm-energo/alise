@@ -1,5 +1,7 @@
 #include "controllerfabric.h"
 
+#include "aliseconstants.h"
+
 ControllerFabric::ControllerFabric(QObject *parent) : QObject(parent)
 {
 #if defined(AVTUK_STM)
@@ -8,6 +10,16 @@ ControllerFabric::ControllerFabric(QObject *parent) : QObject(parent)
     m_broker = new GpioBroker(this);
 #endif
     m_status = m_broker->connect();
+
+    QTimer *checkPowerTimer = new QTimer(this);
+    checkPowerTimer->setInterval(AliseConstants::PowerCheckPeriod());
+    QObject::connect(checkPowerTimer, &QTimer::timeout, m_broker, &Broker::checkPowerUnit);
+    checkPowerTimer->start();
+
+    QTimer *checkIndicationTimer = new QTimer(this);
+    checkIndicationTimer->setInterval(checkIndicationPeriod);
+    QObject::connect(checkIndicationTimer, &QTimer::timeout, m_broker, &Broker::checkIndication);
+    checkIndicationTimer->start();
 }
 
 bool ControllerFabric::createController(Controller::ContrTypes ofType, int port)
