@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
 
     GitVersion gitVersion;
     QCoreApplication a(argc, argv);
-    a.setApplicationVersion(QString(COMAVERSION) + "-" + gitVersion.getGitHash());
+    a.setApplicationVersion(QString(ALISEVERSION) + "-" + gitVersion.getGitHash());
     StdFunc::Init();
 
     QCommandLineParser parser;
