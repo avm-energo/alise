@@ -12,7 +12,8 @@
 ZeroPublisher::ZeroPublisher(const QString &type, zmq::context_t &ctx, int sock_type, QObject *parent)
     : QObject(parent), _ctx(ctx), _worker(_ctx, sock_type)
 {
-    m_type = "[ " + type + " ]";
+    m_typeString = "[ " + type + " ]";
+    m_type = type.toStdString();
 }
 
 void ZeroPublisher::work()
@@ -33,15 +34,14 @@ void ZeroPublisher::work()
     }
 }
 
-template <typename T> void ZeroPublisher::appendToQueue(const std::string &id, const T &paylod)
+template <typename T> void ZeroPublisher::appendToQueue(const T &paylod)
 {
     alise::PackedMessage packedMessage;
     packedMessage.mutable_content()->PackFrom(paylod);
     std::string serialized_update;
     packedMessage.SerializeToString(&serialized_update);
-    //  qDebug() << paylod.DebugString().c_str();
     _mutex.lock();
-    _queue.push({ id, serialized_update });
+    _queue.push({ m_type, serialized_update });
     _mutex.unlock();
     _waiter.wakeOne();
 }
@@ -52,17 +52,17 @@ void ZeroPublisher::publishTime(const QVariant &msg)
     google::protobuf::Timestamp protoTime;
     protoTime.set_seconds(time.tv_sec);
     protoTime.set_nanos(time.tv_nsec);
-    appendToQueue(sonicacore, protoTime);
-    qDebug() << m_type + "Time => Q : " << time.tv_sec;
+    appendToQueue(protoTime);
+    qDebug() << m_typeString + " => Time : " << time.tv_sec;
 }
 
 void ZeroPublisher::publishPowerStatus(const AVTUK_CCU::Main powerStatus)
 {
     alise::PowerStatus protoPower;
     protoPower.set_pwrin(powerStatus.PWRIN);
-    appendToQueue(sonicacore, protoPower);
-    qDebug() << m_type + "Power => Q : " << powerStatus.PWRIN;
-    qDebug() << m_type + "Reset => Q : " << powerStatus.resetReq;
+    appendToQueue(protoPower);
+    qDebug() << m_typeString + " => Power : " << powerStatus.PWRIN;
+    qDebug() << m_typeString + " => Reset : " << powerStatus.resetReq;
 }
 
 void ZeroPublisher::publishBlock(const DataTypes::BlockStruct blk)
@@ -75,35 +75,35 @@ void ZeroPublisher::publishBlock(const DataTypes::BlockStruct blk)
     }
 }
 
-void ZeroPublisher::publishHello(const QString id, const quint32 code)
+void ZeroPublisher::publishHello(const quint32 code)
 {
+    Q_UNUSED(code)
     alise::HelloReply helloReply;
-    helloReply.set_message(COMAVERSION);
-    appendToQueue(id.toStdString(), helloReply);
-    qDebug() << m_type + "HelloReply => Q : " << id << ", code: " << code;
+    helloReply.set_message(ALISEVERSION);
+    appendToQueue(helloReply);
+    qDebug() << m_typeString + " => HelloReply version: " << ALISEVERSION;
 }
 
 void ZeroPublisher::publishNtpStatus(bool status)
 {
     alise::NtpStatus ntpStatus;
     ntpStatus.set_isntpenabled(status);
-    appendToQueue(sonicacore, ntpStatus);
-    qDebug() << m_type + "Ntp => Q : " << status;
+    appendToQueue(ntpStatus);
+    qDebug() << m_typeString + " => Ntp : " << status;
 }
 
 void ZeroPublisher::publishHealthQuery()
 {
     alise::HealthQuery query;
     query.set_query(true);
-    appendToQueue(booter, query);
-    qDebug() << m_type + "Health => Q";
+    appendToQueue(query);
+    qDebug() << m_typeString + " => Health";
 }
 
 void ZeroPublisher::send(itemType &str)
 {
     zmq::message_t identity(str.first);
     zmq::message_t msg(str.second);
-    //    qDebug() << "Send message to: {" << str.first.c_str() << "}, with payload: {" << str.second.c_str() << "}";
     _worker.send(identity, zmq::send_flags::sndmore);
     _worker.send(msg, zmq::send_flags::none);
 }

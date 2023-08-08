@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
     AliseConstants::setSonicaNormalBlinkPeriod(settings.value("Timers/NormalBlink", "500").toInt());
     AliseConstants::setPowerCheckPeriod(settings.value("Timers/PowerCheckPeriod", "1000").toInt());
     AliseConstants::setResetCheckPeriod(settings.value("Timers/ResetCheckPeriod", "1000").toInt());
-    AliseConstants::setHealthQueryPeriod(settings.value("Timers/HealthQueryPeriod", "4000").toInt());
+    AliseConstants::setHealthQueryPeriod(settings.value("Timers/HealthQueryPeriod", "1500").toInt());
     AliseConstants::setGpioBlinkPeriod(settings.value("Timers/GpioBlinkPeriod", "50").toInt());
     AliseConstants::setSecondsToHardReset(settings.value("Reset/TimeToWaitForHardReset", "4").toInt());
     Logger::writeStart(logFileName);
