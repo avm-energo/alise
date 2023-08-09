@@ -13,6 +13,9 @@
 void listPins();
 #endif
 
+constexpr char ethPathString[] = "/etc/network/interfaces.d/eth";
+constexpr char ethResourcePathString[] = ":/network/eth";
+
 int main(int argc, char *argv[])
 {
     std::cout << "Started " << std::endl;
@@ -80,8 +83,18 @@ int main(int argc, char *argv[])
     qInfo() << "Reset check period:" << AliseConstants::ResetCheckPeriod() << " ms";
     qInfo() << "Health query period:" << AliseConstants::HealthQueryPeriod() << " ms";
     qInfo() << "Gpio blink check period:" << AliseConstants::GpioBlinkCheckPeriod() << " ms";
-    qInfo() << "=========================";
 
+    for (const QString ethLetter : { "0", "2" })
+    {
+        QString ethPath = ethPathString + ethLetter;
+        QString ethResourcePath = ethResourcePathString + ethLetter;
+        if (!QFile::exists(ethResourcePath))
+            qInfo() << "Recovery eth" << ethLetter << ": not found";
+        else
+            qInfo() << "Recovery eth" << ethLetter << ": found";
+    }
+
+    qInfo() << "=========================";
     ControllerFabric fabric;
     if (!fabric.getStatus())
     {
