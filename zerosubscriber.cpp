@@ -35,7 +35,7 @@ void ZeroSubscriber::work()
                     qWarning() << Error::WriteError;
                     continue;
                 }
-                qDebug() << "[" << iden.c_str() << "] Health <= :" << protoHealth->code();
+                qDebug() << "[" << iden.c_str() << "] <= Health :" << protoHealth->code();
                 emit healthReceived(protoHealth->code());
                 delete protoHealth;
             }
@@ -50,7 +50,7 @@ void ZeroSubscriber::work()
                 timespec unixTime;
                 unixTime.tv_sec = protoTime.seconds();
                 unixTime.tv_nsec = protoTime.nanos();
-                qDebug() << "[" << iden.c_str() << "] Time <= :" << unixTime.tv_sec << ":" << unixTime.tv_nsec;
+                qDebug() << "[" << iden.c_str() << "] <= Time :" << unixTime.tv_sec << ":" << unixTime.tv_nsec;
                 emit timeReceived(unixTime);
             }
             else if (messageContent.Is<alise::HelloRequest>())
@@ -61,8 +61,8 @@ void ZeroSubscriber::work()
                     qWarning() << Error::WriteError;
                     continue;
                 }
-                qDebug() << "[" << iden.c_str() << "] HelloReq <= :" << helloAlise.message();
-                emit helloReceived(QString::fromStdString(identity.to_string()), helloAlise.message());
+                qDebug() << "[" << iden.c_str() << "] <= HelloReq :" << helloAlise.message();
+                emit helloReceived(helloAlise.message());
             }
             else if (messageContent.Is<alise::TimeRequest>())
             {
@@ -72,7 +72,7 @@ void ZeroSubscriber::work()
                     qWarning() << Error::WriteError;
                     continue;
                 }
-                qDebug() << "[" << iden.c_str() << "] TimeReq <=";
+                qDebug() << "[" << iden.c_str() << "] <= TimeReq";
                 emit timeRequest();
             }
             else

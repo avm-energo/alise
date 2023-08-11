@@ -1,9 +1,10 @@
 cmake_minimum_required(VERSION 3.18)
-project(alise VERSION 1.2.2)
+project(alise VERSION 1.2.3)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
 
 option(ALISE_STM "Build with STM32 support" OFF)
 option(ALISE_LOCALDEBUG "Local debug on PC" OFF)

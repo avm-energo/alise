@@ -6,14 +6,6 @@
 
 Broker::Broker(QObject *parent) : QObject(parent)
 {
-    QTimer *checkPowerTimer = new QTimer(this);
-    checkPowerTimer->setInterval(AliseConstants::PowerCheckPeriod());
-    QObject::connect(checkPowerTimer, &QTimer::timeout, this, &Broker::checkPowerUnit);
-
-    QTimer *checkIndicationTimer = new QTimer(this);
-    checkIndicationTimer->setInterval(checkIndicationPeriod);
-    QObject::connect(checkIndicationTimer, &QTimer::timeout, this, &Broker::checkIndication);
-
     m_clientTimeoutTimer.setInterval(
         AliseConstants::HealthQueryPeriod() * 3); // 3 times of Health Query period without replies
     QObject::connect(&m_clientTimeoutTimer, &QTimer::timeout, [&] {
@@ -21,8 +13,6 @@ Broker::Broker(QObject *parent) : QObject(parent)
         criticalBlinking();
     });
 
-    checkIndicationTimer->start();
-    checkPowerTimer->start();
     m_clientTimeoutTimer.start();
 }
 

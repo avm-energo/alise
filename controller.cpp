@@ -6,8 +6,6 @@
 #include <gen/datatypes.h>
 #include <iostream>
 
-constexpr int minSecs = 60;
-
 Controller::Controller(Broker *devBroker, ZeroRunner *runner, QObject *parent) noexcept
     : QObject(parent), m_runner(runner), m_deviceBroker(devBroker)
 {
@@ -95,7 +93,7 @@ void Controller::ofType(Controller::ContrTypes type)
             if (!status)
                 return;
             syncCounter++;
-            if (syncCounter == minSecs)
+            if (syncCounter == 60)
             {
 #if defined(AVTUK_STM)
                 m_deviceBroker->setTime(m_timeSynchronizer.systemTime());

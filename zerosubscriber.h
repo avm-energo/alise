@@ -22,7 +22,7 @@ signals:
     void timeReceived(timespec);
     void timeRequest();
     void healthReceived(ZeroSubscriber::healthType);
-    void helloReceived(const QString, quint32);
+    void helloReceived(quint32);
 
 private:
     zmq::context_t &_ctx;

@@ -22,7 +22,7 @@ void RecoveryEngine::setDefEth(int ethNum)
     qDebug() << "[Recovery] Set default ip eth" + ethLetter;
     if (!QFile::exists(ethResourcePath))
     {
-        qCritical() << "No eth0 recovery";
+        qCritical() << "No eth" << ethLetter << " recovery: " << ethResourcePath;
         return;
     }
     if (QFile::exists(ethPath))

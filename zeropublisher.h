@@ -13,9 +13,6 @@ Q_DECLARE_METATYPE(AVTUK_CCU::Indication);
 
 #define LOG_PROTOBUF
 
-constexpr char booter[] = "sb";     // booter
-constexpr char sonicacore[] = "sc"; // core
-
 class ZeroPublisher : public QObject
 {
     Q_OBJECT
@@ -36,7 +33,7 @@ public slots:
     void publishTime(const QVariant &msg);
     void publishPowerStatus(const AVTUK_CCU::Main powerStatus);
     void publishBlock(const DataTypes::BlockStruct blk);
-    void publishHello(const QString id, const quint32 code);
+    void publishHello(const quint32 code);
     void publishNtpStatus(bool status);
     void publishHealthQuery();
 
@@ -47,10 +44,11 @@ private:
     QWaitCondition _waiter;
     bool is_active = true;
     queueType _queue;
-    QString m_type;
+    QString m_typeString;
+    std::string m_type;
 
     void send(itemType &str);
     void checkQueue();
 
-    template <typename T> void appendToQueue(const std::string &id, const T &paylod);
+    template <typename T> void appendToQueue(const T &paylod);
 };

@@ -13,13 +13,16 @@
 void listPins();
 #endif
 
+constexpr char ethPathString[] = "/etc/network/interfaces.d/eth";
+constexpr char ethResourcePathString[] = ":/network/eth";
+
 int main(int argc, char *argv[])
 {
     std::cout << "Started " << std::endl;
 
     GitVersion gitVersion;
     QCoreApplication a(argc, argv);
-    a.setApplicationVersion(QString(COMAVERSION) + "-" + gitVersion.getGitHash());
+    a.setApplicationVersion(QString(ALISEVERSION) + "-" + gitVersion.getGitHash());
     StdFunc::Init();
 
     QCommandLineParser parser;
@@ -60,7 +63,7 @@ int main(int argc, char *argv[])
     AliseConstants::setSonicaNormalBlinkPeriod(settings.value("Timers/NormalBlink", "500").toInt());
     AliseConstants::setPowerCheckPeriod(settings.value("Timers/PowerCheckPeriod", "1000").toInt());
     AliseConstants::setResetCheckPeriod(settings.value("Timers/ResetCheckPeriod", "1000").toInt());
-    AliseConstants::setHealthQueryPeriod(settings.value("Timers/HealthQueryPeriod", "4000").toInt());
+    AliseConstants::setHealthQueryPeriod(settings.value("Timers/HealthQueryPeriod", "1500").toInt());
     AliseConstants::setGpioBlinkPeriod(settings.value("Timers/GpioBlinkPeriod", "50").toInt());
     AliseConstants::setSecondsToHardReset(settings.value("Reset/TimeToWaitForHardReset", "4").toInt());
     Logger::writeStart(logFileName);
@@ -80,8 +83,18 @@ int main(int argc, char *argv[])
     qInfo() << "Reset check period:" << AliseConstants::ResetCheckPeriod() << " ms";
     qInfo() << "Health query period:" << AliseConstants::HealthQueryPeriod() << " ms";
     qInfo() << "Gpio blink check period:" << AliseConstants::GpioBlinkCheckPeriod() << " ms";
-    qInfo() << "=========================";
 
+    for (const QString ethLetter : { "0", "2" })
+    {
+        QString ethPath = ethPathString + ethLetter;
+        QString ethResourcePath = ethResourcePathString + ethLetter;
+        if (!QFile::exists(ethResourcePath))
+            qInfo() << "Recovery eth" << ethLetter << ": not found";
+        else
+            qInfo() << "Recovery eth" << ethLetter << ": found";
+    }
+
+    qInfo() << "=========================";
     ControllerFabric fabric;
     if (!fabric.getStatus())
     {
