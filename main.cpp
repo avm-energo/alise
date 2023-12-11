@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
     qInfo() << "Health query period:" << AliseConstants::HealthQueryPeriod() << " ms";
     qInfo() << "Gpio blink check period:" << AliseConstants::GpioBlinkCheckPeriod() << " ms";
 
-    for (const QString ethLetter : { "0", "2" })
+    for (const QString ethLetter : { "0", "1", "2" })
     {
         QString ethPath = ethPathString + ethLetter;
         QString ethResourcePath = ethResourcePathString + ethLetter;
