@@ -58,13 +58,15 @@ int main(int argc, char *argv[])
     QString logLevel = settings.value("Logs/Loglevel", "Info").toString();
     int portCore = settings.value("Main/CorePort", "5555").toInt();
     int portBooter = settings.value("Main/BooterPort", "5556").toInt();
-    AliseConstants::setFailureBlinkPeriod(settings.value("Timers/FailureBlink", "50").toInt());
-    AliseConstants::setSonicaStartingBlinkPeriod(settings.value("Timers/StartingBlink", "250").toInt());
-    AliseConstants::setSonicaNormalBlinkPeriod(settings.value("Timers/NormalBlink", "500").toInt());
+    int portAdminja = settings.value("Main/AdminjaPort", "5557").toInt();
+    AliseConstants::setFailureBlinkFreq(settings.value("Timers/FailureBlink", "25").toInt());
+    AliseConstants::setProcessStartingBlinkFreq(settings.value("Timers/StartingBlink", "250").toInt());
+    AliseConstants::setProcessNormalBlinkFreq(settings.value("Timers/NormalBlink", "500").toInt());
+    AliseConstants::setProcessStoppedBlinkFreq(settings.value("Timers/StoppedBlink", "3000").toInt());
+    AliseConstants::setProcessFailedBlinkFreq(settings.value("Timers/FailedBlink", "125").toInt());
     AliseConstants::setPowerCheckPeriod(settings.value("Timers/PowerCheckPeriod", "1000").toInt());
     AliseConstants::setResetCheckPeriod(settings.value("Timers/ResetCheckPeriod", "1000").toInt());
     AliseConstants::setHealthQueryPeriod(settings.value("Timers/HealthQueryPeriod", "1500").toInt());
-    AliseConstants::setGpioBlinkPeriod(settings.value("Timers/GpioBlinkPeriod", "50").toInt());
     AliseConstants::setSecondsToHardReset(settings.value("Reset/TimeToWaitForHardReset", "4").toInt());
     Logger::writeStart(logFileName);
     Logger::setLogLevel(logLevel);
@@ -76,13 +78,13 @@ int main(int argc, char *argv[])
     qInfo() << "LogLevel: " << Logger::logLevel();
     qInfo() << "CorePort: " << portCore;
     qInfo() << "BooterPort: " << portBooter;
-    qInfo() << "FailureBlink freq:" << 1000 / AliseConstants::FailureBlinkPeriod() << " Hz";
-    qInfo() << "StartingBlink freq:" << 1000 / AliseConstants::SonicaStartingBlinkPeriod() << " Hz";
-    qInfo() << "NormalBlink freq:" << 1000 / AliseConstants::SonicaNormalBlinkPeriod() << " Hz";
+    qInfo() << "AdminjaPort: " << portAdminja;
+    qInfo() << "FailureBlink freq:" << AliseConstants::FailureBlink() << " mHz";
+    qInfo() << "StartingBlink freq:" << AliseConstants::ProcessStartingBlink() << " mHz";
+    qInfo() << "NormalBlink freq:" << AliseConstants::ProcessNormalBlink() << " mHz";
     qInfo() << "Power check period:" << AliseConstants::PowerCheckPeriod() << " ms";
     qInfo() << "Reset check period:" << AliseConstants::ResetCheckPeriod() << " ms";
     qInfo() << "Health query period:" << AliseConstants::HealthQueryPeriod() << " ms";
-    qInfo() << "Gpio blink check period:" << AliseConstants::GpioBlinkCheckPeriod() << " ms";
 
     for (const QString ethLetter : { "0", "1", "2" })
     {
@@ -107,6 +109,11 @@ int main(int argc, char *argv[])
         return 12;
     }
     if (!fabric.createController(Controller::ContrTypes::IS_CORE, portCore))
+    {
+        qCritical() << "Core controller was not created, exiting";
+        return 13;
+    }
+    if (!fabric.createController(Controller::ContrTypes::IS_ADMINJA, portAdminja))
     {
         qCritical() << "Core controller was not created, exiting";
         return 13;

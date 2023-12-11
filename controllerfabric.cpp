@@ -24,8 +24,9 @@ ControllerFabric::ControllerFabric(QObject *parent) : QObject(parent)
 
 bool ControllerFabric::createController(Controller::ContrTypes ofType, int port)
 {
-    const QMap<Controller::ContrTypes, QString> map = { { Controller::ContrTypes::IS_BOOTER, "sb" },
-        { Controller::ContrTypes::IS_CORE, "sc" }, { Controller::ContrTypes::IS_INCORRECT_TYPE, "unk" } };
+    const QMap<Controller::ContrTypes, QString> map
+        = { { Controller::ContrTypes::IS_ADMINJA, "sa" }, { Controller::ContrTypes::IS_BOOTER, "sb" },
+              { Controller::ContrTypes::IS_CORE, "sc" }, { Controller::ContrTypes::IS_INCORRECT_TYPE, "unk" } };
     if (!m_status)
         return false;
     Q_ASSERT(map.contains(ofType));

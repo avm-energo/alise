@@ -8,10 +8,10 @@
 #include <queue>
 #include <vector>
 #include <zmq.hpp>
-Q_DECLARE_METATYPE(AVTUK_CCU::Main);
-Q_DECLARE_METATYPE(AVTUK_CCU::Indication);
 
 #define LOG_PROTOBUF
+Q_DECLARE_METATYPE(AVTUK_CCU::Main);
+Q_DECLARE_METATYPE(AVTUK_CCU::Indication);
 
 class ZeroPublisher : public QObject
 {

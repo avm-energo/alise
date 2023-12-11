@@ -24,22 +24,20 @@ public slots:
     void currentIndicationReceived(const QVariant &) override {};
     void checkIndication() override {};
     void checkPowerUnit() override;
-    void setIndication() override;
+    void setIndication(const AVTUK_CCU::Indication &indication) override;
     void setTime(timespec time) override;
     void getTime() override;
     void rebootMyself() override;
 
 private:
-    bool blinkStatus = true;
+    bool m_blinkStatus = true;
+    int m_blinkCount, m_blinkMode;
     int resetCounter = 0;
     QMutex _mutex;
 
-    //  QTimer m_timer;
     QTimer m_gpioTimer, m_resetTimer;
-    //  QTimer m_resetTimer, m_healthQueryTimeoutTimer;
-    //  int m_currentBlinkingPeriod;
     void reset();
-    //  void criticalBlinking();
+    void restartBlinkTimer();
 
     ::gpiod::chip chip0, chip1, chip2, chip3;
 

@@ -8,6 +8,7 @@ set(CMAKE_AUTORCC ON)
 
 option(ALISE_STM "Build with STM32 support" OFF)
 option(ALISE_LOCALDEBUG "Local debug on PC" OFF)
+#set(ALISE_BUILDFORDEB "bullseye" CACHE STRING "debian version to build for")
 
 find_package(QT NAMES Qt6 Qt5)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Xml REQUIRED)
@@ -53,7 +54,6 @@ conan_cmake_configure(
 conan_cmake_install(
   PATH_OR_REFERENCE .
   BUILD missing
-  REMOTE conancenter
   SETTINGS ${settings})
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_BINARY_DIR}")
@@ -145,8 +145,14 @@ if (REQUIRED_SERVICE_PATH)
     install(FILES ${SERVICE_PATH_NAME} DESTINATION share)
 endif()
 
+# TODO: change /root/sonica to /avtuk/settings && /usr/sonica to /avtuk/sonica
+
 if (NOT EXISTS /root/sonica/alise/settings/settings.ini)
     install(FILES settings.ini DESTINATION /root/sonica/alise/settings)
+endif ()
+
+if (NOT EXISTS /usr/sonica/alise/settings/settings.ini)
+    install(FILES booter/settings.ini DESTINATION /usr/sonica/alise/settings)
 endif ()
 
 # Configure the scripts that are executed by the DEB.

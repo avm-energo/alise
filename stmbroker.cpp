@@ -62,11 +62,11 @@ void StmBroker::checkIndication()
 #endif
 }
 
-void StmBroker::setIndication()
+void StmBroker::setIndication(const AVTUK_CCU::Indication &indication)
 {
-#ifndef ALISE_LOCALDEBUG
     QMutexLocker locker(&_mutex);
-    const AVTUK_CCU::Indication indication = transformBlinkPeriod();
+    m_currentIndication = indication;
+#ifndef ALISE_LOCALDEBUG
     qDebug() << "Indication is: cnt1: " << indication.PulseCnt1 << ", freq1: " << indication.PulseFreq1
              << ", cnt2: " << indication.PulseCnt2 << ", freq2: " << indication.PulseFreq2;
     DataTypes::BlockStruct block;
@@ -107,17 +107,7 @@ void StmBroker::currentIndicationReceived(const QVariant &msg)
     auto blk = msg.value<DataTypes::BlockStruct>();
     qDebug() << "[StmBroker] <= MCU : Block ID = " << blk.ID << ", data = " << blk.data;
     if (blk.ID == AVTUK_CCU::IndicationBlock)
-    {
-        AVTUK_CCU::Indication block;
-        memcpy(&block, blk.data.data(), sizeof(block));
-        m_currentBlinkingPeriod = 1000 / (block.PulseFreq1 / 1000);
-    }
-}
-
-AVTUK_CCU::Indication StmBroker::transformBlinkPeriod() const
-{
-    quint16 blinkfreq = 1000 / m_currentBlinkingPeriod * 1000; // transform to mHz from ms
-    return { 1, blinkfreq, 0, 0 };
+        memcpy(&m_currentIndication, blk.data.data(), sizeof(m_currentIndication));
 }
 
 timespec StmBroker::transform(google::protobuf::Timestamp timestamp) const
