@@ -58,11 +58,6 @@ void AliseConstants::setSecondsToHardReset(int seconds)
     s_SecondsToHardReset = seconds;
 }
 
-void AliseConstants::setSecondsToHardReset(int seconds)
-{
-    s_SecondsToHardReset = seconds;
-}
-
 int AliseConstants::ResetCheckPeriod()
 {
     return _timersConstants.ResetCheckPeriod;
@@ -116,9 +111,4 @@ uint16_t AliseConstants::freqByPeriod(int period)
 uint16_t AliseConstants::periodByFreq(int freq)
 {
     return 1000 / (freq / 1000);
-}
-
-int AliseConstants::SecondsToHardReset()
-{
-    return s_SecondsToHardReset;
 }
