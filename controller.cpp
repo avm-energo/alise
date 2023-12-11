@@ -3,7 +3,6 @@
 #include "aliseconstants.h"
 
 #include <QTimer>
-#include <gen/datatypes.h>
 #include <iostream>
 
 Controller::Controller(Broker *devBroker, ZeroRunner *runner, QObject *parent) noexcept

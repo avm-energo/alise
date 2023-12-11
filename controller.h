@@ -16,6 +16,7 @@ public:
     {
         IS_BOOTER,
         IS_CORE,
+        IS_ADMINJA,
         IS_INCORRECT_TYPE
     };
 

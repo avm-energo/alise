@@ -62,11 +62,12 @@ void StmBroker::checkIndication()
 #endif
 }
 
-void StmBroker::setIndication()
+void StmBroker::setIndication(const AVTUK_CCU::Indication &indication)
 {
 #ifndef ALISE_LOCALDEBUG
     QMutexLocker locker(&_mutex);
-    const AVTUK_CCU::Indication indication = transformBlinkPeriod();
+    m_currentIndication = indication;
+#ifndef ALISE_LOCALDEBUG
     qDebug() << "Indication is: cnt1: " << indication.PulseCnt1 << ", freq1: " << indication.PulseFreq1
              << ", cnt2: " << indication.PulseCnt2 << ", freq2: " << indication.PulseFreq2;
     DataTypes::BlockStruct block;
@@ -107,11 +108,7 @@ void StmBroker::currentIndicationReceived(const QVariant &msg)
     auto blk = msg.value<DataTypes::BlockStruct>();
     qDebug() << "[StmBroker] <= MCU : Block ID = " << blk.ID << ", data = " << blk.data;
     if (blk.ID == AVTUK_CCU::IndicationBlock)
-    {
-        AVTUK_CCU::Indication block;
-        memcpy(&block, blk.data.data(), sizeof(block));
-        m_currentBlinkingPeriod = 1000 / (block.PulseFreq1 / 1000);
-    }
+        memcpy(&m_currentIndication, blk.data.data(), sizeof(m_currentIndication));
 }
 
 AVTUK_CCU::Indication StmBroker::transformBlinkPeriod() const

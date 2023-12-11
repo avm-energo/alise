@@ -1,6 +1,5 @@
 #include "gpiobroker.h"
 
-#include "aliseconstants.h"
 #include "avtukccu.h"
 
 #include <QDebug>
@@ -26,7 +25,7 @@ GpioBroker::GpioBroker(QObject *parent) : Broker(parent)
 bool GpioBroker::connect()
 {
     m_resetTimer.setInterval(AliseConstants::ResetCheckPeriod());
-    m_gpioTimer.setInterval(AliseConstants::GpioBlinkCheckPeriod());
+    setIndication(AliseConstants::FailureIndication);
     QObject::connect(&m_resetTimer, &QTimer::timeout, this, &GpioBroker::reset);
     QObject::connect(&m_gpioTimer, &QTimer::timeout, this, &GpioBroker::blink);
     m_resetTimer.start();
@@ -52,7 +51,7 @@ bool GpioBroker::connect()
         auto line = chip3.get_line(PowerStatusPin1.offset);
         line.request({ PROGNAME, ::gpiod::line_request::DIRECTION_INPUT, 0 });
     }
-    chip1.get_line(LedPin.offset).set_value(blinkStatus);
+    chip1.get_line(LedPin.offset).set_value(m_blinkStatus);
     return true;
 }
 
@@ -69,15 +68,20 @@ void GpioBroker::checkPowerUnit()
     str.PWRIN = status2 | (status1 << 1);
     qDebug() << "[GPIO] PWRIN: " << str.PWRIN;
     str.resetReq = false;
-    std::memcpy(blk.data.data(), &str, sizeof(AVTUK_CCU::Main));
+    memcpy(blk.data.data(), &str, sizeof(AVTUK_CCU::Main));
     blk.ID = AVTUK_CCU::MainBlock;
     DataManager::GetInstance().addSignalToOutList(blk);
 }
 
-void GpioBroker::setIndication()
+void GpioBroker::setIndication(const AVTUK_CCU::Indication &indication)
 {
     QMutexLocker locker(&_mutex);
-    m_gpioTimer.setInterval(m_currentBlinkingPeriod);
+    m_currentIndication = indication;
+    m_currentIndication.PulseCnt1 *= 2;       // one is on & one is off
+    m_currentIndication.PulseCnt2 *= 2;       // the same
+    m_blinkCount = indication.PulseCnt1;
+    m_blinkMode = indication.PulseFreq1;
+    restartBlinkTimer();
 }
 
 void GpioBroker::setTime(timespec time)
@@ -112,7 +116,8 @@ void GpioBroker::reset()
         return;
 
     // soft reset (only reboot)
-    if ((resetCounter > (AliseConstants::SecondsToHardReset() / 2)) && (resetCounter <= AliseConstants::SecondsToHardReset()))
+    if ((resetCounter > (AliseConstants::SecondsToHardReset() / 2))
+        && (resetCounter <= AliseConstants::SecondsToHardReset()))
     {
         qDebug() << "[GPIO] Reboot only";
         rebootMyself();
@@ -139,8 +144,29 @@ void GpioBroker::reset()
     resetCounter = 0;
 }
 
+void GpioBroker::restartBlinkTimer()
+{
+    m_gpioTimer.start(m_blinkMode);
+}
+
 void GpioBroker::blink()
 {
-    chip1.get_line(LedPin.offset).set_value(blinkStatus);
-    blinkStatus = !blinkStatus;
+    --m_blinkCount;
+    chip1.get_line(LedPin.offset).set_value(m_blinkStatus);
+    m_blinkStatus = !m_blinkStatus;
+    if (m_blinkCount <= 0)
+    {
+        if (m_blinkMode == m_currentIndication.PulseFreq1)
+        {
+            m_blinkMode = m_currentIndication.PulseFreq2;
+            m_blinkCount = m_currentIndication.PulseCnt2 << 1;
+            restartBlinkTimer();
+        }
+        else
+        {
+            m_blinkMode = m_currentIndication.PulseFreq1;
+            m_blinkCount = m_currentIndication.PulseCnt1 << 1;
+            restartBlinkTimer();
+        }
+    }
 }

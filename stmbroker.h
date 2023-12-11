@@ -22,14 +22,13 @@ public:
 public slots:
     void checkPowerUnit() override;
     void checkIndication() override;
-    void setIndication() override;
+    void setIndication(const AVTUK_CCU::Indication &indication) override;
     void setTime(timespec time) override;
     void getTime() override;
     void rebootMyself() override;
     void currentIndicationReceived(const QVariant &msg) override;
 
 private:
-    AVTUK_CCU::Indication transformBlinkPeriod() const;
     timespec transform(google::protobuf::Timestamp timestamp) const;
     QMutex _mutex;
     Protocom *m_interface;

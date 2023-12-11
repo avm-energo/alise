@@ -83,8 +83,7 @@ void ProtocomThread::parseRequest(const CommandStruct &cmdStr)
     {
         if (protoCommandMap.contains(cmdStr.command))
         {
-            ba = prepareBlock(
-                protoCommandMap.value(cmdStr.command), StdFunc::ArrayFromNumber(cmdStr.arg1.value<quint8>()));
+            ba = prepareBlock(protoCommandMap.value(cmdStr.command), StdFunc::toByteArray(cmdStr.arg1.value<quint8>()));
             emit sendDataToPort(ba);
         }
         break;
@@ -98,13 +97,13 @@ void ProtocomThread::parseRequest(const CommandStruct &cmdStr)
         if (cmdStr.arg1.canConvert<timespec>())
         {
             timespec time = cmdStr.arg1.value<timespec>();
-            tba.push_back(StdFunc::ArrayFromNumber(quint32(time.tv_sec)));
-            tba.push_back(StdFunc::ArrayFromNumber(quint32(time.tv_nsec)));
+            tba.push_back(StdFunc::toByteArray(quint32(time.tv_sec)));
+            tba.push_back(StdFunc::toByteArray(quint32(time.tv_nsec)));
         }
         else
 #endif
         {
-            tba = StdFunc::ArrayFromNumber(cmdStr.arg1.value<quint32>());
+            tba = StdFunc::toByteArray(cmdStr.arg1.value<quint32>());
         }
         ba = prepareBlock(Proto::Commands::WriteTime, tba);
         emit sendDataToPort(ba);
@@ -117,7 +116,7 @@ void ProtocomThread::parseRequest(const CommandStruct &cmdStr)
         if (cmdStr.arg1.canConvert<DataTypes::BlockStruct>())
         {
             DataTypes::BlockStruct bs = cmdStr.arg1.value<DataTypes::BlockStruct>();
-            ba = StdFunc::ArrayFromNumber(static_cast<quint8>(bs.ID));
+            ba = StdFunc::toByteArray(static_cast<quint8>(bs.ID));
             ba.append(bs.data);
             writeBlock(protoCommandMap.value(cmdStr.command), ba);
         }
