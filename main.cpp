@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
     if (!fabric.createController(Controller::ContrTypes::IS_ADMINJA, portAdminja))
     {
         qCritical() << "Core controller was not created, exiting";
-        return 13;
+        return 14;
     }
 
     std::cout << "Enter the event loop" << std::endl;
