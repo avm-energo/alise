@@ -66,12 +66,7 @@ void Controller::ofType(Controller::ContrTypes type)
     m_type = type;
     switch (type)
     {
-    case IS_BOOTER:
-    {
-        connect(m_runner, &ZeroRunner::healthReceived, m_deviceBroker, &Broker::healthReceived);
-        break;
-    }
-    case IS_CORE:
+    case IS_ADMINJA:
     {
         connect(m_runner, &ZeroRunner::timeReceived, &m_timeSynchronizer, &TimeSyncronizer::printAndSetSystemTime);
 #if defined(AVTUK_STM)
@@ -85,8 +80,6 @@ void Controller::ofType(Controller::ContrTypes type)
             });
 #endif
         connect(proxyTS.get(), &DataTypesProxy::DataStorable, m_runner, &ZeroRunner::publishTime, Qt::DirectConnection);
-        //    connect(&m_timeSynchronizer, &TimeSyncronizer::ntpStatusChanged, m_runner,
-        //    &ZeropublishNtpStatus);
         connect(&m_timeSynchronizer, &TimeSyncronizer::ntpStatusChanged, this, [&](bool status) {
             m_runner->publishNtpStatus(status);
             if (!status)
@@ -114,6 +107,15 @@ void Controller::ofType(Controller::ContrTypes type)
 #endif
         break;
     }
+    case IS_BOOTER:
+    {
+        connect(m_runner, &ZeroRunner::healthReceived, m_deviceBroker, &Broker::healthReceived);
+        break;
+    }
+    case IS_CORE:
+    {
+        break;
+    }
     default:
         qCritical() << "Incorrect controller type";
         break;
@@ -122,5 +124,5 @@ void Controller::ofType(Controller::ContrTypes type)
 
 bool Controller::hasIncorrectType()
 {
-    return (m_type != IS_BOOTER) && (m_type != IS_CORE);
+    return (m_type == IS_INCORRECT_TYPE);
 }
