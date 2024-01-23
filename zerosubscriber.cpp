@@ -8,6 +8,7 @@
 ZeroSubscriber::ZeroSubscriber(zmq::context_t &ctx, int sock_type, QObject *parent)
     : QObject(parent), _ctx(ctx), _worker(_ctx, sock_type)
 {
+    qRegisterMetaType<ZeroSubscriber::healthType>();
 }
 
 void ZeroSubscriber::work()

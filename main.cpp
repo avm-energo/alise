@@ -52,8 +52,8 @@ int main(int argc, char *argv[])
     QSettings settings("~/sonica/alise/settings/settings.ini", QSettings::IniFormat);
     QString logFileName = settings.value("Logs/logfile", "~/sonica/alise/logs/alise.log").toString();
 #else
-    QSettings settings("/root/sonica/alise/settings/settings.ini", QSettings::IniFormat);
-    QString logFileName = settings.value("Logs/logfile", "/root/sonica/alise/logs/alise.log").toString();
+    QSettings settings("/avtuk/settings/alise/settings/settings.ini", QSettings::IniFormat);
+    QString logFileName = settings.value("Logs/logfile", "/avtuk/settings/alise/logs/alise.log").toString();
 #endif
     int logcounter = settings.value("Test/counter", "1").toInt();
     settings.setValue("Test/counter", ++logcounter);
