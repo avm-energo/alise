@@ -114,6 +114,8 @@ void Broker::healthReceived(uint32_t code)
             indic.PulseFreq1 = AliseConstants::ProcessBlink(m_worstProcessError);
         }
     }
+    qDebug() << "set indication: PulseCnt1 = " << indic.PulseCnt1 << ", PulseFreq1 = " << indic.PulseFreq1
+             << "PulseCnt2 = " << indic.PulseCnt2 << ", PulseFreq2 = " << indic.PulseFreq2;
     setIndication(indic);
     m_clientTimeoutTimer.start(); // restart health query timeout timer
 }
@@ -123,6 +125,7 @@ void Broker::setStartingProcessError(int index)
     if ((m_worstProcessError != Alise::RED) && (m_worstProcessError != Alise::VIOLET)
         && (m_worstProcessError != Alise::ORANGE))
     {
+        qDebug() << "set mode YELLOW for " << index << " component";
         m_worstProcessNumber = index;
         m_worstProcessError = Alise::YELLOW;
     }
@@ -132,6 +135,7 @@ void Broker::setStoppedProcessError(int index)
 {
     if ((m_worstProcessError != Alise::RED) && (m_worstProcessError != Alise::VIOLET))
     {
+        qDebug() << "set mode ORANGE for " << index << " component";
         m_worstProcessNumber = index;
         m_worstProcessError = Alise::ORANGE;
     }
@@ -139,6 +143,7 @@ void Broker::setStoppedProcessError(int index)
 
 void Broker::setFailedProcessError(int index)
 {
+    qDebug() << "set mode FAILED for " << index << " component";
     m_worstProcessNumber = index;
     m_worstProcessError = Alise::RED;
 }
@@ -147,6 +152,7 @@ void Broker::setSemiWorkingProcessError(int index)
 {
     if (m_worstProcessError != Alise::RED)
     {
+        qDebug() << "set mode VIOLET for " << index << " component";
         m_worstProcessNumber = index;
         m_worstProcessError = Alise::VIOLET;
     }

@@ -145,14 +145,12 @@ if (REQUIRED_SERVICE_PATH)
     install(FILES ${SERVICE_PATH_NAME} DESTINATION share)
 endif()
 
-# TODO: change /root/sonica to /avtuk/settings && /usr/sonica to /avtuk/sonica
-
-if (NOT EXISTS /root/sonica/alise/settings/settings.ini)
-    install(FILES settings.ini DESTINATION /root/sonica/alise/settings)
+if (NOT EXISTS /avtuk/settings/alise/settings/settings.ini)
+    install(FILES settings.ini DESTINATION /avtuk/settings/alise/settings)
 endif ()
 
-if (NOT EXISTS /usr/sonica/alise/settings/settings.ini)
-    install(FILES booter/settings.ini DESTINATION /usr/sonica/alise/settings)
+if (NOT EXISTS /avtuk/sonica/alise/settings/settings.ini)
+    install(FILES booter/settings.ini DESTINATION /avtuk/sonica/alise/settings)
 endif ()
 
 # Configure the scripts that are executed by the DEB.
