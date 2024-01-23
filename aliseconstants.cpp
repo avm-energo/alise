@@ -1,7 +1,11 @@
 #include "aliseconstants.h"
 
+#include <QMap>
+
+using namespace Alise;
+
 AliseConstants::Timers AliseConstants::_timersConstants = { 1000, 1000, 50, 4000 };
-AliseConstants::Blinks AliseConstants::_blinksConstants = { 25, 250, 500, 3000, 125 };
+AliseConstants::Blinks AliseConstants::_blinksConstants = { 25, 250, 500, 3000, 125, 1000 };
 int AliseConstants::s_SecondsToHardReset = 4;
 AVTUK_CCU::Indication AliseConstants::FailureIndication = { 1, AliseConstants::_blinksConstants.FailureBlink, 0, 0 };
 AVTUK_CCU::Indication AliseConstants::NormalIndication
@@ -53,6 +57,11 @@ void AliseConstants::setProcessFailedBlinkFreq(uint16_t period)
     _blinksConstants.ProcessStatusFailedBlink = freqByPeriod(period);
 }
 
+void AliseConstants::setProcessSemiWorkingBlinkFreq(uint16_t period)
+{
+    _blinksConstants.ProcessStatusSemiWorkingBlink = freqByPeriod(period);
+}
+
 void AliseConstants::setSecondsToHardReset(int seconds)
 {
     s_SecondsToHardReset = seconds;
@@ -83,25 +92,42 @@ uint16_t AliseConstants::FailureBlink()
     return _blinksConstants.FailureBlink;
 }
 
-uint16_t AliseConstants::ProcessStartingBlink()
+uint16_t AliseConstants::ProcessBlink(Alise::ProcessErrors error)
 {
-    return _blinksConstants.ProcessStatusStartingBlink;
+    static const QMap<Alise::ProcessErrors, uint16_t> map = {
+        { NORMAL, _blinksConstants.ProcessStatusNormalBlink },
+        { YELLOW, _blinksConstants.ProcessStatusStartingBlink },
+        { ORANGE, _blinksConstants.ProcessStatusStoppedBlink },
+        { VIOLET, _blinksConstants.ProcessStatusSemiWorkingBlink },
+        { RED, _blinksConstants.ProcessStatusFailedBlink },
+    };
+    return map.value(error, _blinksConstants.ProcessStatusFailedBlink);
 }
 
-uint16_t AliseConstants::ProcessNormalBlink()
-{
-    return _blinksConstants.ProcessStatusNormalBlink;
-}
+// uint16_t AliseConstants::ProcessStartingBlink()
+//{
+//    return _blinksConstants.ProcessStatusStartingBlink;
+//}
 
-uint16_t AliseConstants::ProcessStoppedBlink()
-{
-    return _blinksConstants.ProcessStatusStoppedBlink;
-}
+// uint16_t AliseConstants::ProcessNormalBlink()
+//{
+//    return _blinksConstants.ProcessStatusNormalBlink;
+//}
 
-uint16_t AliseConstants::ProcessFailedBlink()
-{
-    return _blinksConstants.ProcessStatusFailedBlink;
-}
+// uint16_t AliseConstants::ProcessStoppedBlink()
+//{
+//    return _blinksConstants.ProcessStatusStoppedBlink;
+//}
+
+// uint16_t AliseConstants::ProcessFailedBlink()
+//{
+//    return _blinksConstants.ProcessStatusFailedBlink;
+//}
+
+// uint16_t AliseConstants::ProcessSemiWorkingBlink()
+//{
+//    return _blinksConstants.ProcessStatusSemiWorkingBlink;
+//}
 
 uint16_t AliseConstants::freqByPeriod(int period)
 {

@@ -5,21 +5,33 @@
 
 #include <cstdint>
 
+namespace Alise
+{
+
+enum ProcessErrors
+{
+    NORMAL = 0,
+    YELLOW = 1,
+    ORANGE = 2,
+    RED = 3,
+    VIOLET = 4
+};
+
+enum ProcessStatuses
+{
+    CHECKHTHBIT = 0,
+    NOTINSTALLED,
+    STARTING,
+    NEEDTOMERGE,
+    BROKENHASH,
+    STOPPING,
+    STOPPED,
+    UNKNOWN
+};
+
 class AliseConstants
 {
 public:
-    enum ProcessStatuses
-    {
-        NOTWORKING = 0,
-        NOTINSTALLED,
-        STARTING,
-        NEEDTOMERGE,
-        UNKNOWN,
-        STOPPING,
-        STOPPED,
-        UNKNOWN2
-    };
-
     struct Timers
     {
         int ResetCheckPeriod;
@@ -35,6 +47,7 @@ public:
         uint16_t ProcessStatusNormalBlink;
         uint16_t ProcessStatusStoppedBlink;
         uint16_t ProcessStatusFailedBlink;
+        uint16_t ProcessStatusSemiWorkingBlink;
     };
 
     AliseConstants();
@@ -46,16 +59,19 @@ public:
     static void setProcessStartingBlinkFreq(uint16_t period);
     static void setProcessStoppedBlinkFreq(uint16_t period);
     static void setProcessFailedBlinkFreq(uint16_t period);
+    static void setProcessSemiWorkingBlinkFreq(uint16_t period);
     static void setSecondsToHardReset(int seconds);
     static int ResetCheckPeriod();
     static int PowerCheckPeriod();
     static int HealthQueryPeriod();
     static int SecondsToHardReset();
     static uint16_t FailureBlink();
-    static uint16_t ProcessStartingBlink();
-    static uint16_t ProcessNormalBlink();
-    static uint16_t ProcessStoppedBlink();
-    static uint16_t ProcessFailedBlink();
+    static uint16_t ProcessBlink(ProcessErrors error);
+    //    static uint16_t ProcessStartingBlink();
+    //    static uint16_t ProcessNormalBlink();
+    //    static uint16_t ProcessStoppedBlink();
+    //    static uint16_t ProcessFailedBlink();
+    //    static uint16_t ProcessSemiWorkingBlink();
     static AVTUK_CCU::Indication FailureIndication;
     static AVTUK_CCU::Indication NormalIndication;
     static Timers _timersConstants;
@@ -67,5 +83,7 @@ private:
     static uint16_t freqByPeriod(int period);
     static uint16_t periodByFreq(int freq);
 };
+
+}
 
 #endif // ALISECONSTANTS_H

@@ -17,6 +17,8 @@ constexpr GpioBroker::GpioPin PowerStatusPin1 { 3, 17 };
 constexpr GpioBroker::GpioPin LedPin { 1, 31 };
 constexpr GpioBroker::GpioPin ResetPin { 2, 6 };
 
+using namespace Alise;
+
 GpioBroker::GpioBroker(QObject *parent) : Broker(parent)
 {
     qDebug() << "[GPIO] GPIO Broker created";
@@ -77,8 +79,8 @@ void GpioBroker::setIndication(const AVTUK_CCU::Indication &indication)
 {
     QMutexLocker locker(&_mutex);
     m_currentIndication = indication;
-    m_currentIndication.PulseCnt1 *= 2;       // one is on & one is off
-    m_currentIndication.PulseCnt2 *= 2;       // the same
+    m_currentIndication.PulseCnt1 *= 2; // one is on & one is off
+    m_currentIndication.PulseCnt2 *= 2; // the same
     m_blinkCount = indication.PulseCnt1;
     m_blinkMode = indication.PulseFreq1;
     restartBlinkTimer();

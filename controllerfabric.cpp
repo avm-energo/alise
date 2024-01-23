@@ -2,6 +2,8 @@
 
 #include "aliseconstants.h"
 
+using namespace Alise;
+
 ControllerFabric::ControllerFabric(QObject *parent) : QObject(parent)
 {
 #if defined(AVTUK_STM)

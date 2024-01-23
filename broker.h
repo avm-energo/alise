@@ -8,21 +8,13 @@
 #include <QTimer>
 
 constexpr int checkIndicationPeriod = 2000;
-constexpr int numberOfProcesses = 5; // adminja, core, ninja, vasya, petya
+constexpr int numberOfProcesses = 7; // booter, adminja, core, alise, ninja, vasya, petya
 constexpr int firstPulsesCount = 10; // number of pulses to show status
 
 class Broker : public QObject
 {
     Q_OBJECT
 public:
-    enum ProcessErrors
-    {
-        NORMAL = 0,
-        STARTING = 1,
-        STOPPED = 2,
-        FAILED = 3
-    };
-
     explicit Broker(QObject *parent = nullptr);
 
     virtual bool connect() = 0;
@@ -41,6 +33,13 @@ public slots:
 
 private:
     QTimer checkPowerTimer, m_clientTimeoutTimer;
+    uint8_t m_worstProcessNumber;
+    Alise::ProcessErrors m_worstProcessError;
+
+    void setStartingProcessError(int index);
+    void setStoppedProcessError(int index);
+    void setFailedProcessError(int index);
+    void setSemiWorkingProcessError(int index);
 
 signals:
 };

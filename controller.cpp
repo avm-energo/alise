@@ -32,7 +32,7 @@ bool Controller::launch()
 
     // timer to periodically check the connection
     m_pingTimer = new QTimer;
-    m_pingTimer->setInterval(AliseConstants::HealthQueryPeriod());
+    m_pingTimer->setInterval(Alise::AliseConstants::HealthQueryPeriod());
 
     // publish data to zeroMQ channel common to all the controllers
     connect(m_pingTimer, &QTimer::timeout, m_runner, &ZeroRunner::publishHealthQueryCallback);

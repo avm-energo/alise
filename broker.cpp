@@ -4,6 +4,8 @@
 
 #include <QDebug>
 
+using namespace Alise;
+
 Broker::Broker(QObject *parent) : QObject(parent)
 {
     m_clientTimeoutTimer.setInterval(
@@ -18,99 +20,134 @@ Broker::Broker(QObject *parent) : QObject(parent)
 
 // Health code received
 //
-// code bits: 0 - there's some errors
-// 1 - adminja working normally
-// 2 - core working normally
-// 3 - ninja working normally
-// 4 - vasya working normally
-// 5 - petya working normally
-// 8-10 - adminja status:
-//     000 - not working (none)
+// code bits: 0: 0 - there's some errors, 1 - no errors
+// 1 - booter working
+// 2 - adminja working
+// 3 - core working
+// 4 - alise working
+// 5 - ninja working
+// 6 - vasya working
+// 7 - petya working
+// 8-10 - booter status:
+//     000 - no status (bit 1 = 0) or working normally (bit 1 = 1)
 //     001 - not installed
 //     010 - starting
 //     011 - need to merge settings
-//     100 - unknown status
+//     100 - broken hash
 //     101 - stopping
 //     110 - stopped
 //     111 - unknown status
-// 11-13 - core status
-// 14-16 - ninja status
-// 17-19 - vasya status
-// 20-22 - petya status
+// 11-13 - adminja status
+// 14-16 - core status
+// 17-19 - alise status
+// 20-22 - ninja status
+// 23-25 - vasya status
+// 26-28 - petya status
+// 29-31 - errors: 000 - no errors, 001 - unknown controller, 111 - unknown error
 
 void Broker::healthReceived(uint32_t code)
 {
     uint8_t processStatus;
-    uint8_t healthCode = code & 0x000000FF;
-    uint8_t worstProcessNumber = 0;
-    uint8_t worstProcessStatus = NORMAL; // 0 - no errors, 1 - starting/stopping, 2 - stopped, 3 - error
+    uint8_t mainHealthBits = (code >> 29) & 0x07;             // main health bits - three MSB's
+    uint8_t healthCode = code & 0x000000FF;                   // health bits by component and overall health in LSB
+    uint32_t componentHealthCodes = (code >> 8) & 0x001FFFFF; // healthes by component
+    m_worstProcessNumber = 0;
+    m_worstProcessError = NORMAL; // 0 - no errors, 1 - starting/stopping, 2 - stopped, 3 - error
     AVTUK_CCU::Indication indic;
     qDebug() << "Setting indication: " << code;
-    m_clientTimeoutTimer.start();
-    if (!(healthCode & 0x01)) // 0 is bad situation
+    if (mainHealthBits || !(healthCode & 0x01))
         indic = AliseConstants::FailureIndication;
     else
     {
         for (int i = 0; i < numberOfProcesses; ++i)
         {
-            if (!(healthCode & (0x02 << i))) // is process in failed state?
+            int move = i * 3;
+            processStatus = (componentHealthCodes & 0x00000007);
+            componentHealthCodes >>= move;
+            if (healthCode & (0x02 << i)) // process working
             {
                 // check three bits in corresponding position
-                int move = i * 3;
-                processStatus = (code & (0x00000700 << move) >> (8 + move));
+                switch (processStatus)
+                {
+                case Alise::NEEDTOMERGE:
+                case Alise::BROKENHASH:
+                    setSemiWorkingProcessError(i);
+                    break;
+                case Alise::CHECKHTHBIT: // working normally
+                    break;               // default value is NORMAL
+                default:
+                    setFailedProcessError(i);
+                    break;
+                }
+            }
+            else // process isn't working
+            {
+                // check three bits in corresponding position
                 switch (processStatus)
                 {
                 // any failure causes failed indication
-                case AliseConstants::NOTINSTALLED:
+                case Alise::NOTINSTALLED:
+                case Alise::CHECKHTHBIT:
                     break; // that's normal for now, checking remains
-                case AliseConstants::NOTWORKING:
-                case AliseConstants::UNKNOWN:
-                case AliseConstants::UNKNOWN2:
-                    worstProcessNumber = i;
-                    worstProcessStatus = FAILED;
+                case Alise::UNKNOWN:
+                case Alise::BROKENHASH:
+                    setFailedProcessError(i);
                     break;
-                case AliseConstants::STARTING:
-                case AliseConstants::STOPPING:
-                    if ((worstProcessStatus != FAILED) && (worstProcessStatus != STOPPED))
-                    {
-                        worstProcessNumber = i;
-                        worstProcessStatus = STARTING;
-                    }
+                case Alise::STARTING:
+                case Alise::STOPPING:
+                    setStartingProcessError(i);
                     break;
-                case AliseConstants::NEEDTOMERGE:
-                case AliseConstants::STOPPED:
-                    if (worstProcessStatus != FAILED)
-                    {
-                        worstProcessNumber = i;
-                        worstProcessStatus = STOPPED;
-                    }
+                case Alise::NEEDTOMERGE:
+                case Alise::STOPPED:
+                    setStoppedProcessError(i);
                     break;
                 }
             }
         }
-        if ((worstProcessStatus == NORMAL) || (worstProcessNumber == 0)) // all is good
+        if ((m_worstProcessError == Alise::NORMAL) || (m_worstProcessNumber == 0)) // all is good
             indic = AliseConstants::NormalIndication;
         else
         {
-            indic.PulseCnt1 = firstPulsesCount;       // first count is for showing status
-            indic.PulseCnt2 = worstProcessNumber + 1; // second count is the number of process
-            indic.PulseFreq2 = AliseConstants::ProcessNormalBlink();
-            switch (worstProcessStatus)
-            {
-            case STARTING:
-                indic.PulseFreq1 = AliseConstants::ProcessStartingBlink();
-                break;
-            case STOPPED:
-                indic.PulseFreq1 = AliseConstants::ProcessStoppedBlink();
-                break;
-            case FAILED:
-                indic.PulseFreq1 = AliseConstants::ProcessFailedBlink();
-                break;
-            default:
-                indic.PulseFreq1 = AliseConstants::ProcessNormalBlink();
-                break;
-            }
+            indic.PulseCnt1 = firstPulsesCount;         // first count is for showing status
+            indic.PulseCnt2 = m_worstProcessNumber + 1; // second count is the number of process
+            indic.PulseFreq2 = AliseConstants::ProcessBlink(Alise::NORMAL);
+            indic.PulseFreq1 = AliseConstants::ProcessBlink(m_worstProcessError);
         }
     }
     setIndication(indic);
+    m_clientTimeoutTimer.start(); // restart health query timeout timer
+}
+
+void Broker::setStartingProcessError(int index)
+{
+    if ((m_worstProcessError != Alise::RED) && (m_worstProcessError != Alise::VIOLET)
+        && (m_worstProcessError != Alise::ORANGE))
+    {
+        m_worstProcessNumber = index;
+        m_worstProcessError = Alise::YELLOW;
+    }
+}
+
+void Broker::setStoppedProcessError(int index)
+{
+    if ((m_worstProcessError != Alise::RED) && (m_worstProcessError != Alise::VIOLET))
+    {
+        m_worstProcessNumber = index;
+        m_worstProcessError = Alise::ORANGE;
+    }
+}
+
+void Broker::setFailedProcessError(int index)
+{
+    m_worstProcessNumber = index;
+    m_worstProcessError = Alise::RED;
+}
+
+void Broker::setSemiWorkingProcessError(int index)
+{
+    if (m_worstProcessError != Alise::RED)
+    {
+        m_worstProcessNumber = index;
+        m_worstProcessError = Alise::VIOLET;
+    }
 }

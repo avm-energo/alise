@@ -16,6 +16,8 @@ void listPins();
 constexpr char ethPathString[] = "/etc/network/interfaces.d/eth";
 constexpr char ethResourcePathString[] = ":/network/eth";
 
+using namespace Alise;
+
 int main(int argc, char *argv[])
 {
     std::cout << "Started " << std::endl;
@@ -61,6 +63,7 @@ int main(int argc, char *argv[])
     int portAdminja = settings.value("Main/AdminjaPort", "5557").toInt();
     AliseConstants::setFailureBlinkFreq(settings.value("Timers/FailureBlink", "25").toInt());
     AliseConstants::setProcessStartingBlinkFreq(settings.value("Timers/StartingBlink", "250").toInt());
+    AliseConstants::setProcessSemiWorkingBlinkFreq(settings.value("Timers/SemiWorkingBlink", "1000").toInt());
     AliseConstants::setProcessNormalBlinkFreq(settings.value("Timers/NormalBlink", "500").toInt());
     AliseConstants::setProcessStoppedBlinkFreq(settings.value("Timers/StoppedBlink", "3000").toInt());
     AliseConstants::setProcessFailedBlinkFreq(settings.value("Timers/FailedBlink", "125").toInt());
@@ -79,9 +82,12 @@ int main(int argc, char *argv[])
     qInfo() << "CorePort: " << portCore;
     qInfo() << "BooterPort: " << portBooter;
     qInfo() << "AdminjaPort: " << portAdminja;
+    qInfo() << "NormalBlink freq:" << AliseConstants::ProcessBlink(Alise::NORMAL) << " mHz";
+    qInfo() << "StartingBlink freq:" << AliseConstants::ProcessBlink(Alise::YELLOW) << " mHz";
+    qInfo() << "StoppedBlink freq:" << AliseConstants::ProcessBlink(Alise::ORANGE) << " mHz";
+    qInfo() << "SemiWorkingBlink freq:" << AliseConstants::ProcessBlink(Alise::VIOLET) << " mHz";
+    qInfo() << "ProcessFailedBlink freq:" << AliseConstants::ProcessBlink(Alise::RED) << " mHz";
     qInfo() << "FailureBlink freq:" << AliseConstants::FailureBlink() << " mHz";
-    qInfo() << "StartingBlink freq:" << AliseConstants::ProcessStartingBlink() << " mHz";
-    qInfo() << "NormalBlink freq:" << AliseConstants::ProcessNormalBlink() << " mHz";
     qInfo() << "Power check period:" << AliseConstants::PowerCheckPeriod() << " ms";
     qInfo() << "Reset check period:" << AliseConstants::ResetCheckPeriod() << " ms";
     qInfo() << "Health query period:" << AliseConstants::HealthQueryPeriod() << " ms";
