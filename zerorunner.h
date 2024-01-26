@@ -34,7 +34,7 @@ public slots:
 signals:
     void timeRequest();
 
-    void healthReceived(ZeroSubscriber::healthType);
+    void healthReceived(uint32_t);
     void timeReceived(timespec);
 
 private:

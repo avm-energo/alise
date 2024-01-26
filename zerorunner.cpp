@@ -24,7 +24,6 @@ ZeroRunner::ZeroRunner(const QString &type, QObject *parent)
 
 void ZeroRunner::runServer(int port)
 {
-    qRegisterMetaType<ZeroSubscriber::healthType>("healthType");
     qRegisterMetaType<timespec>();
     qRegisterMetaType<AVTUK_CCU::Main>();
     frontend_.bind("tcp://*:" + std::to_string(port));
