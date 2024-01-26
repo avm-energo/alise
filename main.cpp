@@ -22,6 +22,8 @@ int main(int argc, char *argv[])
 {
     std::cout << "Started " << std::endl;
 
+    qRegisterMetaType < uint32_t >("uint32_t");
+
     GitVersion gitVersion;
     QCoreApplication a(argc, argv);
     a.setApplicationVersion(QString(ALISEVERSION) + "-" + gitVersion.getGitHash());
