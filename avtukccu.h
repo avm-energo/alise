@@ -21,6 +21,12 @@ struct Indication
     uint16_t PulseFreq1;
     uint16_t PulseCnt2;
     uint16_t PulseFreq2;
+
+    friend bool operator==(const Indication &lhs, const Indication &rhs)
+    {
+        return ((lhs.PulseCnt1 == rhs.PulseCnt1) && (lhs.PulseCnt2 == rhs.PulseCnt2)
+            && (lhs.PulseFreq1 == rhs.PulseFreq1) && (lhs.PulseFreq2 == rhs.PulseFreq2));
+    }
 };
 }
 

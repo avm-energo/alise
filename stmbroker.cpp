@@ -65,6 +65,8 @@ void StmBroker::checkIndication()
 void StmBroker::setIndication(const AVTUK_CCU::Indication &indication)
 {
     QMutexLocker locker(&_mutex);
+    if (m_currentIndication == indication)
+        return;
     m_currentIndication = indication;
 #ifndef ALISE_LOCALDEBUG
     qDebug() << "Indication is: cnt1: " << indication.PulseCnt1 << ", freq1: " << indication.PulseFreq1
