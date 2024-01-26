@@ -78,6 +78,8 @@ void GpioBroker::checkPowerUnit()
 void GpioBroker::setIndication(const AVTUK_CCU::Indication &indication)
 {
     QMutexLocker locker(&_mutex);
+    if (m_currentIndication == indication)
+        return;
     m_currentIndication = indication;
     m_currentIndication.PulseCnt1 *= 2; // one is on & one is off
     m_currentIndication.PulseCnt2 *= 2; // the same
