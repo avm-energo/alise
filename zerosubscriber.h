@@ -11,7 +11,6 @@ class ZeroSubscriber : public QObject
 {
     Q_OBJECT
 public:
-    using healthType = uint32_t;
     explicit ZeroSubscriber(zmq::context_t &ctx, int sock_type, QObject *parent = nullptr);
     void work();
     void stop()
@@ -21,7 +20,7 @@ public:
 signals:
     void timeReceived(timespec);
     void timeRequest();
-    void healthReceived(ZeroSubscriber::healthType);
+    void healthReceived(uint32_t);
     void helloReceived(quint32);
 
 private:
@@ -31,5 +30,3 @@ private:
     QWaitCondition _waiter;
     bool is_active = true;
 };
-
-Q_DECLARE_METATYPE(ZeroSubscriber::healthType)
