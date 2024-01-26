@@ -110,7 +110,7 @@ void Broker::healthReceived(uint32_t code)
         {
             indic.PulseCnt1 = firstPulsesCount;         // first count is for showing status
             indic.PulseCnt2 = m_worstProcessNumber + 1; // second count is the number of process
-            indic.PulseFreq2 = AliseConstants::ProcessBlink(Alise::NORMAL);
+            indic.PulseFreq2 = AliseConstants::ProcessBlink(Alise::RED);
             indic.PulseFreq1 = AliseConstants::ProcessBlink(m_worstProcessError);
         }
     }

@@ -163,13 +163,13 @@ void GpioBroker::blink()
         if (m_blinkMode == m_currentIndication.PulseFreq1)
         {
             m_blinkMode = m_currentIndication.PulseFreq2;
-            m_blinkCount = m_currentIndication.PulseCnt2 << 1;
+            m_blinkCount = m_currentIndication.PulseCnt2;
             restartBlinkTimer();
         }
         else
         {
             m_blinkMode = m_currentIndication.PulseFreq1;
-            m_blinkCount = m_currentIndication.PulseCnt1 << 1;
+            m_blinkCount = m_currentIndication.PulseCnt1;
             restartBlinkTimer();
         }
     }

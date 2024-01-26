@@ -76,12 +76,12 @@ public:
     static AVTUK_CCU::Indication NormalIndication;
     static Timers _timersConstants;
     static Blinks _blinksConstants;
+    static uint16_t freqByPeriod(int period);
+    static uint16_t periodByFreq(int freq);
 
 private:
     static int s_SecondsToHardReset; // really it's ResetCheckPeriod times (seconds = ResetCheckPeriod / 1000 *
                                      // s_SecondsToHardReset)
-    static uint16_t freqByPeriod(int period);
-    static uint16_t periodByFreq(int freq);
 };
 
 }
