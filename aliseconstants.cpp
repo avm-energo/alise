@@ -32,34 +32,34 @@ void AliseConstants::setHealthQueryPeriod(int period)
 
 void AliseConstants::setFailureBlinkFreq(uint16_t period)
 {
-    _blinksConstants.FailureBlink = freqByPeriod(period);
+    _blinksConstants.FailureBlink = period;
     FailureIndication = { 1, _blinksConstants.FailureBlink, 0, 0 };
 }
 
 void AliseConstants::setProcessNormalBlinkFreq(uint16_t period)
 {
-    _blinksConstants.ProcessStatusNormalBlink = freqByPeriod(period);
+    _blinksConstants.ProcessStatusNormalBlink = period;
     NormalIndication = { 1, _blinksConstants.ProcessStatusNormalBlink, 0, 0 };
 }
 
 void AliseConstants::setProcessStartingBlinkFreq(uint16_t period)
 {
-    _blinksConstants.ProcessStatusStartingBlink = freqByPeriod(period);
+    _blinksConstants.ProcessStatusStartingBlink = period;
 }
 
 void AliseConstants::setProcessStoppedBlinkFreq(uint16_t period)
 {
-    _blinksConstants.ProcessStatusStoppedBlink = freqByPeriod(period);
+    _blinksConstants.ProcessStatusStoppedBlink = period;
 }
 
 void AliseConstants::setProcessFailedBlinkFreq(uint16_t period)
 {
-    _blinksConstants.ProcessStatusFailedBlink = freqByPeriod(period);
+    _blinksConstants.ProcessStatusFailedBlink = period;
 }
 
 void AliseConstants::setProcessSemiWorkingBlinkFreq(uint16_t period)
 {
-    _blinksConstants.ProcessStatusSemiWorkingBlink = freqByPeriod(period);
+    _blinksConstants.ProcessStatusSemiWorkingBlink = period;
 }
 
 void AliseConstants::setSecondsToHardReset(int seconds)

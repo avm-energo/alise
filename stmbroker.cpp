@@ -67,7 +67,10 @@ void StmBroker::setIndication(const AVTUK_CCU::Indication &indication)
     QMutexLocker locker(&_mutex);
     if (m_currentIndication == indication)
         return;
-    m_currentIndication = indication;
+    m_currentIndication.PulseCnt1 = indication.PulseCnt1;
+    m_currentIndication.PulseCnt2 = indication.PulseCnt2;
+    m_currentIndication.PulseFreq1 = Alise::AliseConstants::freqByPeriod(indication.PulseFreq1);
+    m_currentIndication.PulseFreq2 = Alise::AliseConstants::freqByPeriod(indication.PulseFreq2);
 #ifndef ALISE_LOCALDEBUG
     qDebug() << "Indication is: cnt1: " << indication.PulseCnt1 << ", freq1: " << indication.PulseFreq1
              << ", cnt2: " << indication.PulseCnt2 << ", freq2: " << indication.PulseFreq2;
