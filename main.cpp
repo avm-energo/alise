@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
 {
     std::cout << "Started " << std::endl;
 
-    qRegisterMetaType < uint32_t >("uint32_t");
+    qRegisterMetaType<uint32_t>("uint32_t");
 
     GitVersion gitVersion;
     QCoreApplication a(argc, argv);
@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
     int portCore = settings.value("Main/CorePort", "5555").toInt();
     int portBooter = settings.value("Main/BooterPort", "5556").toInt();
     int portAdminja = settings.value("Main/AdminjaPort", "5557").toInt();
-    AliseConstants::setFailureBlinkFreq(settings.value("Timers/FailureBlink", "25").toInt());
+    AliseConstants::setFailureBlinkFreq(settings.value("Timers/FailureBlink", "50").toInt());
     AliseConstants::setProcessStartingBlinkFreq(settings.value("Timers/StartingBlink", "250").toInt());
     AliseConstants::setProcessSemiWorkingBlinkFreq(settings.value("Timers/SemiWorkingBlink", "1000").toInt());
     AliseConstants::setProcessNormalBlinkFreq(settings.value("Timers/NormalBlink", "500").toInt());
@@ -72,6 +72,7 @@ int main(int argc, char *argv[])
     AliseConstants::setPowerCheckPeriod(settings.value("Timers/PowerCheckPeriod", "1000").toInt());
     AliseConstants::setResetCheckPeriod(settings.value("Timers/ResetCheckPeriod", "1000").toInt());
     AliseConstants::setHealthQueryPeriod(settings.value("Timers/HealthQueryPeriod", "1500").toInt());
+    AliseConstants::setReplyTimeoutPeriod(settings.value("Timers/ReplyTimeoutPeriod", "4000").toInt());
     AliseConstants::setSecondsToHardReset(settings.value("Reset/TimeToWaitForHardReset", "4").toInt());
     Logger::writeStart(logFileName);
     Logger::setLogLevel(logLevel);
@@ -84,15 +85,16 @@ int main(int argc, char *argv[])
     qInfo() << "CorePort: " << portCore;
     qInfo() << "BooterPort: " << portBooter;
     qInfo() << "AdminjaPort: " << portAdminja;
-    qInfo() << "NormalBlink freq:" << AliseConstants::ProcessBlink(Alise::NORMAL) << " mHz";
-    qInfo() << "StartingBlink freq:" << AliseConstants::ProcessBlink(Alise::YELLOW) << " mHz";
-    qInfo() << "StoppedBlink freq:" << AliseConstants::ProcessBlink(Alise::ORANGE) << " mHz";
-    qInfo() << "SemiWorkingBlink freq:" << AliseConstants::ProcessBlink(Alise::VIOLET) << " mHz";
-    qInfo() << "ProcessFailedBlink freq:" << AliseConstants::ProcessBlink(Alise::RED) << " mHz";
-    qInfo() << "FailureBlink freq:" << AliseConstants::FailureBlink() << " mHz";
+    qInfo() << "NormalBlink period:" << AliseConstants::ProcessBlink(Alise::NORMAL) << " ms";
+    qInfo() << "StartingBlink period:" << AliseConstants::ProcessBlink(Alise::YELLOW) << " ms";
+    qInfo() << "StoppedBlink period:" << AliseConstants::ProcessBlink(Alise::ORANGE) << " ms";
+    qInfo() << "SemiWorkingBlink period:" << AliseConstants::ProcessBlink(Alise::VIOLET) << " ms";
+    qInfo() << "ProcessFailedBlink period:" << AliseConstants::ProcessBlink(Alise::RED) << " ms";
+    qInfo() << "FailureBlink period:" << AliseConstants::FailureBlink() << " ms";
     qInfo() << "Power check period:" << AliseConstants::PowerCheckPeriod() << " ms";
     qInfo() << "Reset check period:" << AliseConstants::ResetCheckPeriod() << " ms";
     qInfo() << "Health query period:" << AliseConstants::HealthQueryPeriod() << " ms";
+    qInfo() << "Reply timeout period:" << AliseConstants::ReplyTimeoutPeriod() << " ms";
 
     for (const QString ethLetter : { "0", "1", "2" })
     {

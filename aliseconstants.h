@@ -38,6 +38,7 @@ public:
         int PowerCheckPeriod;
         int GpioBlinkCheckPeriod;
         int HealthQueryPeriod;
+        int ReplyTimeoutPeriod;
     };
 
     struct Blinks
@@ -54,6 +55,7 @@ public:
     static void setResetCheckPeriod(int period);
     static void setPowerCheckPeriod(int period);
     static void setHealthQueryPeriod(int period);
+    static void setReplyTimeoutPeriod(int period);
     static void setFailureBlinkFreq(uint16_t period);
     static void setProcessNormalBlinkFreq(uint16_t period);
     static void setProcessStartingBlinkFreq(uint16_t period);
@@ -64,14 +66,10 @@ public:
     static int ResetCheckPeriod();
     static int PowerCheckPeriod();
     static int HealthQueryPeriod();
+    static int ReplyTimeoutPeriod();
     static int SecondsToHardReset();
     static uint16_t FailureBlink();
     static uint16_t ProcessBlink(ProcessErrors error);
-    //    static uint16_t ProcessStartingBlink();
-    //    static uint16_t ProcessNormalBlink();
-    //    static uint16_t ProcessStoppedBlink();
-    //    static uint16_t ProcessFailedBlink();
-    //    static uint16_t ProcessSemiWorkingBlink();
     static AVTUK_CCU::Indication FailureIndication;
     static AVTUK_CCU::Indication NormalIndication;
     static Timers _timersConstants;

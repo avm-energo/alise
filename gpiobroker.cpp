@@ -22,6 +22,7 @@ using namespace Alise;
 GpioBroker::GpioBroker(QObject *parent) : Broker(parent)
 {
     qDebug() << "[GPIO] GPIO Broker created";
+    m_blinkMode = BlinkMode::ONEBLINK;
 }
 
 bool GpioBroker::connect()
@@ -78,13 +79,51 @@ void GpioBroker::checkPowerUnit()
 void GpioBroker::setIndication(const AVTUK_CCU::Indication &indication)
 {
     QMutexLocker locker(&_mutex);
-    if (m_currentIndication == indication)
+    AVTUK_CCU::Indication indic = indication;
+    indic.PulseCnt1 *= 2; // one is on & one is off
+    indic.PulseCnt2 *= 2; // the same
+    if (m_currentIndication == indic)
         return;
-    m_currentIndication = indication;
-    m_currentIndication.PulseCnt1 *= 2; // one is on & one is off
-    m_currentIndication.PulseCnt2 *= 2; // the same
-    m_blinkCount = indication.PulseCnt1;
-    m_blinkMode = indication.PulseFreq1;
+    qDebug() << "new indication: PulseCnt1 = " << indic.PulseCnt1 << ", PulseFreq1 = " << indic.PulseFreq1
+             << "PulseCnt2 = " << indic.PulseCnt2 << ", PulseFreq2 = " << indic.PulseFreq2;
+    qDebug() << "old indication: PulseCnt1 = " << m_currentIndication.PulseCnt1
+             << ", PulseFreq1 = " << m_currentIndication.PulseFreq1 << "PulseCnt2 = " << m_currentIndication.PulseCnt2
+             << ", PulseFreq2 = " << m_currentIndication.PulseFreq2;
+    m_currentIndication = indic;
+    m_blinkCount = indic.PulseCnt1;
+    m_blinkFreq = indic.PulseFreq1;
+    bool blinkIsZero = false;
+    if ((m_currentIndication.PulseCnt1 == 0) || (m_currentIndication.PulseFreq1 == 0))
+    {
+        m_blinkCount = c_maxBlinks;
+        m_blinkFreq = indic.PulseFreq2;
+        m_blinkMode = BlinkMode::ONEBLINK;
+        blinkIsZero = true;
+        qDebug() << "1. restartBlinkTimer: blinkCount = " << m_blinkCount << ", blinkMode = " << m_blinkMode
+                 << ", blinkFreq = " << m_blinkFreq;
+        restartBlinkTimer();
+        return;
+    }
+    if ((m_currentIndication.PulseCnt2 == 0) || (m_currentIndication.PulseFreq2 == 0))
+    {
+        if (blinkIsZero)
+        {
+            Q_ASSERT(
+                !(AliseConstants::FailureIndication == AVTUK_CCU::Indication(0, 0, 0, 0))); // failure mustn't be zeroed
+            qDebug() << "Blink is zero!";
+            setIndication(AliseConstants::FailureIndication); // all blinks are zero - failure
+            return;
+        }
+        m_blinkCount = c_maxBlinks;
+        m_blinkMode = BlinkMode::ONEBLINK;
+        qDebug() << "2. restartBlinkTimer: blinkCount = " << m_blinkCount << ", blinkMode = " << m_blinkMode
+                 << ", blinkFreq = " << m_blinkFreq;
+        restartBlinkTimer();
+        return;
+    }
+    else
+        m_blinkMode = BlinkMode::TWOBLINKS;
+    qDebug() << "Two blinks mode";
     restartBlinkTimer();
 }
 
@@ -150,7 +189,7 @@ void GpioBroker::reset()
 
 void GpioBroker::restartBlinkTimer()
 {
-    m_gpioTimer.start(m_blinkMode);
+    m_gpioTimer.start(m_blinkFreq);
 }
 
 void GpioBroker::blink()
@@ -160,16 +199,23 @@ void GpioBroker::blink()
     m_blinkStatus = !m_blinkStatus;
     if (m_blinkCount <= 0)
     {
-        if (m_blinkMode == m_currentIndication.PulseFreq1)
+        if (m_blinkMode != BlinkMode::TWOBLINKS)
         {
-            m_blinkMode = m_currentIndication.PulseFreq2;
+            qDebug() << "Setting maxBlinks";
+            m_blinkCount = c_maxBlinks;
+        }
+        else if (m_blinkFreq == m_currentIndication.PulseFreq1)
+        {
+            m_blinkFreq = m_currentIndication.PulseFreq2;
             m_blinkCount = m_currentIndication.PulseCnt2;
+            qDebug() << "Setting PulseFreq2 = " << m_blinkFreq << ", PulseCnt2 = " << m_blinkCount;
             restartBlinkTimer();
         }
         else
         {
-            m_blinkMode = m_currentIndication.PulseFreq1;
+            m_blinkFreq = m_currentIndication.PulseFreq1;
             m_blinkCount = m_currentIndication.PulseCnt1;
+            qDebug() << "Setting PulseFreq1 = " << m_blinkFreq << ", PulseCnt1 = " << m_blinkCount;
             restartBlinkTimer();
         }
     }

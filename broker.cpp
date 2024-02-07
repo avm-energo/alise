@@ -8,8 +8,7 @@ using namespace Alise;
 
 Broker::Broker(QObject *parent) : QObject(parent)
 {
-    m_clientTimeoutTimer.setInterval(
-        AliseConstants::HealthQueryPeriod() * 3); // 3 times of Health Query period without replies
+    m_clientTimeoutTimer.setInterval(AliseConstants::ReplyTimeoutPeriod());
     QObject::connect(&m_clientTimeoutTimer, &QTimer::timeout, [&] {
         qDebug() << "Health Query Timeout";
         setIndication(AliseConstants::FailureIndication);
@@ -114,8 +113,6 @@ void Broker::healthReceived(uint32_t code)
             indic.PulseFreq1 = AliseConstants::ProcessBlink(m_worstProcessError);
         }
     }
-    qDebug() << "set indication: PulseCnt1 = " << indic.PulseCnt1 << ", PulseFreq1 = " << indic.PulseFreq1
-             << "PulseCnt2 = " << indic.PulseCnt2 << ", PulseFreq2 = " << indic.PulseFreq2;
     setIndication(indic);
     m_clientTimeoutTimer.start(); // restart health query timeout timer
 }

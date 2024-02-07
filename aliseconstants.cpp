@@ -4,8 +4,19 @@
 
 using namespace Alise;
 
-AliseConstants::Timers AliseConstants::_timersConstants = { 1000, 1000, 50, 4000 };
-AliseConstants::Blinks AliseConstants::_blinksConstants = { 25, 250, 500, 3000, 125, 1000 };
+AliseConstants::Timers AliseConstants::_timersConstants = { .ResetCheckPeriod = 1000,
+    .PowerCheckPeriod = 1000,
+    .GpioBlinkCheckPeriod = 1000,
+    .HealthQueryPeriod = 4000,
+    .ReplyTimeoutPeriod = 4000 };
+
+AliseConstants::Blinks AliseConstants::_blinksConstants = { .FailureBlink = 25,
+    .ProcessStatusStartingBlink = 250,
+    .ProcessStatusNormalBlink = 500,
+    .ProcessStatusStoppedBlink = 3000,
+    .ProcessStatusFailedBlink = 125,
+    .ProcessStatusSemiWorkingBlink = 1000 };
+
 int AliseConstants::s_SecondsToHardReset = 4;
 AVTUK_CCU::Indication AliseConstants::FailureIndication = { 1, AliseConstants::_blinksConstants.FailureBlink, 0, 0 };
 AVTUK_CCU::Indication AliseConstants::NormalIndication
@@ -28,6 +39,11 @@ void AliseConstants::setPowerCheckPeriod(int period)
 void AliseConstants::setHealthQueryPeriod(int period)
 {
     _timersConstants.HealthQueryPeriod = period;
+}
+
+void AliseConstants::setReplyTimeoutPeriod(int period)
+{
+    _timersConstants.ReplyTimeoutPeriod = period;
 }
 
 void AliseConstants::setFailureBlinkFreq(uint16_t period)
@@ -82,6 +98,11 @@ int AliseConstants::HealthQueryPeriod()
     return _timersConstants.HealthQueryPeriod;
 }
 
+int AliseConstants::ReplyTimeoutPeriod()
+{
+    return _timersConstants.ReplyTimeoutPeriod;
+}
+
 int AliseConstants::SecondsToHardReset()
 {
     return s_SecondsToHardReset;
@@ -103,31 +124,6 @@ uint16_t AliseConstants::ProcessBlink(Alise::ProcessErrors error)
     };
     return map.value(error, _blinksConstants.ProcessStatusFailedBlink);
 }
-
-// uint16_t AliseConstants::ProcessStartingBlink()
-//{
-//    return _blinksConstants.ProcessStatusStartingBlink;
-//}
-
-// uint16_t AliseConstants::ProcessNormalBlink()
-//{
-//    return _blinksConstants.ProcessStatusNormalBlink;
-//}
-
-// uint16_t AliseConstants::ProcessStoppedBlink()
-//{
-//    return _blinksConstants.ProcessStatusStoppedBlink;
-//}
-
-// uint16_t AliseConstants::ProcessFailedBlink()
-//{
-//    return _blinksConstants.ProcessStatusFailedBlink;
-//}
-
-// uint16_t AliseConstants::ProcessSemiWorkingBlink()
-//{
-//    return _blinksConstants.ProcessStatusSemiWorkingBlink;
-//}
 
 uint16_t AliseConstants::freqByPeriod(int period)
 {

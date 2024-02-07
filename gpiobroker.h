@@ -9,6 +9,8 @@
 #include <QTimer>
 #include <gpiod.hpp>
 
+constexpr uint16_t c_maxBlinks = 0xFFFF;
+
 class GpioBroker : public Broker
 {
 public:
@@ -17,6 +19,13 @@ public:
         int chip;
         int offset;
     };
+
+    enum BlinkMode
+    {
+        ONEBLINK,
+        TWOBLINKS
+    };
+
     GpioBroker(QObject *parent = nullptr);
     bool connect() override;
 
@@ -31,7 +40,8 @@ public slots:
 
 private:
     bool m_blinkStatus = true;
-    int m_blinkCount, m_blinkMode;
+    int m_blinkCount, m_blinkFreq;
+    BlinkMode m_blinkMode;
     int resetCounter = 0;
     QMutex _mutex;
 
