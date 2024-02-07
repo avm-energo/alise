@@ -127,10 +127,14 @@ uint16_t AliseConstants::ProcessBlink(Alise::ProcessErrors error)
 
 uint16_t AliseConstants::freqByPeriod(int period)
 {
+    if (period == 0)
+        return 0;
     return 1000 / period * 1000;
 }
 
 uint16_t AliseConstants::periodByFreq(int freq)
 {
+    if (freq == 0)
+        return 0;
     return 1000 / (freq / 1000);
 }
