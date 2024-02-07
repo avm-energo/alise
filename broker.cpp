@@ -54,6 +54,8 @@ void Broker::healthReceived(uint32_t code)
     m_worstProcessError = NORMAL; // 0 - no errors, 1 - starting/stopping, 2 - stopped, 3 - error
     AVTUK_CCU::Indication indic;
     qDebug() << "Setting indication: " << code;
+    qDebug() << "MainHealthBits = " << mainHealthBits << "HealthCode = " << healthCode
+             << "ComponentHealthCodes = " << componentHealthCodes;
     if (mainHealthBits || !(healthCode & 0x01))
         indic = AliseConstants::FailureIndication;
     else
@@ -61,10 +63,12 @@ void Broker::healthReceived(uint32_t code)
         for (int i = 0; i < numberOfProcesses; ++i)
         {
             int move = i * 3;
-            processStatus = (componentHealthCodes & 0x00000007);
             componentHealthCodes >>= move;
+            processStatus = (componentHealthCodes & 0x00000007);
+            qDebug() << "processStatus now is: " << processStatus;
             if (healthCode & (0x02 << i)) // process working
             {
+                qDebug() << "healthCode for " << i << " = 1";
                 // check three bits in corresponding position
                 switch (processStatus)
                 {
@@ -75,12 +79,14 @@ void Broker::healthReceived(uint32_t code)
                 case Alise::CHECKHTHBIT: // working normally
                     break;               // default value is NORMAL
                 default:
+                    qDebug() << "processStatus is unknown: " << processStatus << " not 0, 3, 4";
                     setFailedProcessError(i);
                     break;
                 }
             }
             else // process isn't working
             {
+                qDebug() << "healthCode for " << i << " = 0";
                 // check three bits in corresponding position
                 switch (processStatus)
                 {
