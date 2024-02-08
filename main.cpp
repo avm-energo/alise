@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
     AliseConstants::setProcessStartingBlinkFreq(settings.value("Timers/StartingBlink", "250").toInt());
     AliseConstants::setProcessSemiWorkingBlinkFreq(settings.value("Timers/SemiWorkingBlink", "1000").toInt());
     AliseConstants::setProcessNormalBlinkFreq(settings.value("Timers/NormalBlink", "500").toInt());
-    AliseConstants::setProcessStoppedBlinkFreq(settings.value("Timers/StoppedBlink", "3000").toInt());
+    AliseConstants::setProcessStoppedBlinkFreq(settings.value("Timers/StoppedBlink", "2000").toInt());
     AliseConstants::setProcessFailedBlinkFreq(settings.value("Timers/FailedBlink", "125").toInt());
     AliseConstants::setPowerCheckPeriod(settings.value("Timers/PowerCheckPeriod", "1000").toInt());
     AliseConstants::setResetCheckPeriod(settings.value("Timers/ResetCheckPeriod", "1000").toInt());

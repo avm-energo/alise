@@ -76,8 +76,8 @@ void StmBroker::setIndication(const AVTUK_CCU::Indication &indication)
 #ifndef ALISE_LOCALDEBUG
     DataTypes::BlockStruct block;
     block.ID = AVTUK_CCU::IndicationBlock;
-    block.data.resize(sizeof(indication));
-    memcpy(block.data.data(), &indication, sizeof(indication));
+    block.data.resize(sizeof(m_currentIndication));
+    memcpy(block.data.data(), &m_currentIndication, sizeof(m_currentIndication));
     m_interface->writeCommand(Interface::Commands::C_WriteUserValues, QVariant::fromValue(block));
 #endif
 }

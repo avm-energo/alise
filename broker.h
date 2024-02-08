@@ -9,7 +9,8 @@
 
 constexpr int checkIndicationPeriod = 2000;
 constexpr int numberOfProcesses = 7; // booter, adminja, core, alise, ninja, vasya, petya
-constexpr int firstPulsesCount = 4;  // number of pulses to show status
+constexpr int firstPulsesCount = 10; // number of pulses to show status
+constexpr int numberFreq = 750;      // period (in ms) of showing process number
 
 class Broker : public QObject
 {
