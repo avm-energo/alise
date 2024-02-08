@@ -62,8 +62,7 @@ void Broker::healthReceived(uint32_t code)
     {
         for (int i = 0; i < numberOfProcesses; ++i)
         {
-            int move = i * 3;
-            componentHealthCodes >>= move;
+            componentHealthCodes >>= 3;
             processStatus = (componentHealthCodes & 0x00000007);
             qDebug() << "processStatus now is: " << processStatus;
             if (healthCode & (0x02 << i)) // process working
