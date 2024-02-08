@@ -9,6 +9,7 @@ set(CMAKE_AUTORCC ON)
 option(ALISE_STM "Build with STM32 support" OFF)
 option(ALISE_LOCALDEBUG "Local debug on PC" OFF)
 #set(ALISE_BUILDFORDEB "bullseye" CACHE STRING "debian version to build for")
+set(ALISE_POSTFIX)
 
 find_package(QT NAMES Qt6 Qt5)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Xml REQUIRED)
@@ -21,9 +22,11 @@ endif()
 
 if (ALISE_STM)
     set(AVTUK_MODULE_PATH avtuk-14)
+    set(ALISE_POSTFIX stm)
     add_compile_definitions(AVTUK_STM)
 else()
     set(AVTUK_MODULE_PATH avtuk-12)
+    set(ALISE_POSTFIX nostm)
     add_compile_definitions(AVTUK_NO_STM)
     find_library(GPIODCXX_LIBRARY NAMES libgpiodcxx.so)
     if(NOT GPIODCXX_LIBRARY)
@@ -174,7 +177,7 @@ configure_file(${PRERM_IN} ${PRERM_OUT} @ONLY)
 
 set(CONFFILE ${CMAKE_CURRENT_SOURCE_DIR}/deb-scripts/conffiles)
 
-set(CPACK_PACKAGE_FILE_NAME ${PROJECT_NAME}-${PROJECT_VERSION})
+set(CPACK_PACKAGE_FILE_NAME ${PROJECT_NAME}-${ALISE_POSTFIX}-${PROJECT_VERSION})
 set(CPACK_GENERATOR "DEB")
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER "AVM-Energo") #required
 set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "Avtuk LInux SErver")
