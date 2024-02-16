@@ -1,7 +1,6 @@
 #pragma once
 #include "broker.h"
 #include "gen/stdfunc.h"
-#include "recovery.h"
 #include "timesyncronizer.h"
 #include "zerorunner.h"
 
@@ -37,7 +36,6 @@ private:
     Broker *m_deviceBroker;
     QTimer *m_pingTimer;
     TimeSyncronizer m_timeSynchronizer;
-    RecoveryEngine m_recoveryEngine;
     int syncCounter = 0;
     UniquePointer<DataTypesProxy> proxyBS, proxyTS;
 };

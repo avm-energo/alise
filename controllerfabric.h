@@ -2,8 +2,14 @@
 #define CONTROLLERFABRIC_H
 
 #include "controller.h"
-#include "gpiobroker.h"
+
+#if defined(AVTUK_STM)
 #include "stmbroker.h"
+#elif defined(AVTUK_NO_STM)
+#include "gpiobroker.h"
+#endif
+
+#include "recovery.h"
 #include "zerorunner.h"
 
 #include <QObject>
@@ -29,6 +35,8 @@ private:
     ZeroRunner *m_runner;
     Broker *m_broker;
     bool m_status;
+    RecoveryEngine m_recoveryEngine;
+    UniquePointer<DataTypesProxy> proxyBS;
 };
 
 #endif // CONTROLLERFABRIC_H

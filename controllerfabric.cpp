@@ -2,6 +2,7 @@
 
 #include "aliseconstants.h"
 
+#include <gen/datamanager/typesproxy.h>
 using namespace Alise;
 
 ControllerFabric::ControllerFabric(QObject *parent) : QObject(parent)
@@ -22,6 +23,13 @@ ControllerFabric::ControllerFabric(QObject *parent) : QObject(parent)
     checkIndicationTimer->setInterval(checkIndicationPeriod);
     QObject::connect(checkIndicationTimer, &QTimer::timeout, m_broker, &Broker::checkIndication);
     checkIndicationTimer->start();
+
+    proxyBS = UniquePointer<DataTypesProxy>(new DataTypesProxy(&DataManager::GetInstance()));
+    proxyBS->RegisterType<DataTypes::BlockStruct>();
+    // RecoveryEngine: rebooting and Power Status get from MCU
+    connect(&m_recoveryEngine, &RecoveryEngine::rebootReq, m_broker, &Broker::rebootMyself);
+    connect(proxyBS.get(), &DataTypesProxy::DataStorable, &m_recoveryEngine, &RecoveryEngine::receiveBlock);
+    connect(proxyBS.get(), &DataTypesProxy::DataStorable, m_broker, &Broker::currentIndicationReceived);
 }
 
 bool ControllerFabric::createController(Controller::ContrTypes ofType, int port)

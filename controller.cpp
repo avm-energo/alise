@@ -34,15 +34,6 @@ bool Controller::launch()
     m_pingTimer = new QTimer;
     m_pingTimer->setInterval(Alise::AliseConstants::HealthQueryPeriod());
 
-    // publish data to zeroMQ channel common to all the controllers
-    connect(m_pingTimer, &QTimer::timeout, m_runner, &ZeroRunner::publishHealthQueryCallback);
-    connect(proxyBS.get(), &DataTypesProxy::DataStorable, m_runner, &ZeroRunner::publishBlock);
-
-    // RecoveryEngine: rebooting and Power Status get from MCU
-    connect(&m_recoveryEngine, &RecoveryEngine::rebootReq, m_deviceBroker, &Broker::rebootMyself);
-    connect(proxyBS.get(), &DataTypesProxy::DataStorable, &m_recoveryEngine, &RecoveryEngine::receiveBlock);
-    connect(proxyBS.get(), &DataTypesProxy::DataStorable, m_deviceBroker, &Broker::currentIndicationReceived);
-
     m_pingTimer->start();
 #if defined(AVTUK_STM)
     m_deviceBroker->getTime();
@@ -84,15 +75,11 @@ void Controller::ofType(Controller::ContrTypes type)
             m_runner->publishNtpStatus(status);
             if (!status)
                 return;
-            syncCounter++;
-            if (syncCounter == 60)
-            {
-#if defined(AVTUK_STM)
-                m_deviceBroker->setTime(m_timeSynchronizer.systemTime());
-#endif
-                syncCounter = 0;
-            }
         });
+#if defined(AVTUK_STM)
+        connect(&m_timeSynchronizer, &TimeSyncronizer::setTime, this,
+            [&](const timespec &time) { m_deviceBroker->setTime(time); });
+#endif
 #ifdef __linux__
         auto connectionTimeSync = std::shared_ptr<QMetaObject::Connection>(new QMetaObject::Connection);
         *connectionTimeSync = connect(
@@ -109,11 +96,14 @@ void Controller::ofType(Controller::ContrTypes type)
     }
     case IS_BOOTER:
     {
+        // publish data to zeroMQ channel
+        connect(m_pingTimer, &QTimer::timeout, m_runner, &ZeroRunner::publishHealthQueryCallback);
         connect(m_runner, &ZeroRunner::healthReceived, m_deviceBroker, &Broker::healthReceived);
         break;
     }
     case IS_CORE:
     {
+        connect(proxyBS.get(), &DataTypesProxy::DataStorable, m_runner, &ZeroRunner::publishBlock);
         break;
     }
     default:

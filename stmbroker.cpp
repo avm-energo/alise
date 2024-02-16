@@ -110,7 +110,7 @@ void StmBroker::rebootMyself()
 void StmBroker::currentIndicationReceived(const QVariant &msg)
 {
     auto blk = msg.value<DataTypes::BlockStruct>();
-    qDebug() << "[StmBroker] <= MCU : Block ID = " << blk.ID << ", data = " << blk.data;
+    //    qDebug() << "[StmBroker] <= MCU : Block ID = " << blk.ID << ", data = " << blk.data;
     if (blk.ID == AVTUK_CCU::IndicationBlock)
         memcpy(&m_currentIndication, blk.data.data(), sizeof(m_currentIndication));
 }

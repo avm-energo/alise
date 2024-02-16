@@ -14,6 +14,7 @@ Broker::Broker(QObject *parent) : QObject(parent)
         setIndication(AliseConstants::FailureIndication);
     });
 
+    m_oldCode = 0;
     m_clientTimeoutTimer.start();
 }
 
@@ -46,6 +47,9 @@ Broker::Broker(QObject *parent) : QObject(parent)
 
 void Broker::healthReceived(uint32_t code)
 {
+    if (code == m_oldCode)
+        return;
+    m_oldCode = code;
     uint8_t processStatus;
     uint8_t mainHealthBits = (code >> 29) & 0x07;             // main health bits - three MSB's
     uint8_t healthCode = code & 0x000000FF;                   // health bits by component and overall health in LSB
@@ -64,10 +68,10 @@ void Broker::healthReceived(uint32_t code)
         {
             processStatus = (componentHealthCodes & 0x00000007);
             componentHealthCodes >>= 3;
-            qDebug() << "processStatus now is: " << processStatus;
+            //            qDebug() << "processStatus now is: " << processStatus;
             if (healthCode & (0x02 << i)) // process working
             {
-                qDebug() << "healthCode for " << i << " = 1";
+                //                qDebug() << "healthCode for " << i << " = 1";
                 // check three bits in corresponding position
                 switch (processStatus)
                 {
@@ -78,14 +82,14 @@ void Broker::healthReceived(uint32_t code)
                 case Alise::CHECKHTHBIT: // working normally
                     break;               // default value is NORMAL
                 default:
-                    qDebug() << "processStatus is unknown: " << processStatus << " not 0, 3, 4";
+                    qWarning() << "processStatus is unknown: " << processStatus << " not 0, 3, 4";
                     setFailedProcessError(i);
                     break;
                 }
             }
             else // process isn't working
             {
-                qDebug() << "healthCode for " << i << " = 0";
+                //                qDebug() << "healthCode for " << i << " = 0";
                 // check three bits in corresponding position
                 switch (processStatus)
                 {
@@ -127,7 +131,7 @@ void Broker::setStartingProcessError(int index)
     if ((m_worstProcessError != Alise::RED) && (m_worstProcessError != Alise::VIOLET)
         && (m_worstProcessError != Alise::ORANGE))
     {
-        qDebug() << "set mode YELLOW for " << index << " component";
+        qWarning() << "set mode YELLOW for " << index << " component";
         m_worstProcessNumber = index;
         m_worstProcessError = Alise::YELLOW;
     }
@@ -137,7 +141,7 @@ void Broker::setStoppedProcessError(int index)
 {
     if ((m_worstProcessError != Alise::RED) && (m_worstProcessError != Alise::VIOLET))
     {
-        qDebug() << "set mode ORANGE for " << index << " component";
+        qWarning() << "set mode ORANGE for " << index << " component";
         m_worstProcessNumber = index;
         m_worstProcessError = Alise::ORANGE;
     }
@@ -145,7 +149,7 @@ void Broker::setStoppedProcessError(int index)
 
 void Broker::setFailedProcessError(int index)
 {
-    qDebug() << "set mode FAILED for " << index << " component";
+    qCritical() << "set mode FAILED for " << index << " component";
     m_worstProcessNumber = index;
     m_worstProcessError = Alise::RED;
 }
@@ -154,7 +158,7 @@ void Broker::setSemiWorkingProcessError(int index)
 {
     if (m_worstProcessError != Alise::RED)
     {
-        qDebug() << "set mode VIOLET for " << index << " component";
+        qWarning() << "set mode VIOLET for " << index << " component";
         m_worstProcessNumber = index;
         m_worstProcessError = Alise::VIOLET;
     }

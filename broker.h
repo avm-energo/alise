@@ -35,6 +35,7 @@ public slots:
 private:
     QTimer checkPowerTimer, m_clientTimeoutTimer;
     uint8_t m_worstProcessNumber;
+    uint32_t m_oldCode;
     Alise::ProcessErrors m_worstProcessError;
 
     void setStartingProcessError(int index);

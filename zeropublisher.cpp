@@ -54,7 +54,7 @@ void ZeroPublisher::publishTime(const QVariant &msg)
     protoTime.set_seconds(time.tv_sec);
     protoTime.set_nanos(time.tv_nsec);
     appendToQueue(protoTime);
-    qDebug() << m_typeString + " => Time : " << time.tv_sec;
+    qDebug() << m_typeString + " out Time : " << time.tv_sec;
 }
 
 void ZeroPublisher::publishPowerStatus(const AVTUK_CCU::Main powerStatus)
@@ -62,8 +62,8 @@ void ZeroPublisher::publishPowerStatus(const AVTUK_CCU::Main powerStatus)
     alise::PowerStatus protoPower;
     protoPower.set_pwrin(powerStatus.PWRIN);
     appendToQueue(protoPower);
-    qDebug() << m_typeString + " => Power : " << powerStatus.PWRIN;
-    qDebug() << m_typeString + " => Reset : " << powerStatus.resetReq;
+    qDebug() << m_typeString + " out Power : " << powerStatus.PWRIN;
+    qDebug() << m_typeString + " out Reset : " << powerStatus.resetReq;
 }
 
 void ZeroPublisher::publishBlock(const DataTypes::BlockStruct blk)
@@ -82,7 +82,7 @@ void ZeroPublisher::publishHello(const quint32 code)
     alise::HelloReply helloReply;
     helloReply.set_message(ALISEVERSION);
     appendToQueue(helloReply);
-    qDebug() << m_typeString + " => HelloReply version: " << ALISEVERSION;
+    qDebug() << m_typeString + " out HelloReply version: " << ALISEVERSION;
 }
 
 void ZeroPublisher::publishNtpStatus(bool status)
@@ -90,7 +90,7 @@ void ZeroPublisher::publishNtpStatus(bool status)
     alise::NtpStatus ntpStatus;
     ntpStatus.set_isntpenabled(status);
     appendToQueue(ntpStatus);
-    qDebug() << m_typeString + " => Ntp : " << status;
+    qDebug() << m_typeString + " out Ntp : " << status;
 }
 
 void ZeroPublisher::publishHealthQuery()
@@ -98,7 +98,7 @@ void ZeroPublisher::publishHealthQuery()
     alise::HealthQuery query;
     query.set_query(true);
     appendToQueue(query);
-    qDebug() << m_typeString + " => Health";
+    qDebug() << m_typeString + " out Health";
 }
 
 void ZeroPublisher::send(itemType &str)
