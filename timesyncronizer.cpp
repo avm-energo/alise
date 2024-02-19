@@ -130,7 +130,10 @@ bool TimeSyncronizer::ntpStatus() const
     }
 #endif
     if (output.isEmpty())
+    {
         qWarning() << "ntpq output is empty!";
+        return false;
+    }
     if (output.contains("Connection refused"))
     {
         qWarning() << "ntpq error: connection refused";
@@ -139,6 +142,11 @@ bool TimeSyncronizer::ntpStatus() const
 
     // Split ntpq output
     QStringList lines = output.split('\n');
+    if (lines.size() < 2)
+    {
+        qWarning() << "ntpq output is wrong!";
+        return false;
+    }
     // Removing ntpq table header
     lines.removeFirst(); //     remote           refid      st t when poll reach   delay   offset  jitter
     lines.removeFirst(); //==============================================================================
