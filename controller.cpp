@@ -84,15 +84,11 @@ void Controller::ofType(Controller::ContrTypes type)
             m_runner->publishNtpStatus(status);
             if (!status)
                 return;
-            syncCounter++;
-            if (syncCounter == 60)
-            {
-#if defined(AVTUK_STM)
-                m_deviceBroker->setTime(m_timeSynchronizer.systemTime());
-#endif
-                syncCounter = 0;
-            }
         });
+#if defined(AVTUK_STM)
+        connect(&m_timeSynchronizer, &TimeSyncronizer::setTime, this,
+            [&](const timespec &time) { m_deviceBroker->setTime(time); });
+#endif
 #ifdef __linux__
         auto connectionTimeSync = std::shared_ptr<QMetaObject::Connection>(new QMetaObject::Connection);
         *connectionTimeSync = connect(
