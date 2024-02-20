@@ -36,6 +36,7 @@ private:
     QTimer checkPowerTimer, m_clientTimeoutTimer;
     uint8_t m_worstProcessNumber;
     Alise::ProcessErrors m_worstProcessError;
+    uint32_t m_oldCode;
 
     void setStartingProcessError(int index);
     void setStoppedProcessError(int index);

@@ -13,6 +13,7 @@ Broker::Broker(QObject *parent) : QObject(parent)
         qDebug() << "Health Query Timeout";
         setIndication(AliseConstants::FailureIndication);
     });
+    m_oldCode = 0;
 
     m_clientTimeoutTimer.start();
 }
@@ -46,6 +47,9 @@ Broker::Broker(QObject *parent) : QObject(parent)
 
 void Broker::healthReceived(uint32_t code)
 {
+    if (code == m_oldCode)
+        return;
+    m_oldCode = code;
     uint8_t processStatus;
     uint8_t mainHealthBits = (code >> 29) & 0x07;             // main health bits - three MSB's
     uint8_t healthCode = code & 0x000000FF;                   // health bits by component and overall health in LSB

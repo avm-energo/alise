@@ -62,15 +62,18 @@ TimeSyncronizer::TimeSyncronizer(QObject *parent) : QObject(parent)
     connect(timer, &QTimer::timeout, this, [this] {
         bool status = ntpStatus();
         ++m_timeCounter;
-        if ((m_timeCounter >= 20) && status) // one time per minute
+        if (m_timeCounter >= 20) // one time per minute
         {
-            m_timeCounter = 0;
-            emit setTime(systemTime());
-        }
-        if (status != m_ntpStatus)
-        {
+            if (status)
+            {
+                m_timeCounter = 0;
+                emit setTime(systemTime());
+            }
+            //            if (status != m_ntpStatus)
+            //            {
             emit ntpStatusChanged(status);
-            m_ntpStatus = status;
+            //                m_ntpStatus = status;
+            //            }
         }
     });
     timer->start();
@@ -129,6 +132,7 @@ bool TimeSyncronizer::ntpStatus() const
         file.close();
     }
 #endif
+    qDebug() << "Ntpq -pn output: " << output;
     if (output.isEmpty())
     {
         qWarning() << "ntpq output is empty!";
