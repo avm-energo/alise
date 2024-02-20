@@ -47,6 +47,7 @@ Broker::Broker(QObject *parent) : QObject(parent)
 
 void Broker::healthReceived(uint32_t code)
 {
+    m_clientTimeoutTimer.start(); // restart health query timeout timer
     if (code == m_oldCode)
         return;
     m_oldCode = code;
@@ -123,7 +124,6 @@ void Broker::healthReceived(uint32_t code)
         }
     }
     setIndication(indic);
-    m_clientTimeoutTimer.start(); // restart health query timeout timer
 }
 
 void Broker::setStartingProcessError(int index)

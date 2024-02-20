@@ -129,12 +129,5 @@ uint16_t AliseConstants::freqByPeriod(int period)
 {
     if (period == 0)
         return 0;
-    return 1000 / period * 1000 / 2; // /2 -> in STM variant freq is two times faster (on and off is one cycle)
-}
-
-uint16_t AliseConstants::periodByFreq(int freq)
-{
-    if (freq == 0)
-        return 0;
-    return 1000 / (freq / 1000 * 2);
+    return 1000000L / period;
 }
