@@ -118,12 +118,12 @@ bool TimeSyncronizer::ntpStatus() const
     QStringList arguments { "-pn" };
     process.start(program, arguments);
 
-    if (!process.waitForFinished(5000))
+    if (!process.waitForFinished(1000))
     {
         qWarning() << "ntpq start error: " << process.errorString();
         return false;
     }
-    output = process.readAll();
+    output = process.readAllStandardOutput();
 #else
     QFile file(qApp->applicationDirPath() + "/ntpq_output.txt");
     if (file.exists() && file.open(QIODevice::ReadOnly))
