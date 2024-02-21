@@ -39,6 +39,8 @@ bool StmBroker::connect()
     else
     {
         m_conn->connection(this, &StmBroker::currentIndicationReceived);
+        m_conn->connection(static_cast<Broker *>(this), &Broker::updateBlock);
+        m_conn->connection(static_cast<Broker *>(this), &StmBroker::updateTime);
         return true;
     }
 #else

@@ -32,7 +32,6 @@ private:
     void processInt(const quint8 num);
     void processSinglePoint(const QByteArray &data, const quint16 startAddr);
     void processBlock(const QByteArray &data, quint32 blockNum);
-    void processTechBlock(const QByteArray &data, quint32 blockNum);
 
     void processDataBlock(const QByteArray &data, const quint16 addr);
     void processDataSection(const QByteArray &fileSection);

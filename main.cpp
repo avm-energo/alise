@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
     qInfo() << "Reading settings from: " << settings.fileName();
     qInfo() << "Startup information:";
     qInfo() << "=========================";
-    qInfo() << "LogLevel: " << Logger::logLevel();
+    qInfo() << "LogLevel: " << logLevel;
     qInfo() << "CorePort: " << portCore;
     qInfo() << "BooterPort: " << portBooter;
     qInfo() << "AdminjaPort: " << portAdminja;

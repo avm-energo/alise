@@ -1,7 +1,7 @@
 #pragma once
 
 #include <interfaces/exec/default_query_executor.h>
-#include <interfaces/types/settingstypes.h>
+#include <interfaces/types/usbhidsettings.h>
 
 namespace Interface
 {

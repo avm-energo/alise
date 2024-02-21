@@ -30,12 +30,6 @@ void SyncConnection::responseReceived(const DataTypes::GeneralResponseStruct &re
     m_busy = false;
 }
 
-void SyncConnection::fileReceived(const S2::FileStruct &file)
-{
-    m_byteArrayResult = file.data;
-    m_busy = false;
-}
-
 void SyncConnection::timeout()
 {
     m_busy = false;
@@ -131,67 +125,6 @@ Error::Msg SyncConnection::writeBlockSync(
         WARNMSG("Некорректный номер блока");
         return Error::Msg::GeneralError;
     }
-}
-
-Error::Msg SyncConnection::writeFileSync(S2::FilesEnum filenum, const QByteArray &ba)
-{
-    m_busy = true;
-    m_timeout = false;
-    auto conn = m_connection->connection(this, &SyncConnection::responseReceived);
-    m_connection->writeFile(quint32(filenum), ba);
-    m_timeoutTimer->start();
-    while (m_busy)
-    {
-        QCoreApplication::processEvents(QEventLoop::AllEvents);
-        StdFunc::Wait();
-    }
-    QObject::disconnect(conn);
-    if (m_timeout)
-        return Error::Msg::Timeout;
-    return (m_responseResult) ? Error::Msg::NoError : Error::Msg::GeneralError;
-}
-
-Error::Msg SyncConnection::writeConfigurationSync(const QByteArray &ba)
-{
-    return writeFileSync(S2::FilesEnum::Config, ba);
-}
-
-Error::Msg SyncConnection::readS2FileSync(S2::FilesEnum filenum)
-{
-    m_busy = true;
-    m_timeout = false;
-    auto conn = m_connection->connection(this, [=](const QList<S2::DataItem> &) { m_busy = false; });
-    m_connection->reqFile(quint32(filenum), DataTypes::FileFormat::DefaultS2);
-    m_timeoutTimer->start();
-    while (m_busy)
-    {
-        QCoreApplication::processEvents(QEventLoop::AllEvents);
-        StdFunc::Wait();
-    }
-    QObject::disconnect(conn);
-    if (m_timeout)
-        return Error::Msg::Timeout;
-
-    return (m_responseResult) ? Error::Msg::NoError : Error::Msg::GeneralError;
-}
-
-Error::Msg SyncConnection::readFileSync(S2::FilesEnum filenum, QByteArray &ba)
-{
-    m_busy = true;
-    m_timeout = false;
-    auto conn = m_connection->connection(this, &SyncConnection::fileReceived);
-    m_connection->reqFile(quint32(filenum), DataTypes::FileFormat::Binary);
-    m_timeoutTimer->start();
-    while (m_busy)
-    {
-        QCoreApplication::processEvents(QEventLoop::AllEvents);
-        StdFunc::Wait();
-    }
-    QObject::disconnect(conn);
-    if (m_timeout)
-        return Error::Msg::Timeout;
-    ba = m_byteArrayResult;
-    return Error::Msg::NoError;
 }
 
 Error::Msg SyncConnection::reqTimeSync(void *block, quint32 blocksize)

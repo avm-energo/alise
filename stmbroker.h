@@ -7,7 +7,6 @@
 #include <QMutex>
 #include <QObject>
 #include <QTimer>
-#include <gen/datatypes.h>
 #include <gen/stdfunc.h>
 
 namespace Interface

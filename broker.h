@@ -6,6 +6,7 @@
 
 #include <QObject>
 #include <QTimer>
+#include <gen/datatypes.h>
 
 constexpr int checkIndicationPeriod = 2000;
 constexpr int numberOfProcesses = 7; // booter, adminja, core, alise, ninja, vasya, petya
@@ -15,14 +16,16 @@ constexpr int numberFreq = 750;      // period (in ms) of showing process number
 class Broker : public QObject
 {
     Q_OBJECT
-public:
-    explicit Broker(QObject *parent = nullptr);
-
-    virtual bool connect() = 0;
-
+protected:
     AVTUK_CCU::Indication m_currentIndication;
 
+public:
+    explicit Broker(QObject *parent = nullptr);
+    virtual bool connect() = 0;
+
 public slots:
+    void updateBlock(const DataTypes::BlockStruct &blk);
+    void updateTime(const timespec &time);
     void healthReceived(uint32_t code);
     virtual void checkIndication() = 0;
     virtual void checkPowerUnit() = 0;
@@ -30,7 +33,6 @@ public slots:
     virtual void getTime() = 0;
     virtual void rebootMyself() = 0;
     virtual void setIndication(const AVTUK_CCU::Indication &indication) = 0;
-    // virtual void currentIndicationReceived(const DataTypes::BlockStruct &blk) = 0;
 
 private:
     QTimer checkPowerTimer, m_clientTimeoutTimer;
@@ -44,6 +46,8 @@ private:
     void setSemiWorkingProcessError(int index);
 
 signals:
+    void receivedBlock(const DataTypes::BlockStruct &blk);
+    void receivedTime(const timespec &time);
 };
 
 #endif // BROKER_H

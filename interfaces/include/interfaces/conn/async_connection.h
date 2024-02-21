@@ -33,9 +33,6 @@ public:
     void reqBSI();
     void reqBSIExt();
     void reqFile(quint32 id, FileFormat format = FileFormat::Binary, quint32 expectedSize = 0);
-    void writeFile(quint32 id, const QByteArray &ba);
-    void writeConfiguration(const QByteArray &ba);
-    void writeFirmware(const QByteArray &ba);
     void reqTime();
     void writeTime(quint32 time);
 #ifdef Q_OS_LINUX

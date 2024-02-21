@@ -30,7 +30,7 @@ public:
 
 signals:
 public slots:
-    void publishTime(const QVariant &msg);
+    void publishTime(const timespec &time);
     void publishPowerStatus(const AVTUK_CCU::Main powerStatus);
     void publishBlock(const DataTypes::BlockStruct blk);
     void publishHello(const quint32 code);

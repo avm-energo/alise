@@ -35,7 +35,7 @@ AsyncConnection *ConnectionManager::createConnection(const UsbHidSettings &conne
     setup(connectionData);
     auto interface = new UsbHidPort(connectionData);
     auto executor = QueryExecutorFabric::makeProtocomExecutor(m_currentConnection->getQueue(), connectionData);
-    m_context.init(interface, executor, Strategy::Sync, Qt::DirectConnection);
+    m_context.init(interface, executor, Qt::DirectConnection);
     connect(m_context.m_iface, &BaseInterface::error, //
         this, &ConnectionManager::handleInterfaceErrors, Qt::QueuedConnection);
     connect(m_context.m_executor, &DefaultQueryExecutor::timeout, //

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <interfaces/ifaces/baseinterface.h>
-#include <interfaces/types/settingstypes.h>
+#include <interfaces/types/usbhidsettings.h>
 
 struct hid_device_;
 using hid_device = hid_device_; ///< opaque hidapi structure

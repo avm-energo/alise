@@ -1,7 +1,6 @@
 #include "interfaces/conn/async_connection.h"
 
 #include <gen/std_ext.h>
-#include <s2/s2util.h>
 
 namespace Interface
 {
@@ -66,24 +65,6 @@ void AsyncConnection::reqFile(quint32 id, FileFormat format, quint32 expectedSiz
         emit response(resp);
     }
     setToQueue(CommandStruct { Commands::C_ReqFile, id, format });
-}
-
-void AsyncConnection::writeFile(quint32 id, const QByteArray &ba)
-{
-    setToQueue(CommandStruct { Commands::C_WriteFile, id, ba });
-}
-
-void AsyncConnection::writeConfiguration(const QByteArray &ba)
-{
-    constexpr auto fileType = std_ext::to_underlying(S2::FilesEnum::Config);
-    writeFile(fileType, ba);
-    emit silentReconnectMode();
-}
-
-void AsyncConnection::writeFirmware(const QByteArray &ba)
-{
-    constexpr auto fileType = std_ext::to_underlying(S2::FilesEnum::Firmware);
-    writeFile(fileType, ba);
 }
 
 void AsyncConnection::reqTime()

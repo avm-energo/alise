@@ -98,25 +98,8 @@ void ProtocomResponseParser::parse()
             m_longDataBuffer.clear();
         }
         break;
-    case Proto::Commands::ReadBlkTech:
-        processDataSection(m_responseBuffer);
-        if (m_isLastSectionReceived)
-        {
-            processTechBlock(m_longDataBuffer, addr);
-            m_longDataBuffer.clear();
-        }
-        break;
     case Proto::Commands::ReadProgress:
         processU32(m_responseBuffer, addr);
-        break;
-    case Proto::Commands::ReadFile:
-        processDataSection(m_responseBuffer);
-        // Если получили последнюю секцию, от отправляем файл наверх и очищаем буффер
-        if (m_isLastSectionReceived)
-        {
-            fileReceived(m_longDataBuffer, S2::FilesEnum(addr), DataTypes::FileFormat(m_request.arg2.toUInt()));
-            m_longDataBuffer.clear();
-        }
         break;
     case Proto::Commands::ReadMode:
         processInt(m_responseBuffer.toInt());
@@ -127,20 +110,6 @@ void ProtocomResponseParser::parse()
         break;
     }
     clearResponseBuffer();
-}
-
-void ProtocomResponseParser::receiveJournalData(const S2::FilesEnum fileNum, const QByteArray &file)
-{
-    if (!boardType.isEmpty())
-    {
-        auto s2bFile = m_util.emulateS2B(file, std_ext::to_underlying(fileNum), boardType.mTypeB, boardType.mTypeM);
-        DataTypes::GeneralResponseStruct genResp {
-            DataTypes::GeneralResponseTypes::Ok,      //
-            static_cast<quint64>(s2bFile.header.size) //
-        };
-        emit responseParsed(genResp);
-        emit responseParsed(s2bFile);
-    }
 }
 
 #ifdef Q_OS_LINUX
@@ -208,59 +177,6 @@ void ProtocomResponseParser::processBlock(const QByteArray &data, quint32 blockN
     emit responseParsed(resp);
 }
 
-void ProtocomResponseParser::processTechBlock(const QByteArray &data, quint32 blockNum)
-{
-    switch (blockNum)
-    {
-    case TechBlocks::T_Oscillogram:
-    {
-        qDebug("Блок наличия осциллограмм Bo");
-        Q_ASSERT(data.size() % sizeof(S2::OscInfo) == 0);
-        constexpr auto step = sizeof(S2::OscInfo);
-        for (int i = 0; i != data.size(); i += step)
-        {
-            QByteArray buffer = data.mid(i, step);
-            S2::OscInfo oscInfo;
-            memcpy(&oscInfo, buffer.constData(), step);
-            emit responseParsed(oscInfo);
-        }
-        break;
-    }
-    case TechBlocks::T_GeneralEvent:
-    {
-        qDebug("Блок текущих событий Be");
-        break;
-    }
-    case TechBlocks::T_TechEvent:
-    {
-        qDebug("Блок технологических событий BTe");
-        break;
-    }
-    case TechBlocks::T_SwitchJournal:
-    {
-        qDebug("Блок наличия журналов переключения");
-        Q_ASSERT(data.size() % sizeof(S2::SwitchJourInfo) == 0);
-        constexpr auto step = sizeof(S2::SwitchJourInfo);
-        for (int i = 0; i != data.size(); i += step)
-        {
-            QByteArray buffer = data.mid(i, step);
-            S2::SwitchJourInfo swjInfo;
-            memcpy(&swjInfo, buffer.constData(), step);
-            emit responseParsed(swjInfo);
-        }
-        break;
-    }
-    case TechBlocks::T_WorkArchive:
-    {
-        qDebug("Блок рабочего архива (Bra)");
-        break;
-    }
-    default:
-        qDebug() << data;
-        break;
-    }
-}
-
 void ProtocomResponseParser::processDataBlock(const QByteArray &data, const quint16 addr)
 {
     switch (m_request.command)
@@ -288,13 +204,8 @@ void ProtocomResponseParser::processDataSection(const QByteArray &dataSection)
     // Добавляем полученные данные в буфер
     m_longDataBuffer.append(dataSection);
     // Если получили первую секцию
-    if (m_isFirstSectionReceived)
-    {
-        if (m_receivedCommand == Proto::Commands::ReadFile)
-            processProgressRange(m_util.getFileSize(m_longDataBuffer)); // Отсылаем общую длину
-        if (!m_isLastSectionReceived)
-            emit readingLongData();
-    }
+    if (m_isFirstSectionReceived && !m_isLastSectionReceived)
+        emit readingLongData();
     if (m_receivedCommand == Proto::Commands::ReadFile)
         processProgressCount(m_longDataBuffer.size()); // Отсылаем текущий прогресс
     // Восстанавливаем флаг, когда получаем последнюю секцию
