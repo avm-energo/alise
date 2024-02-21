@@ -1,4 +1,5 @@
 #pragma once
+
 #include "broker.h"
 #include "gen/stdfunc.h"
 #include "recovery.h"
@@ -7,7 +8,6 @@
 
 #include <QObject>
 #include <QThread>
-//#include <gen/datamanager/typesproxy.h>
 
 class Controller : public QObject
 {
@@ -39,5 +39,4 @@ private:
     TimeSyncronizer m_timeSynchronizer;
     RecoveryEngine m_recoveryEngine;
     int syncCounter = 0;
-    // UniquePointer<DataTypesProxy> proxyBS, proxyTS;
 };

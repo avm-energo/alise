@@ -30,7 +30,14 @@ bool StmBroker::connect()
                   << "Serial number:" << device.serial.toStdString() << std::endl;
     }
 
-    m_conn = m_manager->createConnection(devices.first());
+    UsbHidSettings settings { devices.first() };
+    settings.m_timeout = 1000;
+    settings.m_maxErrors = 5;
+    settings.m_maxTimeouts = 5;
+    settings.m_isLoggingEnabled = true;
+    settings.m_reconnectInterval = 100;
+    settings.m_silentInterval = 100;
+    m_conn = m_manager->createConnection(settings);
     if (m_conn == nullptr)
     {
         std::cout << "Couldn't connect" << std::endl;

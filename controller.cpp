@@ -26,7 +26,7 @@ bool Controller::launch()
 
     // RecoveryEngine: rebooting and Power Status get from MCU
     connect(&m_recoveryEngine, &RecoveryEngine::rebootReq, m_deviceBroker, &Broker::rebootMyself);
-    // connect(proxyBS.get(), &DataTypesProxy::DataStorable, &m_recoveryEngine, &RecoveryEngine::receiveBlock);
+    connect(m_deviceBroker, &Broker::receivedBlock, &m_recoveryEngine, &RecoveryEngine::receiveBlock);
 
 #if defined(AVTUK_STM)
     m_deviceBroker->getTime();
@@ -73,10 +73,7 @@ void Controller::adminjaSetup()
     connect(m_runner, &ZeroRunner::timeRequest, m_deviceBroker, &Broker::getTime);
 #elif defined(AVTUK_NO_STM)
     connect(m_runner, &ZeroRunner::timeRequest, &m_timeSynchronizer, //
-        [&] {
-            auto ts = m_timeSynchronizer.systemTime();
-            // DataManager::GetInstance().addSignalToOutList(ts);
-        });
+        [this] { m_deviceBroker->updateTime(m_timeSynchronizer.systemTime()); });
 #endif
     connect(m_deviceBroker, &Broker::receivedTime, m_runner, &ZeroRunner::publishTime, Qt::DirectConnection);
     connect(&m_timeSynchronizer, &TimeSyncronizer::ntpStatusChanged, this, [&](bool status) {
