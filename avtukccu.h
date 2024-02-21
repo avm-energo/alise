@@ -25,10 +25,12 @@ struct Indication
     Indication() : PulseCnt1(0), PulseFreq1(0), PulseCnt2(0), PulseFreq2(0)
     {
     }
+
     Indication(uint16_t pulseCnt1, uint16_t pulseFreq1, uint16_t pulseCnt2, uint16_t pulseFreq2)
         : PulseCnt1(pulseCnt1), PulseFreq1(pulseFreq1), PulseCnt2(pulseCnt2), PulseFreq2(pulseFreq2)
     {
     }
+
     friend bool operator==(const Indication &lhs, const Indication &rhs)
     {
         return ((lhs.PulseCnt1 == rhs.PulseCnt1) && (lhs.PulseCnt2 == rhs.PulseCnt2)

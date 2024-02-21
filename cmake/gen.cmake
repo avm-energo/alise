@@ -3,10 +3,7 @@ include(FetchContent)
 FetchContent_Declare(
   gen
   GIT_REPOSITORY https://github.com/avm-energo/gen.git
-#  if(ALISE_BUILDFORDEB STREQUAL "buster")
-#    GIT_TAG        origin/alice-buster
-#elseif(ALISE_BUILDFORDEB STREQUAL "bullseye")
-    GIT_TAG        4ad32f8ab2e9d368884bed21aeaae1a4f02dfbac
+  GIT_TAG        ea63d22cc9e8d4a148d408a35fdb034f3b443dc4
 )
 
 set(GEN_STATIC ON)

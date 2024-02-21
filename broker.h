@@ -30,7 +30,7 @@ public slots:
     virtual void getTime() = 0;
     virtual void rebootMyself() = 0;
     virtual void setIndication(const AVTUK_CCU::Indication &indication) = 0;
-    virtual void currentIndicationReceived(const QVariant &msg) = 0;
+    // virtual void currentIndicationReceived(const DataTypes::BlockStruct &blk) = 0;
 
 private:
     QTimer checkPowerTimer, m_clientTimeoutTimer;
