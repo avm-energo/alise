@@ -3,21 +3,21 @@
 #include "aliseconstants.h"
 #include "controller.h"
 #include "helper.h"
-#include "interfaces/protocom.h"
-#include "interfaces/usbhidport.h"
 #include "timesyncronizer.h"
 
 #include <QRandomGenerator>
-#include <gen/helper.h>
+#include <interfaces/connectionmanager.h>
+#include <interfaces/types/usbhidportinfo.h>
 
-StmBroker::StmBroker(QObject *parent) : Broker(parent)
+StmBroker::StmBroker(QObject *parent)
+    : Broker(parent), m_manager(new Interface::ConnectionManager(this)), m_conn(nullptr)
 {
 }
 
 bool StmBroker::connect()
 {
 #ifndef ALISE_LOCALDEBUG
-    const auto devices = UsbHidPort::devicesFound(0x0483);
+    const auto devices = UsbHidPortInfo::devicesFound(0x0483);
     if (devices.isEmpty())
     {
         std::cout << "No devices" << std::endl;
@@ -29,27 +29,38 @@ bool StmBroker::connect()
                   << "Product id:" << std::hex << device.product_id << std::dec << " : "
                   << "Serial number:" << device.serial.toStdString() << std::endl;
     }
-    BaseInterface::InterfacePointer device;
-    device = BaseInterface::InterfacePointer(new Protocom());
-    BaseInterface::setIface(std::move(device));
 
-    m_interface = static_cast<Protocom *>(BaseInterface::iface());
-    if (!m_interface->start(devices.first()))
+    UsbHidSettings settings { devices.first() };
+    settings.m_timeout = 1000;
+    settings.m_maxErrors = 5;
+    settings.m_maxTimeouts = 5;
+    settings.m_isLoggingEnabled = true;
+    settings.m_reconnectInterval = 100;
+    settings.m_silentInterval = 100;
+    m_conn = m_manager->createConnection(settings);
+    if (m_conn == nullptr)
     {
         std::cout << "Couldn't connect" << std::endl;
         return false;
     }
-
-#endif
+    else
+    {
+        m_conn->connection(this, &StmBroker::currentIndicationReceived);
+        m_conn->connection(static_cast<Broker *>(this), &Broker::updateBlock);
+        m_conn->connection(static_cast<Broker *>(this), &StmBroker::updateTime);
+        return true;
+    }
+#else
     return true;
+#endif
 }
 
 void StmBroker::checkPowerUnit()
 {
 #ifndef ALISE_LOCALDEBUG
     QMutexLocker locker(&_mutex);
-    Q_CHECK_PTR(m_interface);
-    m_interface->writeCommand(Interface::Commands::C_ReqBlkData, AVTUK_CCU::MainBlock);
+    Q_CHECK_PTR(m_conn);
+    m_conn->writeCommand(Interface::Commands::C_ReqBlkData, AVTUK_CCU::MainBlock);
 #endif
 }
 
@@ -57,8 +68,8 @@ void StmBroker::checkIndication()
 {
 #ifndef ALISE_LOCALDEBUG
     QMutexLocker locker(&_mutex);
-    Q_CHECK_PTR(m_interface);
-    m_interface->writeCommand(Interface::Commands::C_ReqBlkData, AVTUK_CCU::IndicationBlock);
+    Q_CHECK_PTR(m_conn);
+    m_conn->writeCommand(Interface::Commands::C_ReqBlkData, AVTUK_CCU::IndicationBlock);
 #endif
 }
 
@@ -78,7 +89,7 @@ void StmBroker::setIndication(const AVTUK_CCU::Indication &indication)
     block.ID = AVTUK_CCU::IndicationBlock;
     block.data.resize(sizeof(m_currentIndication));
     memcpy(block.data.data(), &m_currentIndication, sizeof(m_currentIndication));
-    m_interface->writeCommand(Interface::Commands::C_WriteUserValues, QVariant::fromValue(block));
+    m_conn->writeCommand(Interface::Commands::C_WriteUserValues, QVariant::fromValue(block));
 #endif
 }
 
@@ -86,8 +97,8 @@ void StmBroker::setTime(timespec time)
 {
 #ifndef ALISE_LOCALDEBUG
     QMutexLocker locker(&_mutex);
-    Q_CHECK_PTR(m_interface);
-    m_interface->writeTime(time);
+    Q_CHECK_PTR(m_conn);
+    m_conn->writeTime(time);
 #endif
 }
 
@@ -95,21 +106,20 @@ void StmBroker::getTime()
 {
 #ifndef ALISE_LOCALDEBUG
     QMutexLocker locker(&_mutex);
-    Q_CHECK_PTR(m_interface);
-    m_interface->reqTime();
+    Q_CHECK_PTR(m_conn);
+    m_conn->reqTime();
 #endif
 }
 
 void StmBroker::rebootMyself()
 {
 #ifndef ALISE_LOCALDEBUG
-    m_interface->writeCommand(Interface::Commands::C_Reboot, 0xff);
+    m_conn->writeCommand(Interface::Commands::C_Reboot, 0xff);
 #endif
 }
 
-void StmBroker::currentIndicationReceived(const QVariant &msg)
+void StmBroker::currentIndicationReceived(const DataTypes::BlockStruct &blk)
 {
-    auto blk = msg.value<DataTypes::BlockStruct>();
     qDebug() << "[StmBroker] <= MCU : Block ID = " << blk.ID << ", data = " << blk.data;
     if (blk.ID == AVTUK_CCU::IndicationBlock)
         memcpy(&m_currentIndication, blk.data.data(), sizeof(m_currentIndication));

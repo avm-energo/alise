@@ -6,8 +6,6 @@
 #include <QRandomGenerator>
 #include <config.h>
 #include <cstdlib>
-#include <gen/datamanager/datamanager.h>
-#include <gen/datatypes.h>
 #include <gen/error.h>
 #include <sys/reboot.h>
 #include <unistd.h>
@@ -73,7 +71,7 @@ void GpioBroker::checkPowerUnit()
     str.resetReq = false;
     memcpy(blk.data.data(), &str, sizeof(AVTUK_CCU::Main));
     blk.ID = AVTUK_CCU::MainBlock;
-    DataManager::GetInstance().addSignalToOutList(blk);
+    emit receivedBlock(blk);
 }
 
 void GpioBroker::setIndication(const AVTUK_CCU::Indication &indication)
@@ -182,7 +180,7 @@ void GpioBroker::reset()
         str.resetReq = true;
         std::memcpy(blk.data.data(), &str, sizeof(AVTUK_CCU::Main));
         blk.ID = AVTUK_CCU::MainBlock;
-        DataManager::GetInstance().addSignalToOutList(blk);
+        emit receivedBlock(blk);
     }
     resetCounter = 0;
 }

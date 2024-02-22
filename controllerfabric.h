@@ -8,16 +8,6 @@
 
 #include <QObject>
 
-// clang-format off
-#if defined(AVTUK_STM)
-    using deviceType = StmBroker;
-#elif defined(AVTUK_NO_STM)
-    using deviceType = GpioBroker;
-#else
-    using deviceType = void;
-#endif
-// clang-format on
-
 class ControllerFabric : public QObject
 {
 public:

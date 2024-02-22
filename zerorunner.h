@@ -6,7 +6,6 @@
 
 #include <QMutex>
 #include <QObject>
-#include <gen/datamanager/typesproxy.h>
 #include <zmq.hpp>
 
 constexpr uint32_t timeout = 300000;
@@ -28,8 +27,8 @@ public slots:
 
     void publishHealthQueryCallback();
     void publishNtpStatus(bool);
-    void publishBlock(const QVariant &msg);
-    void publishTime(const QVariant &msg);
+    void publishBlock(const DataTypes::BlockStruct &blk);
+    void publishTime(const timespec &time);
 
 signals:
     void timeRequest();

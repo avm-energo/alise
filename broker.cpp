@@ -18,6 +18,16 @@ Broker::Broker(QObject *parent) : QObject(parent)
     m_clientTimeoutTimer.start();
 }
 
+void Broker::updateBlock(const DataTypes::BlockStruct &blk)
+{
+    emit receivedBlock(blk);
+}
+
+void Broker::updateTime(const timespec &time)
+{
+    emit receivedTime(time);
+}
+
 // Health code received
 //
 // code bits: 0: 0 - there's some errors, 1 - no errors

@@ -47,9 +47,8 @@ template <typename T> void ZeroPublisher::appendToQueue(const T &paylod)
     _waiter.wakeOne();
 }
 
-void ZeroPublisher::publishTime(const QVariant &msg)
+void ZeroPublisher::publishTime(const timespec &time)
 {
-    auto time = msg.value<timespec>();
     google::protobuf::Timestamp protoTime;
     protoTime.set_seconds(time.tv_sec);
     protoTime.set_nanos(time.tv_nsec);

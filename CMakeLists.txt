@@ -104,7 +104,6 @@ endif()
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 add_subdirectory(gitversion)
-add_subdirectory(interfaces)
 target_include_directories(${PROJECT_NAME} PUBLIC ${CONAN_INCLUDE_DIRS_CPPZMQ})
 
 protobuf_generate(
@@ -115,12 +114,13 @@ protobuf_generate(
 configure_file(${CMAKE_SOURCE_DIR}/cconfig.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h @ONLY)
 
 if (ALISE_STM)
+    add_subdirectory(interfaces)
     ##WARNING Link interfaces before gen (!)
-    target_link_libraries(${PROJECT_NAME} interfaces)
+    target_link_libraries(${PROJECT_NAME} PUBLIC interfaces)
 else()
-    target_link_libraries(${PROJECT_NAME} ${GPIODCXX_LIBRARY})
+    target_link_libraries(${PROJECT_NAME} PUBLIC gen ${GPIODCXX_LIBRARY})
 endif()
-target_link_libraries(${PROJECT_NAME} gen Qt5::Core Qt5::Xml pthread gitversion ZeroMQ::libzmq-static cppzmq::cppzmq protobuf::libprotobuf)
+target_link_libraries(${PROJECT_NAME} PUBLIC Qt5::Xml pthread gitversion ZeroMQ::libzmq-static cppzmq::cppzmq protobuf::libprotobuf)
 
 install(TARGETS ${PROJECT_NAME})
 

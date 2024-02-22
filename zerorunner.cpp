@@ -65,15 +65,14 @@ void ZeroRunner::publishNtpStatus(bool status)
     m_publisher->publishNtpStatus(status);
 }
 
-void ZeroRunner::publishBlock(const QVariant &msg)
+void ZeroRunner::publishBlock(const DataTypes::BlockStruct &blk)
 {
-    auto blk = msg.value<DataTypes::BlockStruct>();
     m_publisher->publishBlock(blk);
 }
 
-void ZeroRunner::publishTime(const QVariant &msg)
+void ZeroRunner::publishTime(const timespec &time)
 {
-    m_publisher->publishTime(msg);
+    m_publisher->publishTime(time);
 }
 
 void ZeroRunner::polling()

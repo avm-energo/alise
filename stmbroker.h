@@ -4,19 +4,21 @@
 #include "broker.h"
 #include "protos/protos.pb.h"
 
+#include <QMutex>
 #include <QObject>
 #include <QTimer>
-#include <gen/datamanager/typesproxy.h>
 #include <gen/stdfunc.h>
 
-//#define TEST_INDICATOR
+namespace Interface
+{
+class AsyncConnection;
+class ConnectionManager;
+} // namespace Interface
 
-class Protocom;
-
-class StmBroker : public Broker
+class StmBroker final : public Broker
 {
 public:
-    StmBroker(QObject *parent = nullptr);
+    explicit StmBroker(QObject *parent = nullptr);
     bool connect() override;
 
 public slots:
@@ -26,13 +28,13 @@ public slots:
     void setTime(timespec time) override;
     void getTime() override;
     void rebootMyself() override;
-    void currentIndicationReceived(const QVariant &msg) override;
+    void currentIndicationReceived(const DataTypes::BlockStruct &blk);
 
 private:
     timespec transform(google::protobuf::Timestamp timestamp) const;
     QMutex _mutex;
-    Protocom *m_interface;
-    //    UniquePointer<DataTypesProxy> proxyBS, proxyBStr;
+    Interface::ConnectionManager *m_manager;
+    Interface::AsyncConnection *m_conn;
 
 #ifdef TEST_INDICATOR
     QTimer m_testTimer;

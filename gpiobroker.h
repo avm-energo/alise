@@ -30,7 +30,7 @@ public:
     bool connect() override;
 
 public slots:
-    void currentIndicationReceived(const QVariant &) override {};
+    // void currentIndicationReceived(const QVariant &) override {};
     void checkIndication() override {};
     void checkPowerUnit() override;
     void setIndication(const AVTUK_CCU::Indication &indication) override;
