@@ -132,7 +132,7 @@ bool TimeSyncronizer::ntpStatus() const
         file.close();
     }
 #endif
-    qDebug() << "Ntpq -pn output: " << output;
+    //    qDebug() << "Ntpq -pn output: " << output;
     if (output.isEmpty())
     {
         qWarning() << "ntpq output is empty!";
