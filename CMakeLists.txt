@@ -67,6 +67,8 @@ find_package(Protobuf REQUIRED)
 
 set(SOURCES
     main.cpp
+    maincreator.cpp
+    maincreator.h
     avtukccu.h
     timesyncronizer.cpp
     timesyncronizer.h

@@ -2,10 +2,12 @@
 #include "aliseconstants.h"
 #include "controllerfabric.h"
 #include "gitversion/gitversion.h"
+#include "maincreator.h"
 
 #include <QCoreApplication>
 #include <config.h>
 #include <gen/logger.h>
+#include <gpiod.hpp>
 #include <iostream>
 #include <memory>
 
@@ -20,6 +22,12 @@ using namespace Alise;
 
 int main(int argc, char *argv[])
 {
+    MainCreator creator;
+    bool ok;
+    Broker *broker;
+    TimeSyncronizer *tm;
+    ControllerFabric fabric;
+
     std::cout << "Started " << std::endl;
 
     qRegisterMetaType<uint32_t>("uint32_t");
@@ -107,23 +115,26 @@ int main(int argc, char *argv[])
     }
 
     qInfo() << "=========================";
-    ControllerFabric fabric;
-    if (!fabric.getStatus())
+
+    broker = creator.create(ok);
+    if (!ok)
     {
-        qCritical() << "Fabric was not created, exiting";
+        qCritical() << "Can't create broker, exiting";
         return 11;
     }
-    if (!fabric.createController(Controller::ContrTypes::IS_BOOTER, portBooter))
+    tm = creator.getTimeSynchronizer();
+
+    if (!fabric.createController(Controller::ContrTypes::IS_BOOTER, portBooter, broker, tm))
     {
         qCritical() << "Booter controller was not created, exiting";
         return 12;
     }
-    if (!fabric.createController(Controller::ContrTypes::IS_CORE, portCore))
+    if (!fabric.createController(Controller::ContrTypes::IS_CORE, portCore, broker, tm))
     {
         qCritical() << "Core controller was not created, exiting";
         return 13;
     }
-    if (!fabric.createController(Controller::ContrTypes::IS_ADMINJA, portAdminja))
+    if (!fabric.createController(Controller::ContrTypes::IS_ADMINJA, portAdminja, broker, tm))
     {
         qCritical() << "Core controller was not created, exiting";
         return 14;

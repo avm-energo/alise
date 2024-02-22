@@ -20,11 +20,13 @@ public:
         IS_INCORRECT_TYPE
     };
 
-    explicit Controller(Broker *devBroker, ZeroRunner *runner, QObject *parent = nullptr) noexcept;
-    bool launch();
+    explicit Controller(QObject *parent = nullptr) noexcept;
     void shutdown();
     void syncTime(const timespec &);
-    void ofType(ContrTypes type);
+    Controller *withBroker(Broker *broker);
+    Controller *withTimeSynchonizer(TimeSyncronizer *tm);
+    Controller *ofType(ContrTypes type);
+    bool launchOnPort(int port);
 
 private:
     bool isIncorrectType();
@@ -34,9 +36,11 @@ private:
 
     ContrTypes m_type;
     ZeroRunner *m_runner;
+    TimeSyncronizer *m_timeSynchronizer;
     Broker *m_deviceBroker;
     QTimer *m_pingTimer;
-    TimeSyncronizer m_timeSynchronizer;
-    RecoveryEngine m_recoveryEngine;
     int syncCounter = 0;
+    const QMap<Controller::ContrTypes, QString> c_controllerMap
+        = { { Controller::ContrTypes::IS_ADMINJA, "sa" }, { Controller::ContrTypes::IS_BOOTER, "sb" },
+              { Controller::ContrTypes::IS_CORE, "sc" }, { Controller::ContrTypes::IS_INCORRECT_TYPE, "unk" } };
 };

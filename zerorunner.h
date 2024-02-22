@@ -14,11 +14,6 @@ class ZeroRunner : public QObject
 {
     Q_OBJECT
 public:
-    enum
-    {
-        kMaxThread = 1
-    };
-
     ZeroRunner(const QString &type, QObject *parent = nullptr);
 
 public slots:

@@ -6,32 +6,22 @@
 #include <QTimer>
 #include <iostream>
 
-Controller::Controller(Broker *devBroker, ZeroRunner *runner, QObject *parent) noexcept
-    : QObject(parent)
-    , m_type(IS_INCORRECT_TYPE)
-    , m_runner(runner)
-    , m_deviceBroker(devBroker)
-    , m_timeSynchronizer(this)
-    , m_recoveryEngine(this)
+Controller::Controller(QObject *parent) noexcept : QObject(parent)
 {
 }
 
-bool Controller::launch()
+bool Controller::launchOnPort(int port)
 {
     if (isIncorrectType())
     {
         qCritical() << "Controller has incorrect type or no type was given";
         return false;
     }
-
-    // RecoveryEngine: rebooting and Power Status get from MCU
-    connect(&m_recoveryEngine, &RecoveryEngine::rebootReq, m_deviceBroker, &Broker::rebootMyself);
-    connect(m_deviceBroker, &Broker::receivedBlock, &m_recoveryEngine, &RecoveryEngine::receiveBlock);
-
+    m_runner->runServer(port);
 #if defined(AVTUK_STM)
     m_deviceBroker->getTime();
 #elif defined(AVTUK_NO_STM)
-    m_timeSynchronizer.systemTime();
+    m_timeSynchronizer->systemTime();
 #endif
     return true;
 }
@@ -45,9 +35,25 @@ void Controller::syncTime(const timespec &)
 {
 }
 
-void Controller::ofType(Controller::ContrTypes type)
+Controller *Controller::withBroker(Broker *broker)
 {
-    m_type = type;
+    m_deviceBroker = broker;
+    return this;
+}
+
+Controller *Controller::withTimeSynchonizer(TimeSyncronizer *tm)
+{
+    m_timeSynchronizer = tm;
+    return this;
+}
+
+Controller *Controller::ofType(Controller::ContrTypes type)
+{
+    if (!c_controllerMap.contains(type))
+        m_type = Controller::ContrTypes::IS_INCORRECT_TYPE;
+    else
+        m_type = type;
+    m_runner = new ZeroRunner(c_controllerMap[type], this);
     switch (type)
     {
     case IS_ADMINJA:
@@ -63,38 +69,25 @@ void Controller::ofType(Controller::ContrTypes type)
         qCritical() << "Incorrect controller type";
         break;
     }
+    return this;
 }
 
 void Controller::adminjaSetup()
 {
-    connect(m_runner, &ZeroRunner::timeReceived, &m_timeSynchronizer, &TimeSyncronizer::printAndSetSystemTime);
+    connect(m_runner, &ZeroRunner::timeReceived, m_timeSynchronizer, &TimeSyncronizer::printAndSetSystemTime);
 #if defined(AVTUK_STM)
     connect(m_runner, &ZeroRunner::timeReceived, m_deviceBroker, &Broker::setTime);
     connect(m_runner, &ZeroRunner::timeRequest, m_deviceBroker, &Broker::getTime);
 #elif defined(AVTUK_NO_STM)
-    connect(m_runner, &ZeroRunner::timeRequest, &m_timeSynchronizer, //
-        [this] { m_deviceBroker->updateTime(m_timeSynchronizer.systemTime()); });
+    connect(m_runner, &ZeroRunner::timeRequest, m_timeSynchronizer, //
+        [this] { m_deviceBroker->updateTime(m_timeSynchronizer->systemTime()); });
 #endif
     connect(m_deviceBroker, &Broker::receivedTime, m_runner, &ZeroRunner::publishTime, Qt::DirectConnection);
-    connect(&m_timeSynchronizer, &TimeSyncronizer::ntpStatusChanged, this, [&](bool status) {
+    connect(m_timeSynchronizer, &TimeSyncronizer::ntpStatusChanged, this, [&](bool status) {
         m_runner->publishNtpStatus(status);
         if (!status)
             return;
     });
-#if defined(AVTUK_STM)
-    connect(&m_timeSynchronizer, &TimeSyncronizer::setTime, this,
-        [&](const timespec &time) { m_deviceBroker->setTime(time); });
-#endif
-#ifdef __linux__
-    auto connectionTimeSync = std::shared_ptr<QMetaObject::Connection>(new QMetaObject::Connection);
-    *connectionTimeSync = connect(
-        m_deviceBroker, &Broker::receivedTime, this,
-        [=, &syncer = m_timeSynchronizer](const timespec &time) {
-            QObject::disconnect(*connectionTimeSync);
-            syncer.printAndSetSystemTime(time);
-        },
-        Qt::DirectConnection);
-#endif
 }
 
 void Controller::booterSetup()
