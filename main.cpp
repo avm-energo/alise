@@ -2,11 +2,11 @@
 #include "aliseconstants.h"
 #include "controllerfabric.h"
 #include "gitversion/gitversion.h"
+#include "logger.h"
 #include "maincreator.h"
 
 #include <QCoreApplication>
 #include <config.h>
-#include <gen/logger.h>
 #include <gpiod.hpp>
 #include <iostream>
 #include <memory>
@@ -114,7 +114,7 @@ int main(int argc, char *argv[])
             qInfo() << "Recovery eth" << ethLetter << ": found";
     }
 
-    qInfo() << "=========================";
+    qInfo() << "=========================\n";
 
     broker = creator.create(ok);
     if (!ok)

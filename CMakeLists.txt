@@ -67,6 +67,8 @@ find_package(Protobuf REQUIRED)
 
 set(SOURCES
     main.cpp
+    logger.cpp
+    logger.h
     maincreator.cpp
     maincreator.h
     avtukccu.h
