@@ -1,9 +1,6 @@
 #include "stmbroker.h"
 
 #include "aliseconstants.h"
-#include "controller.h"
-#include "helper.h"
-#include "timesyncronizer.h"
 
 #include <QRandomGenerator>
 #include <interfaces/connectionmanager.h>

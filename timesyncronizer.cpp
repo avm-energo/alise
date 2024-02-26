@@ -1,7 +1,5 @@
 #include "timesyncronizer.h"
 
-#include "helper.h"
-
 #include <QDateTime>
 #include <QProcess>
 #include <QTimer>
@@ -47,13 +45,15 @@
 
 #define NTPSTATUSPERIOD 3000
 
-void printts(const timespec &st)
+TimeSyncronizer::TimeSyncronizer(QObject *parent) : QObject(parent)
 {
-    auto datetime = QDateTime::fromMSecsSinceEpoch(((st.tv_sec * 1000) + (st.tv_nsec / 1.0e6)));
-    qDebug() << "Setting datetime: " << datetime;
 }
 
-TimeSyncronizer::TimeSyncronizer(QObject *parent) : QObject(parent)
+TimeSyncronizer::~TimeSyncronizer()
+{
+}
+
+void TimeSyncronizer::init()
 {
     m_timeCounter = 0;
     emit ntpStatusChanged(ntpStatus()); // first time we must emit ntpStatus
@@ -69,18 +69,16 @@ TimeSyncronizer::TimeSyncronizer(QObject *parent) : QObject(parent)
                 m_timeCounter = 0;
                 emit setTime(systemTime());
             }
-            //            if (status != m_ntpStatus)
-            //            {
             emit ntpStatusChanged(status);
-            //                m_ntpStatus = status;
-            //            }
         }
     });
     timer->start();
 }
 
-TimeSyncronizer::~TimeSyncronizer()
+void printts(const timespec &st)
 {
+    auto datetime = QDateTime::fromMSecsSinceEpoch(((st.tv_sec * 1000) + (st.tv_nsec / 1.0e6)));
+    qDebug() << "Setting datetime: " << datetime;
 }
 
 void TimeSyncronizer::printAndSetSystemTime(const timespec time)

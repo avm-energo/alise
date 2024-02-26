@@ -2,7 +2,6 @@
 
 #include "avtukccu.h"
 #include "broker.h"
-#include "protos/protos.pb.h"
 
 #include <QMutex>
 #include <QObject>

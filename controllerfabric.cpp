@@ -9,7 +9,7 @@ bool ControllerFabric::createController(Controller::ContrTypes ofType, int port,
     Controller *controller = new Controller(this);
     return controller             //
         ->withBroker(broker)      //
-        ->ofType(ofType)          //
         ->withTimeSynchonizer(tm) //
+        ->ofType(ofType)          //
         ->launchOnPort(port);     //
 }

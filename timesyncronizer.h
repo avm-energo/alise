@@ -10,6 +10,7 @@ public:
     explicit TimeSyncronizer(QObject *parent = nullptr);
     virtual ~TimeSyncronizer();
 
+    void init();
     timespec systemTime() const;
     bool ntpStatus() const;
 

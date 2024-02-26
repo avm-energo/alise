@@ -9,8 +9,13 @@
 
 MainCreator::MainCreator(QObject *parent)
 {
-    m_timeSynchronizer = new TimeSyncronizer;
     Q_UNUSED(parent)
+}
+
+void MainCreator::init()
+{
+    m_timeSynchronizer = new TimeSyncronizer;
+    m_timeSynchronizer->init();
 }
 
 Broker *MainCreator::create(bool &ok)

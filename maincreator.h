@@ -12,6 +12,7 @@ class MainCreator : public QObject
 public:
     MainCreator(QObject *parent = nullptr);
 
+    void init();
     Broker *create(bool &ok);
     TimeSyncronizer *getTimeSynchronizer();
 
