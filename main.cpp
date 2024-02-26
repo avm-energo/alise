@@ -116,6 +116,7 @@ int main(int argc, char *argv[])
 
     qInfo() << "=========================\n";
 
+    creator.init();
     broker = creator.create(ok);
     if (!ok)
     {
