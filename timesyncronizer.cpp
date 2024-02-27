@@ -59,19 +59,7 @@ void TimeSyncronizer::init()
     emit ntpStatusChanged(ntpStatus()); // first time we must emit ntpStatus
     QTimer *timer = new QTimer(this);
     timer->setInterval(NTPSTATUSPERIOD);
-    connect(timer, &QTimer::timeout, this, [this] {
-        bool status = ntpStatus();
-        ++m_timeCounter;
-        if (m_timeCounter >= 20) // one time per minute
-        {
-            if (status)
-            {
-                m_timeCounter = 0;
-                emit setTime(systemTime());
-            }
-            emit ntpStatusChanged(status);
-        }
-    });
+    connect(timer, &QTimer::timeout, this, &TimeSyncronizer::checkNtpAndSetTime);
     timer->start();
 }
 
@@ -113,6 +101,21 @@ void TimeSyncronizer::setSystemTime(const timespec &systemTime)
     myProcess->start(program, arguments);
     myProcess->waitForFinished();
     qInfo() << "HWClock exited with code: " << myProcess->exitCode() << " and status: " << myProcess->exitStatus();
+}
+
+void TimeSyncronizer::checkNtpAndSetTime()
+{
+    bool status = ntpStatus();
+    ++m_timeCounter;
+    if (m_timeCounter >= 20) // one time per minute
+    {
+        if (status)
+        {
+            m_timeCounter = 0;
+            emit setTime(systemTime());
+        }
+        emit ntpStatusChanged(status);
+    }
 }
 
 bool TimeSyncronizer::ntpStatus() const

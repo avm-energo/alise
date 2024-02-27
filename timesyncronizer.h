@@ -24,6 +24,9 @@ private:
     bool m_ntpStatus;
     int m_timeCounter;
 
+private slots:
+    void checkNtpAndSetTime();
+
 signals:
     void ntpStatusChanged(bool);
     void setTime(const timespec &systemTime);
