@@ -90,7 +90,11 @@ void TimeSyncronizer::printAndSetSystemTime(const timespec time)
 timespec TimeSyncronizer::systemTime() const
 {
     timespec time;
-    clock_gettime(CLOCK_REALTIME, &time);
+    struct timeval timeToGet;
+    gettimeofday(&timeToGet, NULL);
+    //    clock_gettime(CLOCK_REALTIME, &time);
+    time.tv_sec = timeToGet.tv_sec;
+    time.tv_nsec = timeToGet.tv_usec * 1000;
     return time;
 }
 
@@ -99,9 +103,13 @@ void TimeSyncronizer::setSystemTime(const timespec &systemTime)
     QString program = "/usr/sbin/hwclock";
     QStringList arguments { "-w" };
 
-    clock_settime(CLOCK_REALTIME, &systemTime); // set current datetime
-    QProcess *myProcess = new QProcess(this);   // set datetime to RTC
-    qInfo() << "Set hwclock time: " << systemTime.tv_sec << " : " << systemTime.tv_nsec;
+    struct timeval timeToSet;
+    timeToSet.tv_sec = systemTime.tv_sec;
+    timeToSet.tv_usec = 0;
+    settimeofday(&timeToSet, NULL);
+    //    clock_settime(CLOCK_REALTIME, &systemTime); // set current datetime
+    QProcess *myProcess = new QProcess(this); // set datetime to RTC
+    qInfo() << "Set hwclock time: " << systemTime.tv_sec;
     myProcess->start(program, arguments);
     myProcess->waitForFinished();
     qInfo() << "HWClock exited with code: " << myProcess->exitCode() << " and status: " << myProcess->exitStatus();

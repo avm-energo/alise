@@ -144,25 +144,15 @@ QByteArray ProtocomRequestParser::parse(const CommandStruct &cmd)
         }
         break;
     }
-    // QVariantList write
+    // Block write
     case Commands::C_WriteUserValues:
     {
-        if (cmd.arg1.canConvert<QVariantList>())
+        if (cmd.arg1.canConvert<DataTypes::BlockStruct>())
         {
-            auto vList = cmd.arg1.value<QVariantList>();
-            const quint16 start_addr = vList.first().value<DataTypes::FloatStruct>().sigAdr;
-            const auto group = getGroupByAddress(start_addr);
-            if (group.m_startAddr == start_addr)
-            {
-                const auto block = static_cast<quint8>(group.m_block); // сужающий каст
-                QByteArray tmpba = StdFunc::toByteArray(block);
-                for (const auto &item : vList)
-                {
-                    const float value = item.value<DataTypes::FloatStruct>().sigVal;
-                    tmpba.append(StdFunc::toByteArray(value));
-                }
-                m_request = writeLongData(s_protoCmdMap.at(cmd.command), tmpba);
-            }
+            DataTypes::BlockStruct bs = cmd.arg1.value<DataTypes::BlockStruct>();
+            QByteArray tmpba = StdFunc::toByteArray(static_cast<quint8>(bs.ID));
+            tmpba.append(bs.data);
+            m_request = writeLongData(s_protoCmdMap.at(cmd.command), tmpba);
         }
         break;
     }
