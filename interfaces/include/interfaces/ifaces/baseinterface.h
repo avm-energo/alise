@@ -37,7 +37,7 @@ protected:
     std::atomic<Interface::State> m_state;
     quint16 m_reconnectInterval;
     bool m_isLoggingEnabled;
-    LogClass m_log;
+    //    LogClass m_log;
     QMutex m_dataGuard;
 
     void setState(const Interface::State state) noexcept;

@@ -19,7 +19,7 @@ DefaultQueryExecutor::DefaultQueryExecutor(RequestQueue &queue, const BaseSettin
     m_timeoutTimer->setInterval(settings.m_timeout);
     connect(m_timeoutTimer, &QTimer::timeout, this, [this] {
         qCritical() << "Timeout, command: " << m_lastRequestedCommand.load();
-        m_log.error("Timeout");
+        //        m_log.error("Timeout");
         cancelQuery();
         emit this->timeout();
     });
@@ -27,7 +27,8 @@ DefaultQueryExecutor::DefaultQueryExecutor(RequestQueue &queue, const BaseSettin
 
 void DefaultQueryExecutor::initLogger(const QString &protocolName) noexcept
 {
-    m_log.init(protocolName + "Executor." + logExt);
+    //    m_log.init(protocolName + "Executor." + logExt);
+    Q_UNUSED(protocolName)
 }
 
 void DefaultQueryExecutor::setParsers(BaseRequestParser *reqParser, BaseResponseParser *respParser) noexcept
@@ -127,12 +128,15 @@ void DefaultQueryExecutor::writeToLog(const QByteArray &ba, const Direction dir)
         break;
     }
     msg += ba.toHex();
-    m_log.info(msg);
+    //    m_log.info(msg);
+    qDebug() << msg;
 }
 
 void DefaultQueryExecutor::logFromParser(const QString &message, const LogLevel level)
 {
-    m_log.logging("DeviceQueryExecutor: " + message, level);
+    //    m_log.logging("DeviceQueryExecutor: " + message, level);
+    qDebug() << "DeviceQueryExecutor: " << message;
+    Q_UNUSED(level)
 }
 
 void DefaultQueryExecutor::exec()
@@ -154,7 +158,8 @@ void DefaultQueryExecutor::exec()
         QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents);
         currentState = getState();
     }
-    m_log.info("DeviceQueryExecutor is finished\n");
+    //    m_log.info("DeviceQueryExecutor is finished\n");
+    qDebug() << "DeviceQueryExecutor is finished\n";
     emit finished();
 }
 
@@ -252,7 +257,8 @@ void DefaultQueryExecutor::receiveProtocolDescription(const ProtocolDescription 
 
 void DefaultQueryExecutor::cancelQuery()
 {
-    m_log.warning("Command canceled");
+    //    m_log.warning("Command canceled");
+    qWarning() << "Command cancelled";
     m_responseParser->clearResponseBuffer();
     m_queue.get().activate();
     if (m_timeoutTimer->isActive())
@@ -264,7 +270,8 @@ void DefaultQueryExecutor::cancelQuery()
 
 void DefaultQueryExecutor::reconnectEvent()
 {
-    m_log.warning("Reconnect");
+    //    m_log.warning("Reconnect");
+    qWarning() << "Reconnect";
     cancelQuery();
     pause();
     m_queue.get().clear();

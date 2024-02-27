@@ -10,7 +10,8 @@ BaseInterface::BaseInterface(const QString &logFilename, const BaseSettings &set
     , m_isLoggingEnabled(settings.m_isLoggingEnabled)
 {
     qRegisterMetaType<InterfaceError>();
-    m_log.init(logFilename + "." + ::logExt);
+    //    m_log.init(logFilename + "." + ::logExt);
+    Q_UNUSED(logFilename)
 }
 
 void BaseInterface::setState(const Interface::State state) noexcept
@@ -42,7 +43,8 @@ void BaseInterface::writeLog(const QByteArray &ba, Interface::Direction dir)
             break;
         }
         tmpba.append(ba).append("\n");
-        m_log.writeRaw(tmpba);
+        //        m_log.writeRaw(tmpba);
+        qDebug() << tmpba;
     }
 }
 
@@ -80,7 +82,8 @@ void BaseInterface::poll()
 
     // Finish thread
     disconnect();
-    m_log.info(QString(metaObject()->className()) + " is finished\n");
+    //    m_log.info(QString(metaObject()->className()) + " is finished\n");
+    qDebug() << metaObject()->className() << " is finished\n";
     emit finished();
     QCoreApplication::processEvents();
 }

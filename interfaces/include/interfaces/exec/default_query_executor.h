@@ -34,7 +34,7 @@ protected:
     std::atomic<ExecutorState> m_state;
     std::atomic<Commands> m_lastRequestedCommand;
     std::reference_wrapper<RequestQueue> m_queue;
-    LogClass m_log;
+    //    LogClass m_log;
     QTimer *m_timeoutTimer;
     BaseRequestParser *m_requestParser;
     BaseResponseParser *m_responseParser;
