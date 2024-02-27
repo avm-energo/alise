@@ -47,7 +47,7 @@ Broker *MainCreator::create(bool &ok)
     connect(broker, &Broker::receivedBlock, &m_recoveryEngine, &RecoveryEngine::receiveBlock);
 
 #if defined(AVTUK_STM)
-    connect(m_timeSynchronizer, &TimeSyncronizer::setTime, this, [&](const timespec &time) { broker->setTime(time); });
+    connect(m_timeSynchronizer, &TimeSyncronizer::setTime, broker, &Broker::setTime);
 #endif
 #ifdef __linux__
     auto connectionTimeSync = std::shared_ptr<QMetaObject::Connection>(new QMetaObject::Connection);

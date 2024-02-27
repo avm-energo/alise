@@ -24,7 +24,7 @@ public slots:
     void checkPowerUnit() override;
     void checkIndication() override;
     void setIndication(const AVTUK_CCU::Indication &indication) override;
-    void setTime(timespec time) override;
+    void setTime(const timespec &time) override;
     void getTime() override;
     void rebootMyself() override;
     void currentIndicationReceived(const DataTypes::BlockStruct &blk);

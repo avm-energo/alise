@@ -90,7 +90,7 @@ void StmBroker::setIndication(const AVTUK_CCU::Indication &indication)
 #endif
 }
 
-void StmBroker::setTime(timespec time)
+void StmBroker::setTime(const timespec &time)
 {
 #ifndef ALISE_LOCALDEBUG
     QMutexLocker locker(&_mutex);

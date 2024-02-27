@@ -125,7 +125,7 @@ void GpioBroker::setIndication(const AVTUK_CCU::Indication &indication)
     restartBlinkTimer();
 }
 
-void GpioBroker::setTime(timespec time)
+void GpioBroker::setTime(const timespec &time)
 {
     Q_UNUSED(time)
 }

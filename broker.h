@@ -29,7 +29,7 @@ public slots:
     void healthReceived(uint32_t code);
     virtual void checkIndication() = 0;
     virtual void checkPowerUnit() = 0;
-    virtual void setTime(timespec time) = 0;
+    virtual void setTime(const timespec &time) = 0;
     virtual void getTime() = 0;
     virtual void rebootMyself() = 0;
     virtual void setIndication(const AVTUK_CCU::Indication &indication) = 0;
