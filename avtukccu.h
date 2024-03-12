@@ -12,7 +12,7 @@ constexpr uint16_t IndicationBlock = 2;
 struct Main
 {
     uint8_t PWRIN;
-    bool resetReq;
+    uint8_t resetReq;
 };
 
 struct Indication

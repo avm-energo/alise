@@ -22,6 +22,8 @@ AVTUK_CCU::Indication AliseConstants::FailureIndication = { 1, AliseConstants::_
 AVTUK_CCU::Indication AliseConstants::NormalIndication
     = { 1, AliseConstants::_blinksConstants.ProcessStatusNormalBlink, 0, 0 };
 
+AliseConstants::ModuleInfo AliseConstants::s_moduleInfo = { 0x14, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF };
+
 AliseConstants::AliseConstants()
 {
 }

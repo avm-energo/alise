@@ -13,6 +13,9 @@ message HelloRequest {
 
 message HelloReply {
   string message = 1;
+  string serialnum = 2;
+  string hwversion = 3;
+  string swversion = 4;
 }
 
 //reply Timestamp
@@ -51,8 +54,13 @@ message Health {
   string Desc = 2;
 }  
 
+// PWRIN code bits:
+// 0 - PWR2
+// 1 - PWR1
+
 message PowerStatus {
   uint32 PWRIN = 1;
+  uint32 ResetReq = 2;
 }
 
 message PackedMessage {

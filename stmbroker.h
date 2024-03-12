@@ -1,5 +1,6 @@
 #pragma once
 
+#include "alisesettings.h"
 #include "avtukccu.h"
 #include "broker.h"
 
@@ -16,9 +17,16 @@ class ConnectionManager;
 
 class StmBroker final : public Broker
 {
+    Q_OBJECT
+    static constexpr int HWAdr = 3;
+    static constexpr int SWAdr = 4;
+    static constexpr int SerialNumBAdr = 10;
+    static constexpr int ModuleSerialNumAdr = 13;
+
 public:
     explicit StmBroker(QObject *parent = nullptr);
     bool connect() override;
+    void writeHiddenBlock();
 
 public slots:
     void checkPowerUnit() override;
@@ -34,8 +42,11 @@ private:
     QMutex _mutex;
     Interface::ConnectionManager *m_manager;
     Interface::AsyncConnection *m_conn;
+    AliseSettings m_settings;
 
-#ifdef TEST_INDICATOR
-    QTimer m_testTimer;
-#endif
+private slots:
+    void updateBsi(const DataTypes::BitStringStruct &resp);
+
+signals:
+    void ModuleInfoFilled();
 };

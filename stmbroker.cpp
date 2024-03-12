@@ -45,10 +45,25 @@ bool StmBroker::connect()
         m_conn->connection(this, &StmBroker::currentIndicationReceived);
         m_conn->connection(static_cast<Broker *>(this), &Broker::updateBlock);
         m_conn->connection(static_cast<Broker *>(this), &StmBroker::updateTime);
+        m_conn->connection(this, &StmBroker::updateBsi);
+        m_conn->writeCommand(Interface::Commands::C_ReqBSI);
         return true;
     }
 #else
     return true;
+#endif
+}
+
+void StmBroker::writeHiddenBlock()
+{
+#ifndef ALISE_LOCALDEBUG
+    QMutexLocker locker(&_mutex);
+    Q_CHECK_PTR(m_conn);
+    DataTypes::BlockStruct block;
+    block.ID = 0x01; // base block
+    block.data.resize(sizeof(Alise::AliseConstants::ModuleInfo));
+    memcpy(block.data.data(), &Alise::AliseConstants::s_moduleInfo, sizeof(Alise::AliseConstants::ModuleInfo));
+    m_conn->writeCommand(Interface::Commands::C_WriteHiddenBlock, QVariant::fromValue(block));
 #endif
 }
 
@@ -128,4 +143,31 @@ timespec StmBroker::transform(google::protobuf::Timestamp timestamp) const
     temp.tv_nsec = timestamp.nanos();
     temp.tv_sec = timestamp.seconds();
     return temp;
+}
+
+void StmBroker::updateBsi(const DataTypes::BitStringStruct &resp)
+{
+    switch (resp.sigAdr)
+    {
+    case ModuleSerialNumAdr:
+        m_settings.serialNum = resp.sigVal;
+        break;
+    case SerialNumBAdr:
+        m_settings.serialNumB = resp.sigVal;
+        break;
+    case HWAdr:
+        m_settings.hwVersion = resp.sigVal;
+        break;
+    case SWAdr:
+        m_settings.swVersion = resp.sigVal;
+        break;
+    }
+    if (m_settings.isModuleInfoFilled())
+    {
+        Alise::AliseConstants::s_moduleInfo.ModuleSerialNumber = m_settings.serialNum;
+        Alise::AliseConstants::s_moduleInfo.SerialNumber = m_settings.serialNumB;
+        Alise::AliseConstants::s_moduleInfo.HWVersion = m_settings.hwVersion;
+        m_settings.writeSetting();
+        emit ModuleInfoFilled();
+    }
 }

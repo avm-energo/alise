@@ -21,7 +21,7 @@ signals:
     void timeReceived(timespec);
     void timeRequest();
     void healthReceived(uint32_t);
-    void helloReceived(quint32);
+    void helloReceived();
 
 private:
     zmq::context_t &_ctx;

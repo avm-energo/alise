@@ -28,7 +28,7 @@ const std::map<Interface::Commands, Proto::Commands> ProtocomRequestParser::s_pr
     { Commands::C_Reboot, Proto::WriteBlkCmd },                    //
     { Commands::C_GetMode, Proto::ReadMode },                      //
     { Commands::C_SetMode, Proto::WriteMode },                     //
-    { Commands::C_WriteHardware, Proto::WriteHardware }            //
+    { Commands::C_WriteHiddenBlock, Proto::WriteHiddenBlock }            //
 };
 
 ProtocomRequestParser::ProtocomRequestParser(QObject *parent) : BaseRequestParser(parent)
@@ -130,7 +130,7 @@ QByteArray ProtocomRequestParser::parse(const CommandStruct &cmd)
         break;
     }
     // block write, arg1 is BlockStruct of one quint32 (block ID) and one QByteArray (block contents)
-    case Commands::C_WriteHardware:
+    case Commands::C_WriteHiddenBlock:
     case Commands::C_WriteBlkDataTech:
     case Commands::C_SetNewConfiguration:
     case Commands::C_WriteTuningCoef:

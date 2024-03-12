@@ -67,32 +67,36 @@ find_package(Protobuf REQUIRED)
 
 set(SOURCES
     main.cpp
-    logger.cpp
-    logger.h
-    maincreator.cpp
-    maincreator.h
+    aliseconstants.cpp
+    aliseconstants.h
+    alisesettings.cpp
+    alisesettings.h
     avtukccu.h
-    timesyncronizer.cpp
-    timesyncronizer.h
-    helper.h
-    zerorunner.cpp
-    zerorunner.h
+    broker.cpp
+    broker.h
+    commandlineparser.cpp
+    commandlineparser.h
     controller.cpp
     controller.h
     controllerfabric.cpp
     controllerfabric.h
+    helper.h
+    logger.cpp
+    logger.h
+    maincreator.cpp
+    maincreator.h
+    recovery.cpp
+    recovery.h
+    timesyncronizer.cpp
+    timesyncronizer.h
     zeropublisher.cpp
     zeropublisher.h
+    zerorunner.cpp
+    zerorunner.h
     zerosubscriber.cpp
     zerosubscriber.h
     ${AVTUK_MODULE_PATH}/interfaces.qrc
-    recovery.cpp
-    recovery.h
-    aliseconstants.cpp
-    aliseconstants.h
     protos/protos.proto
-    broker.cpp
-    broker.h
     )
 
 if (ALISE_STM)

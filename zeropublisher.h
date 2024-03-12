@@ -33,7 +33,7 @@ public slots:
     void publishTime(const timespec &time);
     void publishPowerStatus(const AVTUK_CCU::Main powerStatus);
     void publishBlock(const DataTypes::BlockStruct blk);
-    void publishHello(const quint32 code);
+    void publishHello();
     void publishNtpStatus(bool status);
     void publishHealthQuery();
 
