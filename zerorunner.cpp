@@ -33,6 +33,9 @@ void ZeroRunner::runServer(int port)
     connect(
         m_subscriber, &ZeroSubscriber::helloReceived, m_publisher, &ZeroPublisher::publishHello, Qt::DirectConnection);
 
+    connect(m_subscriber, &ZeroSubscriber::pingRequest, m_publisher, &ZeroPublisher::publishPingReply,
+        Qt::DirectConnection);
+
     connect(m_subscriber, &ZeroSubscriber::timeRequest, this, &ZeroRunner::timeRequest);
     connect(m_subscriber, &ZeroSubscriber::timeReceived, this, &ZeroRunner::timeReceived);
 

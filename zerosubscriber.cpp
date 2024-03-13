@@ -24,6 +24,7 @@ void ZeroSubscriber::work()
             auto ms = _worker.recv(msg);
             std::string data(msg.to_string());
             std::string iden(identity.to_string());
+            iden = "[ " + iden + "in ] ";
             alise::PackedMessage packedMessage;
             packedMessage.ParseFromString(data);
             const auto &messageContent = packedMessage.content();
@@ -35,7 +36,7 @@ void ZeroSubscriber::work()
                     qWarning() << Error::WriteError;
                     continue;
                 }
-                qDebug() << "[ " << iden.c_str() << "in ] Health :" << protoHealth->code();
+                qDebug() << iden.c_str() << "Health :" << protoHealth->code();
                 emit healthReceived(protoHealth->code());
                 delete protoHealth;
             }
@@ -50,7 +51,7 @@ void ZeroSubscriber::work()
                 timespec unixTime;
                 unixTime.tv_sec = protoTime.seconds();
                 unixTime.tv_nsec = protoTime.nanos();
-                qDebug() << "[ " << iden.c_str() << "in ] Time :" << unixTime.tv_sec << ":" << unixTime.tv_nsec;
+                qDebug() << iden.c_str() << "Time :" << unixTime.tv_sec << ":" << unixTime.tv_nsec;
                 emit timeReceived(unixTime);
             }
             else if (messageContent.Is<alise::HelloRequest>())
@@ -61,7 +62,7 @@ void ZeroSubscriber::work()
                     qWarning() << Error::WriteError;
                     continue;
                 }
-                qDebug() << "[ " << iden.c_str() << "in ] HelloReq :" << helloAlise.message();
+                qDebug() << iden.c_str() << "HelloReq :" << helloAlise.message();
                 emit helloReceived();
             }
             else if (messageContent.Is<alise::TimeRequest>())
@@ -72,8 +73,13 @@ void ZeroSubscriber::work()
                     qWarning() << Error::WriteError;
                     continue;
                 }
-                qDebug() << "[ " << iden.c_str() << "in ] TimeReq";
+                qDebug() << iden.c_str() << "TimeReq";
                 emit timeRequest();
+            }
+            else if (messageContent.Is<alise::PingRequest>())
+            {
+                qDebug() << iden.c_str() << "PingReq";
+                emit pingRequest();
             }
             else
             {

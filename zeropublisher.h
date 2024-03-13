@@ -36,6 +36,7 @@ public slots:
     void publishHello();
     void publishNtpStatus(bool status);
     void publishHealthQuery();
+    void publishPingReply();
 
 private:
     zmq::context_t &_ctx;

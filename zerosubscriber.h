@@ -20,6 +20,7 @@ public:
 signals:
     void timeReceived(timespec);
     void timeRequest();
+    void pingRequest();
     void healthReceived(uint32_t);
     void helloReceived();
 

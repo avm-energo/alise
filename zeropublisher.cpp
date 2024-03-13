@@ -110,6 +110,13 @@ void ZeroPublisher::publishHealthQuery()
     qDebug() << m_typeString + " Health";
 }
 
+void ZeroPublisher::publishPingReply()
+{
+    alise::PingReply reply;
+    appendToQueue(reply);
+    qDebug() << m_typeString + " Ping";
+}
+
 void ZeroPublisher::send(itemType &str)
 {
     zmq::message_t identity(str.first);
