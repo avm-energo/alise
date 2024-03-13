@@ -26,6 +26,7 @@ class StmBroker final : public Broker
 public:
     explicit StmBroker(QObject *parent = nullptr);
     bool connect() override;
+    bool connect(AliseSettings &asettings);
     void writeHiddenBlock();
 
 public slots:
@@ -42,10 +43,10 @@ private:
     QMutex _mutex;
     Interface::ConnectionManager *m_manager;
     Interface::AsyncConnection *m_conn;
-    AliseSettings m_settings;
+    //    AliseSettings m_settings;
 
 private slots:
-    void updateBsi(const DataTypes::BitStringStruct &resp);
+    void updateBsi(AliseSettings &m_settings, const DataTypes::BitStringStruct &resp);
 
 signals:
     void ModuleInfoFilled();

@@ -32,6 +32,9 @@ int main(int argc, char *argv[])
     a.setApplicationVersion(QString(ALISEVERSION) + "-" + gitVersion.getGitHash());
     StdFunc::Init();
 
+    settings.init();
+    settings.readSettings();
+
     if (!parser.parseCommandLine(settings))
         return 0;
 

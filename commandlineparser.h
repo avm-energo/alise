@@ -22,8 +22,6 @@ private:
     void setSerialNumberB(const QString &serialNumB);
     void setHWVersion(const QString &hwversion);
     void waitForBSIOrTimeout();
-    bool connectBroker();
-    //    AliseSettings m_settings;
 
 #ifdef AVTUK_NO_STM
     void listPins();

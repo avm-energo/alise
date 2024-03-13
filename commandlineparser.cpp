@@ -16,9 +16,6 @@ bool CommandLineParser::parseCommandLine(AliseSettings &settings)
 {
     QCommandLineParser parser;
 
-    settings.init();
-    settings.readSettings();
-
     parser.setApplicationDescription("Avtuk LInux SErver");
 #ifdef AVTUK_NO_STM
     QCommandLineOption showGpio("g", "List all gpios");
@@ -28,7 +25,7 @@ bool CommandLineParser::parseCommandLine(AliseSettings &settings)
     QCommandLineOption serialNumberB({ "b", "serialb" }, "Sets board serial number", "serialb");
     QCommandLineOption hardware({ "w", "hardware" }, "Sets module hardware version", "hardware");
     QCommandLineOption software({ "s", "software" }, "Sets module software version", "software");
-    QCommandLineOption listversion({ "l", "list" }, "Lists module versions and numbers", "list");
+    QCommandLineOption listversion({ "l", "list" }, "Lists module versions and numbers");
     parser.addOption(serialNumber);
     parser.addOption(serialNumberB);
     parser.addOption(hardware);
@@ -46,7 +43,8 @@ bool CommandLineParser::parseCommandLine(AliseSettings &settings)
             listPins();
         }
 #endif
-        if (!connectBroker())
+        m_broker = new StmBroker;
+        if (!m_broker->connect(settings))
         {
             std::cout << "Error connecting to broker";
             return false;
@@ -100,14 +98,6 @@ void CommandLineParser::setHWVersion(const QString &hwversion)
 }
 
 #else
-
-bool CommandLineParser::connectBroker()
-{
-    m_broker = new StmBroker;
-    if (!m_broker->connect())
-        return false;
-    return true;
-}
 
 void CommandLineParser::setSerialNumber(const QString &serialNum)
 {

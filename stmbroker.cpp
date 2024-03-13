@@ -45,13 +45,22 @@ bool StmBroker::connect()
         m_conn->connection(this, &StmBroker::currentIndicationReceived);
         m_conn->connection(static_cast<Broker *>(this), &Broker::updateBlock);
         m_conn->connection(static_cast<Broker *>(this), &StmBroker::updateTime);
-        m_conn->connection(this, &StmBroker::updateBsi);
-        m_conn->writeCommand(Interface::Commands::C_ReqBSI);
         return true;
     }
 #else
     return true;
 #endif
+}
+
+bool StmBroker::connect(AliseSettings &asettings)
+{
+    if (connect())
+    {
+        m_conn->connection(this, [&](const DataTypes::BitStringStruct &resp) { updateBsi(asettings, resp); });
+        m_conn->writeCommand(Interface::Commands::C_ReqBSI);
+        return true;
+    }
+    return false;
 }
 
 void StmBroker::writeHiddenBlock()
@@ -145,7 +154,7 @@ timespec StmBroker::transform(google::protobuf::Timestamp timestamp) const
     return temp;
 }
 
-void StmBroker::updateBsi(const DataTypes::BitStringStruct &resp)
+void StmBroker::updateBsi(AliseSettings &m_settings, const DataTypes::BitStringStruct &resp)
 {
     switch (resp.sigAdr)
     {
