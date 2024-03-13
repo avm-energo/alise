@@ -4,7 +4,6 @@
 #include <QMutex>
 #include <QObject>
 #include <QWaitCondition>
-#include <gen/datatypes.h>
 #include <vector>
 #include <zmq.hpp>
 
@@ -12,7 +11,6 @@ class ZeroSubscriber : public QObject
 {
     Q_OBJECT
 public:
-    using healthType = alise::Health_Code;
     explicit ZeroSubscriber(zmq::context_t &ctx, int sock_type, QObject *parent = nullptr);
     void work();
     void stop()
@@ -22,8 +20,8 @@ public:
 signals:
     void timeReceived(timespec);
     void timeRequest();
-    void healthReceived(ZeroSubscriber::healthType);
-    void helloReceived(quint32);
+    void healthReceived(uint32_t);
+    void helloReceived();
 
 private:
     zmq::context_t &_ctx;
@@ -32,5 +30,3 @@ private:
     QWaitCondition _waiter;
     bool is_active = true;
 };
-
-Q_DECLARE_METATYPE(ZeroSubscriber::healthType)

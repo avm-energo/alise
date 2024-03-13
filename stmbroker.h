@@ -1,42 +1,52 @@
 #pragma once
 
+#include "alisesettings.h"
 #include "avtukccu.h"
 #include "broker.h"
-#include "protos/protos.pb.h"
 
+#include <QMutex>
 #include <QObject>
 #include <QTimer>
-#include <gen/datamanager/typesproxy.h>
-#include <gen/datatypes.h>
 #include <gen/stdfunc.h>
 
-//#define TEST_INDICATOR
-
-class Protocom;
-
-class StmBroker : public Broker
+namespace Interface
 {
+class AsyncConnection;
+class ConnectionManager;
+} // namespace Interface
+
+class StmBroker final : public Broker
+{
+    Q_OBJECT
+    static constexpr int HWAdr = 3;
+    static constexpr int SWAdr = 4;
+    static constexpr int SerialNumBAdr = 10;
+    static constexpr int ModuleSerialNumAdr = 13;
+
 public:
-    StmBroker(QObject *parent = nullptr);
+    explicit StmBroker(QObject *parent = nullptr);
     bool connect() override;
+    void writeHiddenBlock();
 
 public slots:
     void checkPowerUnit() override;
     void checkIndication() override;
-    void setIndication() override;
-    void setTime(timespec time) override;
+    void setIndication(const AVTUK_CCU::Indication &indication) override;
+    void setTime(const timespec &time) override;
     void getTime() override;
     void rebootMyself() override;
-    void currentIndicationReceived(const QVariant &msg) override;
+    void currentIndicationReceived(const DataTypes::BlockStruct &blk);
 
 private:
-    AVTUK_CCU::Indication transformBlinkPeriod() const;
     timespec transform(google::protobuf::Timestamp timestamp) const;
     QMutex _mutex;
-    Protocom *m_interface;
-    //    UniquePointer<DataTypesProxy> proxyBS, proxyBStr;
+    Interface::ConnectionManager *m_manager;
+    Interface::AsyncConnection *m_conn;
+    AliseSettings m_settings;
 
-#ifdef TEST_INDICATOR
-    QTimer m_testTimer;
-#endif
+private slots:
+    void updateBsi(const DataTypes::BitStringStruct &resp);
+
+signals:
+    void ModuleInfoFilled();
 };

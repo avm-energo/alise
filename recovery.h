@@ -1,6 +1,7 @@
 #ifndef RECOVERY_H
 #define RECOVERY_H
 
+#include <QObject>
 #include <gen/datatypes.h>
 
 class RecoveryEngine : public QObject
@@ -10,7 +11,7 @@ public:
     RecoveryEngine(QObject *parent = nullptr);
 
 public slots:
-    void receiveBlock(const QVariant &msg);
+    void receiveBlock(const DataTypes::BlockStruct &blk);
 
 signals:
     void rebootReq();

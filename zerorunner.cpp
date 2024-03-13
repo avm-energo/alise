@@ -7,6 +7,7 @@
 #include <QMutexLocker>
 #include <QTimer>
 #include <fstream>
+#include <gen/datatypes.h>
 #include <iostream>
 #include <thread>
 
@@ -23,7 +24,6 @@ ZeroRunner::ZeroRunner(const QString &type, QObject *parent)
 
 void ZeroRunner::runServer(int port)
 {
-    qRegisterMetaType<ZeroSubscriber::healthType>("healthType");
     qRegisterMetaType<timespec>();
     qRegisterMetaType<AVTUK_CCU::Main>();
     frontend_.bind("tcp://*:" + std::to_string(port));
@@ -65,15 +65,14 @@ void ZeroRunner::publishNtpStatus(bool status)
     m_publisher->publishNtpStatus(status);
 }
 
-void ZeroRunner::publishBlock(const QVariant &msg)
+void ZeroRunner::publishBlock(const DataTypes::BlockStruct &blk)
 {
-    auto blk = msg.value<DataTypes::BlockStruct>();
     m_publisher->publishBlock(blk);
 }
 
-void ZeroRunner::publishTime(const QVariant &msg)
+void ZeroRunner::publishTime(const timespec &time)
 {
-    m_publisher->publishTime(msg);
+    m_publisher->publishTime(time);
 }
 
 void ZeroRunner::polling()

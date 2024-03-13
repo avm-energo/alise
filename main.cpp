@@ -1,88 +1,44 @@
-
-#include "aliseconstants.h"
+#include "alisesettings.h"
+#include "commandlineparser.h"
 #include "controllerfabric.h"
 #include "gitversion/gitversion.h"
+#include "logger.h"
+#include "maincreator.h"
 
 #include <QCoreApplication>
 #include <config.h>
-#include <gen/logger.h>
 #include <iostream>
 #include <memory>
-
-#ifdef AVTUK_NO_STM
-void listPins();
-#endif
 
 constexpr char ethPathString[] = "/etc/network/interfaces.d/eth";
 constexpr char ethResourcePathString[] = ":/network/eth";
 
 int main(int argc, char *argv[])
 {
+    MainCreator creator;
+    bool ok;
+    Broker *broker;
+    TimeSyncronizer *tm;
+    ControllerFabric fabric;
+    AliseSettings settings;
+    CommandLineParser parser;
+
     std::cout << "Started " << std::endl;
+
+    qRegisterMetaType<uint32_t>("uint32_t");
 
     GitVersion gitVersion;
     QCoreApplication a(argc, argv);
     a.setApplicationVersion(QString(ALISEVERSION) + "-" + gitVersion.getGitHash());
     StdFunc::Init();
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("Avtuk LInux SErver");
-#ifdef AVTUK_NO_STM
-    QCommandLineOption showGpio("g", "List all gpios");
-    parser.addOption(showGpio);
-#endif
-    parser.addHelpOption();
-    parser.addVersionOption();
-    if (QCoreApplication::arguments().size() > 1)
-    {
-        parser.process(QCoreApplication::arguments());
-#ifdef AVTUK_NO_STM
-        bool showPins = parser.isSet(showGpio);
-        if (showPins)
-        {
-            listPins();
-        }
-#endif
+    if (!parser.parseCommandLine(settings))
         return 0;
-    }
 
-#ifdef ALISE_LOCALDEBUG
-    QSettings settings("~/sonica/alise/settings/settings.ini", QSettings::IniFormat);
-    QString logFileName = settings.value("Logs/logfile", "~/sonica/alise/logs/alise.log").toString();
-#else
-    QSettings settings("/root/sonica/alise/settings/settings.ini", QSettings::IniFormat);
-    QString logFileName = settings.value("Logs/logfile", "/root/sonica/alise/logs/alise.log").toString();
-#endif
-    int logcounter = settings.value("Test/counter", "1").toInt();
-    settings.setValue("Test/counter", ++logcounter);
-    QString logLevel = settings.value("Logs/Loglevel", "Info").toString();
-    int portCore = settings.value("Main/CorePort", "5555").toInt();
-    int portBooter = settings.value("Main/BooterPort", "5556").toInt();
-    AliseConstants::setFailureBlinkPeriod(settings.value("Timers/FailureBlink", "50").toInt());
-    AliseConstants::setSonicaStartingBlinkPeriod(settings.value("Timers/StartingBlink", "250").toInt());
-    AliseConstants::setSonicaNormalBlinkPeriod(settings.value("Timers/NormalBlink", "500").toInt());
-    AliseConstants::setPowerCheckPeriod(settings.value("Timers/PowerCheckPeriod", "1000").toInt());
-    AliseConstants::setResetCheckPeriod(settings.value("Timers/ResetCheckPeriod", "1000").toInt());
-    AliseConstants::setHealthQueryPeriod(settings.value("Timers/HealthQueryPeriod", "1500").toInt());
-    AliseConstants::setGpioBlinkPeriod(settings.value("Timers/GpioBlinkPeriod", "50").toInt());
-    AliseConstants::setSecondsToHardReset(settings.value("Reset/TimeToWaitForHardReset", "4").toInt());
-    Logger::writeStart(logFileName);
-    Logger::setLogLevel(logLevel);
+    Logger::writeStart(settings.logFilename);
+    Logger::setLogLevel(settings.logLevel);
     qInstallMessageHandler(Logger::messageHandler);
-
-    qInfo() << "Reading settings from: " << settings.fileName();
-    qInfo() << "Startup information:";
-    qInfo() << "=========================";
-    qInfo() << "LogLevel: " << Logger::logLevel();
-    qInfo() << "CorePort: " << portCore;
-    qInfo() << "BooterPort: " << portBooter;
-    qInfo() << "FailureBlink freq:" << 1000 / AliseConstants::FailureBlinkPeriod() << " Hz";
-    qInfo() << "StartingBlink freq:" << 1000 / AliseConstants::SonicaStartingBlinkPeriod() << " Hz";
-    qInfo() << "NormalBlink freq:" << 1000 / AliseConstants::SonicaNormalBlinkPeriod() << " Hz";
-    qInfo() << "Power check period:" << AliseConstants::PowerCheckPeriod() << " ms";
-    qInfo() << "Reset check period:" << AliseConstants::ResetCheckPeriod() << " ms";
-    qInfo() << "Health query period:" << AliseConstants::HealthQueryPeriod() << " ms";
-    qInfo() << "Gpio blink check period:" << AliseConstants::GpioBlinkCheckPeriod() << " ms";
+    settings.logSettings();
 
     for (const QString ethLetter : { "0", "1", "2" })
     {
@@ -94,58 +50,33 @@ int main(int argc, char *argv[])
             qInfo() << "Recovery eth" << ethLetter << ": found";
     }
 
-    qInfo() << "=========================";
-    ControllerFabric fabric;
-    if (!fabric.getStatus())
+    qInfo() << "=========================\n";
+
+    creator.init();
+    broker = creator.create(ok);
+    if (!ok)
     {
-        qCritical() << "Fabric was not created, exiting";
+        qCritical() << "Can't create broker, exiting";
         return 11;
     }
-    if (!fabric.createController(Controller::ContrTypes::IS_BOOTER, portBooter))
+    tm = creator.getTimeSynchronizer();
+
+    if (!fabric.createController(Controller::ContrTypes::IS_BOOTER, settings.portBooter, broker, tm))
     {
         qCritical() << "Booter controller was not created, exiting";
         return 12;
     }
-    if (!fabric.createController(Controller::ContrTypes::IS_CORE, portCore))
+    if (!fabric.createController(Controller::ContrTypes::IS_CORE, settings.portCore, broker, tm))
     {
         qCritical() << "Core controller was not created, exiting";
         return 13;
+    }
+    if (!fabric.createController(Controller::ContrTypes::IS_ADMINJA, settings.portAdminja, broker, tm))
+    {
+        qCritical() << "Core controller was not created, exiting";
+        return 14;
     }
 
     std::cout << "Enter the event loop" << std::endl;
     return a.exec();
 }
-
-#ifdef AVTUK_NO_STM
-void listPins()
-{
-    for (auto &cit : ::gpiod::make_chip_iter())
-    {
-        std::cout << cit.name() << " - " << cit.num_lines() << " lines:" << ::std::endl;
-
-        for (auto &lit : ::gpiod::line_iter(cit))
-        {
-            std::cout << "\tline ";
-            std::cout.width(3);
-            std::cout << lit.offset() << ": ";
-
-            std::cout.width(12);
-            std::cout << (lit.name().empty() ? "unnamed" : lit.name());
-            std::cout << " ";
-
-            std::cout.width(12);
-            std::cout << (lit.consumer().empty() ? "unused" : lit.consumer());
-            std::cout << " ";
-
-            std::cout.width(8);
-            std::cout << (lit.direction() == ::gpiod::line::DIRECTION_INPUT ? "input" : "output");
-            std::cout << " ";
-
-            std::cout.width(10);
-            std::cout << (lit.active_state() == ::gpiod::line::ACTIVE_LOW ? "active-low" : "active-high");
-
-            std::cout << ::std::endl;
-        }
-    }
-}
-#endif

@@ -1,42 +1,15 @@
 #include "controllerfabric.h"
 
-#include "aliseconstants.h"
-
 ControllerFabric::ControllerFabric(QObject *parent) : QObject(parent)
 {
-#if defined(AVTUK_STM)
-    m_broker = new StmBroker(this);
-#elif defined(AVTUK_NO_STM)
-    m_broker = new GpioBroker(this);
-#endif
-    m_status = m_broker->connect();
-
-    QTimer *checkPowerTimer = new QTimer(this);
-    checkPowerTimer->setInterval(AliseConstants::PowerCheckPeriod());
-    QObject::connect(checkPowerTimer, &QTimer::timeout, m_broker, &Broker::checkPowerUnit);
-    checkPowerTimer->start();
-
-    QTimer *checkIndicationTimer = new QTimer(this);
-    checkIndicationTimer->setInterval(checkIndicationPeriod);
-    QObject::connect(checkIndicationTimer, &QTimer::timeout, m_broker, &Broker::checkIndication);
-    checkIndicationTimer->start();
 }
 
-bool ControllerFabric::createController(Controller::ContrTypes ofType, int port)
+bool ControllerFabric::createController(Controller::ContrTypes ofType, int port, Broker *broker, TimeSyncronizer *tm)
 {
-    const QMap<Controller::ContrTypes, QString> map = { { Controller::ContrTypes::IS_BOOTER, "sb" },
-        { Controller::ContrTypes::IS_CORE, "sc" }, { Controller::ContrTypes::IS_INCORRECT_TYPE, "unk" } };
-    if (!m_status)
-        return false;
-    Q_ASSERT(map.contains(ofType));
-    ZeroRunner *runner = new ZeroRunner(map[ofType], this);
-    Controller *controller = new Controller(m_broker, runner, this);
-    controller->ofType(ofType);
-    runner->runServer(port);
-    return controller->launch();
-}
-
-bool ControllerFabric::getStatus()
-{
-    return m_status;
+    Controller *controller = new Controller(this);
+    return controller             //
+        ->withBroker(broker)      //
+        ->withTimeSynchonizer(tm) //
+        ->ofType(ofType)          //
+        ->launchOnPort(port);     //
 }

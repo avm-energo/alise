@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.18)
-project(alise VERSION 1.2.4)
+project(alise VERSION 2.0.3)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -8,6 +8,8 @@ set(CMAKE_AUTORCC ON)
 
 option(ALISE_STM "Build with STM32 support" OFF)
 option(ALISE_LOCALDEBUG "Local debug on PC" OFF)
+#set(ALISE_BUILDFORDEB "bullseye" CACHE STRING "debian version to build for")
+set(ALISE_POSTFIX)
 
 find_package(QT NAMES Qt6 Qt5)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Xml REQUIRED)
@@ -20,9 +22,11 @@ endif()
 
 if (ALISE_STM)
     set(AVTUK_MODULE_PATH avtuk-14)
+    set(ALISE_POSTFIX stm)
     add_compile_definitions(AVTUK_STM)
 else()
     set(AVTUK_MODULE_PATH avtuk-12)
+    set(ALISE_POSTFIX nostm)
     add_compile_definitions(AVTUK_NO_STM)
     find_library(GPIODCXX_LIBRARY NAMES libgpiodcxx.so)
     if(NOT GPIODCXX_LIBRARY)
@@ -53,7 +57,6 @@ conan_cmake_configure(
 conan_cmake_install(
   PATH_OR_REFERENCE .
   BUILD missing
-  REMOTE conancenter
   SETTINGS ${settings})
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_BINARY_DIR}")
@@ -64,28 +67,36 @@ find_package(Protobuf REQUIRED)
 
 set(SOURCES
     main.cpp
+    aliseconstants.cpp
+    aliseconstants.h
+    alisesettings.cpp
+    alisesettings.h
     avtukccu.h
-    timesyncronizer.cpp
-    timesyncronizer.h
-    helper.h
-    zerorunner.cpp
-    zerorunner.h
+    broker.cpp
+    broker.h
+    commandlineparser.cpp
+    commandlineparser.h
     controller.cpp
     controller.h
     controllerfabric.cpp
     controllerfabric.h
+    helper.h
+    logger.cpp
+    logger.h
+    maincreator.cpp
+    maincreator.h
+    recovery.cpp
+    recovery.h
+    timesyncronizer.cpp
+    timesyncronizer.h
     zeropublisher.cpp
     zeropublisher.h
+    zerorunner.cpp
+    zerorunner.h
     zerosubscriber.cpp
     zerosubscriber.h
     ${AVTUK_MODULE_PATH}/interfaces.qrc
-    recovery.cpp
-    recovery.h
-    aliseconstants.cpp
-    aliseconstants.h
     protos/protos.proto
-    broker.cpp
-    broker.h
     )
 
 if (ALISE_STM)
@@ -101,7 +112,6 @@ endif()
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 add_subdirectory(gitversion)
-add_subdirectory(interfaces)
 target_include_directories(${PROJECT_NAME} PUBLIC ${CONAN_INCLUDE_DIRS_CPPZMQ})
 
 protobuf_generate(
@@ -112,12 +122,13 @@ protobuf_generate(
 configure_file(${CMAKE_SOURCE_DIR}/cconfig.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h @ONLY)
 
 if (ALISE_STM)
+    add_subdirectory(interfaces)
     ##WARNING Link interfaces before gen (!)
-    target_link_libraries(${PROJECT_NAME} interfaces)
+    target_link_libraries(${PROJECT_NAME} PUBLIC interfaces)
 else()
-    target_link_libraries(${PROJECT_NAME} ${GPIODCXX_LIBRARY})
+    target_link_libraries(${PROJECT_NAME} PUBLIC gen ${GPIODCXX_LIBRARY})
 endif()
-target_link_libraries(${PROJECT_NAME} gen Qt5::Core Qt5::Xml pthread gitversion ZeroMQ::libzmq-static cppzmq::cppzmq protobuf::libprotobuf)
+target_link_libraries(${PROJECT_NAME} PUBLIC Qt5::Xml pthread gitversion ZeroMQ::libzmq-static cppzmq::cppzmq protobuf::libprotobuf)
 
 install(TARGETS ${PROJECT_NAME})
 
@@ -145,8 +156,12 @@ if (REQUIRED_SERVICE_PATH)
     install(FILES ${SERVICE_PATH_NAME} DESTINATION share)
 endif()
 
-if (NOT EXISTS /root/sonica/alise/settings/settings.ini)
-    install(FILES settings.ini DESTINATION /root/sonica/alise/settings)
+if (NOT EXISTS /avtuk/settings/alise/settings/settings.ini)
+    install(FILES settings.ini DESTINATION /avtuk/settings/alise/settings)
+endif ()
+
+if (NOT EXISTS /avtuk/sonica/alise/settings/settings.ini)
+    install(FILES booter/settings.ini DESTINATION /avtuk/sonica/alise/settings)
 endif ()
 
 # Configure the scripts that are executed by the DEB.
@@ -170,7 +185,7 @@ configure_file(${PRERM_IN} ${PRERM_OUT} @ONLY)
 
 set(CONFFILE ${CMAKE_CURRENT_SOURCE_DIR}/deb-scripts/conffiles)
 
-set(CPACK_PACKAGE_FILE_NAME ${PROJECT_NAME}-${PROJECT_VERSION})
+set(CPACK_PACKAGE_FILE_NAME ${PROJECT_NAME}-${ALISE_POSTFIX}-${PROJECT_VERSION})
 set(CPACK_GENERATOR "DEB")
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER "AVM-Energo") #required
 set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "Avtuk LInux SErver")

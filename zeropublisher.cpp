@@ -1,10 +1,13 @@
 #include "zeropublisher.h"
 
+#include "alisesettings.h"
+#include "gitversion/gitversion.h"
 #include "protos/protos.pb.h"
 
 #include <QDebug>
 #include <config.h>
 #include <functional>
+#include <gen/datatypes.h>
 #include <memory>
 #include <random>
 #include <thread>
@@ -12,7 +15,7 @@
 ZeroPublisher::ZeroPublisher(const QString &type, zmq::context_t &ctx, int sock_type, QObject *parent)
     : QObject(parent), _ctx(ctx), _worker(_ctx, sock_type)
 {
-    m_typeString = "[ " + type + " ]";
+    m_typeString = "[ " + type + "out ]";
     m_type = type.toStdString();
 }
 
@@ -46,23 +49,23 @@ template <typename T> void ZeroPublisher::appendToQueue(const T &paylod)
     _waiter.wakeOne();
 }
 
-void ZeroPublisher::publishTime(const QVariant &msg)
+void ZeroPublisher::publishTime(const timespec &time)
 {
-    auto time = msg.value<timespec>();
     google::protobuf::Timestamp protoTime;
     protoTime.set_seconds(time.tv_sec);
     protoTime.set_nanos(time.tv_nsec);
     appendToQueue(protoTime);
-    qDebug() << m_typeString + " => Time : " << time.tv_sec;
+    qDebug() << m_typeString + " Time : " << time.tv_sec;
 }
 
 void ZeroPublisher::publishPowerStatus(const AVTUK_CCU::Main powerStatus)
 {
     alise::PowerStatus protoPower;
     protoPower.set_pwrin(powerStatus.PWRIN);
+    protoPower.set_resetreq(powerStatus.resetReq);
     appendToQueue(protoPower);
-    qDebug() << m_typeString + " => Power : " << powerStatus.PWRIN;
-    qDebug() << m_typeString + " => Reset : " << powerStatus.resetReq;
+    qDebug() << m_typeString + " Power : " << powerStatus.PWRIN;
+    qDebug() << m_typeString + " Reset : " << powerStatus.resetReq;
 }
 
 void ZeroPublisher::publishBlock(const DataTypes::BlockStruct blk)
@@ -75,13 +78,20 @@ void ZeroPublisher::publishBlock(const DataTypes::BlockStruct blk)
     }
 }
 
-void ZeroPublisher::publishHello(const quint32 code)
+void ZeroPublisher::publishHello()
 {
-    Q_UNUSED(code)
+    AliseSettings settings;
+    settings.init();
+    settings.readSettings();
     alise::HelloReply helloReply;
-    helloReply.set_message(ALISEVERSION);
+    GitVersion gitVersion;
+    QString AliseVersion = QString(ALISEVERSION) + "-" + gitVersion.getGitHash();
+    helloReply.set_message(AliseVersion.toStdString());
+    helloReply.set_hwversion(settings.versionStr(settings.hwVersion).toStdString());
+    helloReply.set_serialnum(QString::number(settings.serialNum).toStdString());
+    helloReply.set_swversion(settings.versionStr(settings.swVersion).toStdString());
     appendToQueue(helloReply);
-    qDebug() << m_typeString + " => HelloReply version: " << ALISEVERSION;
+    qDebug() << m_typeString + " HelloReply version: " << ALISEVERSION;
 }
 
 void ZeroPublisher::publishNtpStatus(bool status)
@@ -89,7 +99,7 @@ void ZeroPublisher::publishNtpStatus(bool status)
     alise::NtpStatus ntpStatus;
     ntpStatus.set_isntpenabled(status);
     appendToQueue(ntpStatus);
-    qDebug() << m_typeString + " => Ntp : " << status;
+    qDebug() << m_typeString + " Ntp : " << status;
 }
 
 void ZeroPublisher::publishHealthQuery()
@@ -97,7 +107,7 @@ void ZeroPublisher::publishHealthQuery()
     alise::HealthQuery query;
     query.set_query(true);
     appendToQueue(query);
-    qDebug() << m_typeString + " => Health";
+    qDebug() << m_typeString + " Health";
 }
 
 void ZeroPublisher::send(itemType &str)

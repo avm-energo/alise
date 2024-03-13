@@ -1,7 +1,5 @@
 #include "timesyncronizer.h"
 
-#include "helper.h"
-
 #include <QDateTime>
 #include <QProcess>
 #include <QTimer>
@@ -47,23 +45,28 @@
 
 #define NTPSTATUSPERIOD 3000
 
-void printts(const timespec &st)
-{
-    auto datetime = QDateTime::fromMSecsSinceEpoch(((st.tv_sec * 1000) + (st.tv_nsec / 1.0e6)));
-    std::cout << datetime.toString().toStdString().c_str() << std::endl;
-    std::cout << st << std::endl;
-}
-
 TimeSyncronizer::TimeSyncronizer(QObject *parent) : QObject(parent)
 {
-    QTimer *timer = new QTimer(this);
-    timer->setInterval(NTPSTATUSPERIOD);
-    connect(timer, &QTimer::timeout, this, [this] { emit ntpStatusChanged(ntpStatus()); });
-    timer->start();
 }
 
 TimeSyncronizer::~TimeSyncronizer()
 {
+}
+
+void TimeSyncronizer::init()
+{
+    m_timeCounter = 0;
+    emit ntpStatusChanged(ntpStatus()); // first time we must emit ntpStatus
+    QTimer *timer = new QTimer(this);
+    timer->setInterval(NTPSTATUSPERIOD);
+    connect(timer, &QTimer::timeout, this, &TimeSyncronizer::checkNtpAndSetTime);
+    timer->start();
+}
+
+void printts(const timespec &st)
+{
+    auto datetime = QDateTime::fromMSecsSinceEpoch(((st.tv_sec * 1000) + (st.tv_nsec / 1.0e6)));
+    qDebug() << "Setting datetime: " << datetime;
 }
 
 void TimeSyncronizer::printAndSetSystemTime(const timespec time)
@@ -75,7 +78,11 @@ void TimeSyncronizer::printAndSetSystemTime(const timespec time)
 timespec TimeSyncronizer::systemTime() const
 {
     timespec time;
-    clock_gettime(CLOCK_REALTIME, &time);
+    struct timeval timeToGet;
+    gettimeofday(&timeToGet, NULL);
+    //    clock_gettime(CLOCK_REALTIME, &time);
+    time.tv_sec = timeToGet.tv_sec;
+    time.tv_nsec = timeToGet.tv_usec * 1000;
     return time;
 }
 
@@ -84,34 +91,82 @@ void TimeSyncronizer::setSystemTime(const timespec &systemTime)
     QString program = "/usr/sbin/hwclock";
     QStringList arguments { "-w" };
 
-    clock_settime(CLOCK_REALTIME, &systemTime); // set current datetime
-    QProcess *myProcess = new QProcess(this);   // set datetime to RTC
-    qInfo() << "HWClock is starting...";
+    struct timeval timeToSet;
+    timeToSet.tv_sec = systemTime.tv_sec;
+    timeToSet.tv_usec = 0;
+    settimeofday(&timeToSet, NULL);
+    //    clock_settime(CLOCK_REALTIME, &systemTime); // set current datetime
+    QProcess *myProcess = new QProcess(this); // set datetime to RTC
+    qInfo() << "Set hwclock time: " << systemTime.tv_sec;
     myProcess->start(program, arguments);
     myProcess->waitForFinished();
     qInfo() << "HWClock exited with code: " << myProcess->exitCode() << " and status: " << myProcess->exitStatus();
 }
 
+void TimeSyncronizer::checkNtpAndSetTime()
+{
+    bool status = ntpStatus();
+    ++m_timeCounter;
+    if (m_timeCounter >= 20) // one time per minute
+    {
+        if (status)
+        {
+            m_timeCounter = 0;
+            emit setTime(systemTime());
+        }
+        emit ntpStatusChanged(status);
+    }
+}
+
 bool TimeSyncronizer::ntpStatus() const
 {
-    ntptimeval time;
-    int status = ntp_gettime(&time);
-    qDebug() << "NTP Status: " << status;
-    switch (status)
+    QString output;
+#if defined(Q_OS_LINUX)
+    QProcess process;
+    QString program = "/usr/bin/ntpq";
+    QStringList arguments { "-pn" };
+    process.start(program, arguments);
+
+    if (!process.waitForFinished(1000))
     {
-    case TIME_OK:
-        return true;
-    case TIME_INS:
-        return true;
-    case TIME_DEL:
-        return true;
-    case TIME_OOP:
-        return true;
-    case TIME_WAIT:
-        return true;
-    case TIME_ERROR:
-    default:
+        qWarning() << "ntpq start error: " << process.errorString();
         return false;
-        // return !ntpdStatus();
     }
+    output = process.readAllStandardOutput();
+#else
+    QFile file(qApp->applicationDirPath() + "/ntpq_output.txt");
+    if (file.exists() && file.open(QIODevice::ReadOnly))
+    {
+        output = file.readAll();
+        file.close();
+    }
+#endif
+    //    qDebug() << "Ntpq -pn output: " << output;
+    if (output.isEmpty())
+    {
+        qWarning() << "ntpq output is empty!";
+        return false;
+    }
+    if (output.contains("Connection refused"))
+    {
+        qWarning() << "ntpq error: connection refused";
+        return false;
+    }
+
+    // Split ntpq output
+    QStringList lines = output.split('\n');
+    if (lines.size() < 2)
+    {
+        qWarning() << "ntpq output is wrong!";
+        return false;
+    }
+    // Removing ntpq table header
+    lines.removeFirst(); //     remote           refid      st t when poll reach   delay   offset  jitter
+    lines.removeFirst(); //==============================================================================
+    foreach (QString str, lines)
+    {
+        if (str.startsWith("*")) // ntp is synchronized
+            return true;
+    }
+    return false;
 }

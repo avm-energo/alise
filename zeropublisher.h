@@ -8,10 +8,10 @@
 #include <queue>
 #include <vector>
 #include <zmq.hpp>
-Q_DECLARE_METATYPE(AVTUK_CCU::Main);
-Q_DECLARE_METATYPE(AVTUK_CCU::Indication);
 
 #define LOG_PROTOBUF
+Q_DECLARE_METATYPE(AVTUK_CCU::Main);
+Q_DECLARE_METATYPE(AVTUK_CCU::Indication);
 
 class ZeroPublisher : public QObject
 {
@@ -30,10 +30,10 @@ public:
 
 signals:
 public slots:
-    void publishTime(const QVariant &msg);
+    void publishTime(const timespec &time);
     void publishPowerStatus(const AVTUK_CCU::Main powerStatus);
     void publishBlock(const DataTypes::BlockStruct blk);
-    void publishHello(const quint32 code);
+    void publishHello();
     void publishNtpStatus(bool status);
     void publishHealthQuery();
 

@@ -1,13 +1,11 @@
 #pragma once
+
 #include "broker.h"
-#include "gen/stdfunc.h"
-#include "recovery.h"
 #include "timesyncronizer.h"
 #include "zerorunner.h"
 
 #include <QObject>
 #include <QThread>
-#include <gen/datamanager/typesproxy.h>
 
 class Controller : public QObject
 {
@@ -16,27 +14,31 @@ public:
     {
         IS_BOOTER,
         IS_CORE,
+        IS_ADMINJA,
         IS_INCORRECT_TYPE
     };
 
-    explicit Controller(Broker *devBroker, ZeroRunner *runner, QObject *parent = nullptr) noexcept;
-
-    ~Controller() override;
-
-    bool launch();
+    explicit Controller(QObject *parent = nullptr) noexcept;
     void shutdown();
     void syncTime(const timespec &);
-    void ofType(ContrTypes type);
-signals:
+    Controller *withBroker(Broker *broker);
+    Controller *withTimeSynchonizer(TimeSyncronizer *tm);
+    Controller *ofType(ContrTypes type);
+    bool launchOnPort(int port);
 
 private:
-    bool hasIncorrectType();
+    bool isIncorrectType();
+    void adminjaSetup();
+    void booterSetup();
+    void coreSetup();
+
     ContrTypes m_type;
     ZeroRunner *m_runner;
+    TimeSyncronizer *m_timeSynchronizer;
     Broker *m_deviceBroker;
     QTimer *m_pingTimer;
-    TimeSyncronizer m_timeSynchronizer;
-    RecoveryEngine m_recoveryEngine;
     int syncCounter = 0;
-    UniquePointer<DataTypesProxy> proxyBS, proxyTS;
+    const QMap<Controller::ContrTypes, QString> c_controllerMap
+        = { { Controller::ContrTypes::IS_ADMINJA, "sa" }, { Controller::ContrTypes::IS_BOOTER, "sb" },
+              { Controller::ContrTypes::IS_CORE, "sc" }, { Controller::ContrTypes::IS_INCORRECT_TYPE, "unk" } };
 };

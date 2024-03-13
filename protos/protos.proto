@@ -13,6 +13,9 @@ message HelloRequest {
 
 message HelloReply {
   string message = 1;
+  string serialnum = 2;
+  string hwversion = 3;
+  string swversion = 4;
 }
 
 //reply Timestamp
@@ -27,39 +30,37 @@ message HealthQuery {
   bool query = 1;
 }
 
-
-// | Наименование           | Описание                                               | Режим индикации                                       |
-// | ---------------------- | ------------------------------------------------------ | ----------------------------------------------------- |
-// | Работа (R)             | Штатный режим работы                                   | Постоянное мигание с частотой 1 Гц (1 раз в секунду)  |
-// | Запуск (S)             | Сервер запускается                                     | Постоянное мигание с частотой 4 Гц (4 раза в секунду) |
-// | Обновление (U)         | Выполняется обновление ПО, можно вынимать карту памяти | 2 коротких, 1 длинный                                 |
-// | Отказ запуска (FR)     | Сервер не смог запуститься причина не известна         | 3 коротких, 1 длинный                                 |
-// | Нет проекта (FE)       | Рабочий проект не найден                               | 4 коротких, 1 длинный                                 |
-// | Ошибка проекта (FP)    | В проекте найдены блоки которые отсутствуют в ПО       | 5 коротких, 1 длинный                                 |
-// | Отсутствие ПО (FW)     | В контроллере отсутствует валидное ПО                  | 6 коротких, 1 длинный                                 |
-// | Ошибка загрузчика (FB) | Загрузчик не смог запустить сервер                     | 7 коротких, 1 длинный                                 |
-// | Ошибка настроек (FS)   | Файл настроек не найден                                | 8 коротких, 1 длинный                                 |
-
-
 message Health {
-// Health code as proposal
-  enum Code {
-  Startup = 0;
-  Work = 1;  
-  Update = 2;
-  StartupFail = 3;
-  NoProject= 4;
-  ProjectError = 5;
-  NoFirmware = 6;
-  BootloaderError = 7;
-  SettingsError = 8;
-  }
-  Code code = 1;
+// code bits: 0 - there's some errors
+// 1 - adminja working normal
+// 2 - core working normal
+// 3 - ninja working normal
+// 4 - vasya working normal
+// 5 - petya working normal
+// 8-10 - adminja status:
+//     000 - not working (none)
+//     001 - not installed
+//     010 - starting
+//     011 - need to merge settings
+//     100 - unknown status
+//     101 - stopping
+//     110 - stopped
+//     111 - unknown status
+// 11-13 - core status
+// 14-16 - ninja status
+// 17-19 - vasya status
+// 20-22 - petya status
+  uint32 code = 1;
   string Desc = 2;
 }  
 
+// PWRIN code bits:
+// 0 - PWR2
+// 1 - PWR1
+
 message PowerStatus {
   uint32 PWRIN = 1;
+  uint32 ResetReq = 2;
 }
 
 message PackedMessage {

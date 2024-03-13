@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QProcess>
+#include <gen/datatypes.h>
 
 constexpr char ethPathString[] = "/etc/network/interfaces.d/eth";
 constexpr char ethResourcePathString[] = ":/network/eth";
@@ -61,9 +62,8 @@ void RecoveryEngine::restartNetwork()
     myProcess->waitForFinished();
 }
 
-void RecoveryEngine::receiveBlock(const QVariant &msg)
+void RecoveryEngine::receiveBlock(const DataTypes::BlockStruct &blk)
 {
-    auto blk = msg.value<DataTypes::BlockStruct>();
     qDebug() << "[Recovery] <= MCU : Block ID = " << blk.ID << ", data = " << blk.data;
     switch (blk.ID)
     {

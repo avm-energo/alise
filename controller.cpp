@@ -2,52 +2,26 @@
 
 #include "aliseconstants.h"
 
+#include <QDebug>
 #include <QTimer>
 #include <iostream>
 
-Controller::Controller(Broker *devBroker, ZeroRunner *runner, QObject *parent) noexcept
-    : QObject(parent), m_runner(runner), m_deviceBroker(devBroker)
-{
-
-    m_type = IS_INCORRECT_TYPE;
-    proxyBS = UniquePointer<DataTypesProxy>(new DataTypesProxy(&DataManager::GetInstance()));
-    proxyBS->RegisterType<DataTypes::BlockStruct>();
-#ifdef __linux__
-    proxyTS = UniquePointer<DataTypesProxy>(new DataTypesProxy(&DataManager::GetInstance()));
-    proxyTS->RegisterType<timespec>();
-#endif
-}
-
-Controller::~Controller()
+Controller::Controller(QObject *parent) noexcept : QObject(parent)
 {
 }
 
-bool Controller::launch()
+bool Controller::launchOnPort(int port)
 {
-    if (hasIncorrectType())
+    if (isIncorrectType())
     {
         qCritical() << "Controller has incorrect type or no type was given";
         return false;
     }
-
-    // timer to periodically check the connection
-    m_pingTimer = new QTimer;
-    m_pingTimer->setInterval(AliseConstants::HealthQueryPeriod());
-
-    // publish data to zeroMQ channel common to all the controllers
-    connect(m_pingTimer, &QTimer::timeout, m_runner, &ZeroRunner::publishHealthQueryCallback);
-    connect(proxyBS.get(), &DataTypesProxy::DataStorable, m_runner, &ZeroRunner::publishBlock);
-
-    // RecoveryEngine: rebooting and Power Status get from MCU
-    connect(&m_recoveryEngine, &RecoveryEngine::rebootReq, m_deviceBroker, &Broker::rebootMyself);
-    connect(proxyBS.get(), &DataTypesProxy::DataStorable, &m_recoveryEngine, &RecoveryEngine::receiveBlock);
-    connect(proxyBS.get(), &DataTypesProxy::DataStorable, m_deviceBroker, &Broker::currentIndicationReceived);
-
-    m_pingTimer->start();
+    m_runner->runServer(port);
 #if defined(AVTUK_STM)
     m_deviceBroker->getTime();
 #elif defined(AVTUK_NO_STM)
-    m_timeSynchronizer.systemTime();
+    m_timeSynchronizer->systemTime();
 #endif
     return true;
 }
@@ -61,66 +35,77 @@ void Controller::syncTime(const timespec &)
 {
 }
 
-void Controller::ofType(Controller::ContrTypes type)
+Controller *Controller::withBroker(Broker *broker)
 {
-    m_type = type;
+    m_deviceBroker = broker;
+    return this;
+}
+
+Controller *Controller::withTimeSynchonizer(TimeSyncronizer *tm)
+{
+    m_timeSynchronizer = tm;
+    return this;
+}
+
+Controller *Controller::ofType(Controller::ContrTypes type)
+{
+    if (!c_controllerMap.contains(type))
+        m_type = Controller::ContrTypes::IS_INCORRECT_TYPE;
+    else
+        m_type = type;
+    m_runner = new ZeroRunner(c_controllerMap[type], this);
     switch (type)
     {
+    case IS_ADMINJA:
+        adminjaSetup();
+        break;
     case IS_BOOTER:
-    {
-        connect(m_runner, &ZeroRunner::healthReceived, m_deviceBroker, &Broker::healthReceived);
+        booterSetup();
         break;
-    }
     case IS_CORE:
-    {
-        connect(m_runner, &ZeroRunner::timeReceived, &m_timeSynchronizer, &TimeSyncronizer::printAndSetSystemTime);
-#if defined(AVTUK_STM)
-        connect(m_runner, &ZeroRunner::timeReceived, m_deviceBroker, &Broker::setTime);
-        connect(m_runner, &ZeroRunner::timeRequest, m_deviceBroker, &Broker::getTime);
-#elif defined(AVTUK_NO_STM)
-        connect(m_runner, &ZeroRunner::timeRequest, &m_timeSynchronizer, //
-            [&] {
-                auto ts = m_timeSynchronizer.systemTime();
-                DataManager::GetInstance().addSignalToOutList(ts);
-            });
-#endif
-        connect(proxyTS.get(), &DataTypesProxy::DataStorable, m_runner, &ZeroRunner::publishTime, Qt::DirectConnection);
-        //    connect(&m_timeSynchronizer, &TimeSyncronizer::ntpStatusChanged, m_runner,
-        //    &ZeropublishNtpStatus);
-        connect(&m_timeSynchronizer, &TimeSyncronizer::ntpStatusChanged, this, [&](bool status) {
-            m_runner->publishNtpStatus(status);
-            if (!status)
-                return;
-            syncCounter++;
-            if (syncCounter == 60)
-            {
-#if defined(AVTUK_STM)
-                m_deviceBroker->setTime(m_timeSynchronizer.systemTime());
-#endif
-                syncCounter = 0;
-            }
-        });
-#ifdef __linux__
-        auto connectionTimeSync = std::shared_ptr<QMetaObject::Connection>(new QMetaObject::Connection);
-        *connectionTimeSync = connect(
-            proxyTS.get(), &DataTypesProxy::DataStorable, &m_timeSynchronizer,
-            // [=, &syncer = timeSync](const timespec &time) {
-            [=, &syncer = m_timeSynchronizer](const QVariant &msg) {
-                auto time = msg.value<timespec>();
-                QObject::disconnect(*connectionTimeSync);
-                syncer.printAndSetSystemTime(time);
-            },
-            Qt::DirectConnection);
-#endif
+        coreSetup();
         break;
-    }
     default:
         qCritical() << "Incorrect controller type";
         break;
     }
+    return this;
 }
 
-bool Controller::hasIncorrectType()
+void Controller::adminjaSetup()
 {
-    return (m_type != IS_BOOTER) && (m_type != IS_CORE);
+    connect(m_runner, &ZeroRunner::timeReceived, m_timeSynchronizer, &TimeSyncronizer::printAndSetSystemTime);
+#if defined(AVTUK_STM)
+    connect(m_runner, &ZeroRunner::timeReceived, m_deviceBroker, &Broker::setTime);
+    connect(m_runner, &ZeroRunner::timeRequest, m_deviceBroker, &Broker::getTime);
+#elif defined(AVTUK_NO_STM)
+    connect(m_runner, &ZeroRunner::timeRequest, m_timeSynchronizer, //
+        [this] { m_deviceBroker->updateTime(m_timeSynchronizer->systemTime()); });
+#endif
+    connect(m_deviceBroker, &Broker::receivedTime, m_runner, &ZeroRunner::publishTime, Qt::DirectConnection);
+    connect(m_timeSynchronizer, &TimeSyncronizer::ntpStatusChanged, this, [&](bool status) {
+        m_runner->publishNtpStatus(status);
+        if (!status)
+            return;
+    });
+}
+
+void Controller::booterSetup()
+{
+    m_pingTimer = new QTimer(this);
+    m_pingTimer->setInterval(Alise::AliseConstants::HealthQueryPeriod());
+    // publish data to zeroMQ channel
+    connect(m_pingTimer, &QTimer::timeout, m_runner, &ZeroRunner::publishHealthQueryCallback);
+    m_pingTimer->start();
+    connect(m_runner, &ZeroRunner::healthReceived, m_deviceBroker, &Broker::healthReceived);
+}
+
+void Controller::coreSetup()
+{
+    connect(m_deviceBroker, &Broker::receivedBlock, m_runner, &ZeroRunner::publishBlock);
+}
+
+bool Controller::isIncorrectType()
+{
+    return (m_type == IS_INCORRECT_TYPE);
 }
