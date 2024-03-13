@@ -26,12 +26,14 @@ bool CommandLineParser::parseCommandLine(AliseSettings &settings)
 #endif
     QCommandLineOption serialNumber({ "m", "serial" }, "Sets module serial number", "serial");
     QCommandLineOption serialNumberB({ "b", "serialb" }, "Sets board serial number", "serialb");
-    QCommandLineOption hardware({ "h", "hardware" }, "Sets module hardware version", "hardware");
+    QCommandLineOption hardware({ "w", "hardware" }, "Sets module hardware version", "hardware");
     QCommandLineOption software({ "s", "software" }, "Sets module software version", "software");
+    QCommandLineOption listversion({ "l", "list" }, "Lists module versions and numbers", "list");
     parser.addOption(serialNumber);
     parser.addOption(serialNumberB);
     parser.addOption(hardware);
     parser.addOption(software);
+    parser.addOption(listversion);
     parser.addHelpOption();
     parser.addVersionOption();
     if (QCoreApplication::arguments().size() > 1)
@@ -52,6 +54,14 @@ bool CommandLineParser::parseCommandLine(AliseSettings &settings)
 #ifdef AVTUK_STM
         if (!settings.isModuleInfoFilled())
             waitForBSIOrTimeout();
+        if (parser.isSet(listversion))
+        {
+            std::cout << "Module serial number: " << settings.serialNum << "\n";
+            std::cout << "Board serial number: " << settings.serialNumB << "\n";
+            std::cout << "Hardware version: " << settings.hwVersion << "\n";
+            std::cout << "Software version: " << settings.swVersion << "\n";
+            return false;
+        }
 #endif
         if (parser.isSet(serialNumber))
             setSerialNumber(parser.value("serial"));
