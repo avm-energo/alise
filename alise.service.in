@@ -1,11 +1,12 @@
 [Unit]
 Description=alise
+StartLimitIntervalSec=0
 
 [Service]
 Type=simple
 ExecStart=@EXE_PATH@
-Restart=on-failure
-RestartSec=60s
+Restart=always
+RestartSec=5s
 
 [Install]
 WantedBy=multi-user.target

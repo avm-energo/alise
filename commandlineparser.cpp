@@ -101,7 +101,7 @@ void CommandLineParser::setSerialNumber(const QString &serialNum)
     waitForBSIOrTimeout();
     Alise::AliseConstants::s_moduleInfo.ModuleSerialNumber = serialNum.toUInt();
     std::cout << "Set module serial number: " << serialNum.toStdString();
-    m_broker->writeHiddenBlock();
+    writeHiddenBlock();
 }
 
 void CommandLineParser::setSerialNumberB(const QString &serialNum)
@@ -109,7 +109,7 @@ void CommandLineParser::setSerialNumberB(const QString &serialNum)
     waitForBSIOrTimeout();
     Alise::AliseConstants::s_moduleInfo.SerialNumber = serialNum.toUInt();
     std::cout << "Set board serial number: " << serialNum.toStdString();
-    m_broker->writeHiddenBlock();
+    writeHiddenBlock();
 }
 
 void CommandLineParser::setHWVersion(const QString &hwversion)
@@ -117,7 +117,7 @@ void CommandLineParser::setHWVersion(const QString &hwversion)
     waitForBSIOrTimeout();
     Alise::AliseConstants::s_moduleInfo.HWVersion = hwversion.toUInt();
     std::cout << "Set HW version: " << hwversion.toStdString();
-    m_broker->writeHiddenBlock();
+    writeHiddenBlock();
 }
 
 void CommandLineParser::waitForBSIOrTimeout()
@@ -130,6 +130,19 @@ void CommandLineParser::waitForBSIOrTimeout()
     timer->start();
     loop->exec(QEventLoop::AllEvents);
 }
+
+void CommandLineParser::writeHiddenBlock()
+{
+    QTimer *timer = new QTimer;
+    timer->setInterval(1000); // 1 secs to wait for result
+    QEventLoop *loop = new QEventLoop;
+    connect(timer, &QTimer::timeout, loop, &QEventLoop::quit);
+    connect(m_broker, &StmBroker::operationCompleted, loop, &QEventLoop::quit);
+    timer->start();
+    m_broker->writeHiddenBlock();
+    loop->exec(QEventLoop::AllEvents);
+}
+
 #endif
 
 #ifdef AVTUK_NO_STM

@@ -146,6 +146,12 @@ void StmBroker::currentIndicationReceived(const DataTypes::BlockStruct &blk)
         memcpy(&m_currentIndication, blk.data.data(), sizeof(m_currentIndication));
 }
 
+void StmBroker::writeCompleted(const DataTypes::GeneralResponseStruct &resp)
+{
+    Q_UNUSED(resp)
+    emit operationCompleted();
+}
+
 timespec StmBroker::transform(google::protobuf::Timestamp timestamp) const
 {
     timespec temp;

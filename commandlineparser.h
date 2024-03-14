@@ -21,13 +21,13 @@ private:
     void setSerialNumber(const QString &serialNum);
     void setSerialNumberB(const QString &serialNumB);
     void setHWVersion(const QString &hwversion);
-    void waitForBSIOrTimeout();
 
 #ifdef AVTUK_NO_STM
     void listPins();
 #else
-
     StmBroker *m_broker;
+    void waitForBSIOrTimeout();
+    void writeHiddenBlock();
 
 #endif
 };

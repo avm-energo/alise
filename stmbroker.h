@@ -37,6 +37,7 @@ public slots:
     void getTime() override;
     void rebootMyself() override;
     void currentIndicationReceived(const DataTypes::BlockStruct &blk);
+    void writeCompleted(const DataTypes::GeneralResponseStruct &resp);
 
 private:
     timespec transform(google::protobuf::Timestamp timestamp) const;
@@ -50,4 +51,5 @@ private slots:
 
 signals:
     void ModuleInfoFilled();
+    void operationCompleted();
 };
