@@ -91,7 +91,7 @@ void ZeroPublisher::publishHello()
     helloReply.set_serialnum(QString::number(settings.serialNum).toStdString());
     helloReply.set_swversion(settings.versionStr(settings.swVersion).toStdString());
     appendToQueue(helloReply);
-    qDebug() << m_typeString + " HelloReply version: " << ALISEVERSION;
+    qDebug() << m_typeString + " HelloReply version: " << AliseVersion;
 }
 
 void ZeroPublisher::publishNtpStatus(bool status)

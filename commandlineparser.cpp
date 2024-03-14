@@ -43,13 +43,13 @@ bool CommandLineParser::parseCommandLine(AliseSettings &settings)
             listPins();
         }
 #endif
+#ifdef AVTUK_STM
         m_broker = new StmBroker;
         if (!m_broker->connect(settings))
         {
             std::cout << "Error connecting to broker";
             return false;
         }
-#ifdef AVTUK_STM
         if (!settings.isModuleInfoFilled())
             waitForBSIOrTimeout();
         if (parser.isSet(listversion))
@@ -77,11 +77,6 @@ bool CommandLineParser::parseCommandLine(AliseSettings &settings)
 
 #ifdef AVTUK_NO_STM
 
-bool CommandLineParser::connectBroker()
-{
-    return true;
-}
-
 void CommandLineParser::setSerialNumber(const QString &serialNum)
 {
     Alise::AliseConstants::s_moduleInfo.ModuleSerialNumber = serialNum.toUInt();
@@ -97,12 +92,15 @@ void CommandLineParser::setHWVersion(const QString &hwversion)
     Alise::AliseConstants::s_moduleInfo.HWVersion = hwversion.toUInt();
 }
 
-#else
+#endif
+
+#ifdef AVTUK_STM
 
 void CommandLineParser::setSerialNumber(const QString &serialNum)
 {
     waitForBSIOrTimeout();
     Alise::AliseConstants::s_moduleInfo.ModuleSerialNumber = serialNum.toUInt();
+    std::cout << "Set module serial number: " << serialNum.toStdString();
     m_broker->writeHiddenBlock();
 }
 
@@ -110,6 +108,7 @@ void CommandLineParser::setSerialNumberB(const QString &serialNum)
 {
     waitForBSIOrTimeout();
     Alise::AliseConstants::s_moduleInfo.SerialNumber = serialNum.toUInt();
+    std::cout << "Set board serial number: " << serialNum.toStdString();
     m_broker->writeHiddenBlock();
 }
 
@@ -117,6 +116,7 @@ void CommandLineParser::setHWVersion(const QString &hwversion)
 {
     waitForBSIOrTimeout();
     Alise::AliseConstants::s_moduleInfo.HWVersion = hwversion.toUInt();
+    std::cout << "Set HW version: " << hwversion.toStdString();
     m_broker->writeHiddenBlock();
 }
 
