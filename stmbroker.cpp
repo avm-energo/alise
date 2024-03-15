@@ -156,11 +156,13 @@ void StmBroker::currentIndicationReceived(const DataTypes::BlockStruct &blk)
     AVTUK_CCU::Indication indic;
     // qDebug() << "[StmBroker] <= MCU : Block ID = " << blk.ID << ", data = " << blk.data;
     if (blk.ID == AVTUK_CCU::IndicationBlock)
-        memcpy(&indic, blk.data.data(), sizeof(indic));
-    if (!(indic == m_currentIndication))
     {
-        m_currentIndication = indic;
-        m_oldCode = 0; // force setting indication
+        memcpy(&indic, blk.data.data(), sizeof(indic));
+        if (!(indic == m_currentIndication))
+        {
+            m_currentIndication = indic;
+            m_oldCode = 0; // force setting indication
+        }
     }
 }
 

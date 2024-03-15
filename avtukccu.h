@@ -36,16 +36,6 @@ struct Indication
         return ((lhs.PulseCnt1 == rhs.PulseCnt1) && (lhs.PulseCnt2 == rhs.PulseCnt2)
             && (lhs.PulseFreq1 == rhs.PulseFreq1) && (lhs.PulseFreq2 == rhs.PulseFreq2));
     }
-
-    //    Indication operator=(const Indication &rhs)
-    //    {
-    //        Indication indic;
-    //        indic.PulseCnt1 = rhs.PulseCnt1;
-    //        indic.PulseCnt2 = rhs.PulseCnt2;
-    //        indic.PulseFreq1 = rhs.PulseFreq1;
-    //        indic.PulseFreq2 = rhs.PulseFreq2;
-    //        return indic;
-    //    }
 };
 }
 
