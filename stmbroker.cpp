@@ -9,6 +9,7 @@
 StmBroker::StmBroker(QObject *parent)
     : Broker(parent), m_manager(new Interface::ConnectionManager(this)), m_conn(nullptr)
 {
+    m_BSINotCompleted = 0x0F; // 4 LSBs are for SerialNums & Versions
 }
 
 bool StmBroker::connect()
@@ -74,6 +75,11 @@ void StmBroker::writeHiddenBlock()
     memcpy(block.data.data(), &Alise::AliseConstants::s_moduleInfo, sizeof(Alise::AliseConstants::ModuleInfo));
     m_conn->writeCommand(Interface::Commands::C_WriteHiddenBlock, QVariant::fromValue(block));
 #endif
+}
+
+bool StmBroker::BSIReady()
+{
+    return !m_BSINotCompleted;
 }
 
 void StmBroker::checkPowerUnit()
@@ -166,18 +172,22 @@ void StmBroker::updateBsi(AliseSettings &m_settings, const DataTypes::BitStringS
     {
     case ModuleSerialNumAdr:
         m_settings.serialNum = resp.sigVal;
+        m_BSINotCompleted &= 0x0E;
         break;
     case SerialNumBAdr:
         m_settings.serialNumB = resp.sigVal;
+        m_BSINotCompleted &= 0x0D;
         break;
     case HWAdr:
         m_settings.hwVersion = resp.sigVal;
+        m_BSINotCompleted &= 0x0B;
         break;
     case SWAdr:
         m_settings.swVersion = resp.sigVal;
+        m_BSINotCompleted &= 0x07;
         break;
     }
-    if (m_settings.isModuleInfoFilled())
+    if (!m_BSINotCompleted)
     {
         Alise::AliseConstants::s_moduleInfo.ModuleSerialNumber = m_settings.serialNum;
         Alise::AliseConstants::s_moduleInfo.SerialNumber = m_settings.serialNumB;

@@ -13,7 +13,6 @@ public:
     void readSettings();
     void logSettings();
     void writeSetting(); // write module properties: serialnum, hwversion, etc
-    bool isModuleInfoFilled();
     QString versionStr(const uint32_t &version);
 
     QString logLevel;

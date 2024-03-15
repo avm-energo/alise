@@ -50,7 +50,7 @@ bool CommandLineParser::parseCommandLine(AliseSettings &settings)
             std::cout << "Error connecting to broker";
             return false;
         }
-        if (!settings.isModuleInfoFilled())
+        if (!m_broker->BSIReady())
             waitForBSIOrTimeout();
         if (parser.isSet(listversion))
         {

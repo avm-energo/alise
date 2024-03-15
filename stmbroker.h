@@ -28,6 +28,7 @@ public:
     bool connect() override;
     bool connect(AliseSettings &asettings);
     void writeHiddenBlock();
+    bool BSIReady();
 
 public slots:
     void checkPowerUnit() override;
@@ -44,6 +45,7 @@ private:
     QMutex _mutex;
     Interface::ConnectionManager *m_manager;
     Interface::AsyncConnection *m_conn;
+    std::uint8_t m_BSINotCompleted;
     //    AliseSettings m_settings;
 
 private slots:

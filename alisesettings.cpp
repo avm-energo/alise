@@ -83,12 +83,6 @@ void AliseSettings::writeSetting()
     m_settings->setValue("Module/SoftwareVersion", swVersion);
 }
 
-bool AliseSettings::isModuleInfoFilled()
-{
-    return ((serialNum != 0xFFFFFFFF) && (serialNumB != 0xFFFFFFFF) && (hwVersion != 0xFFFFFFFF)
-        && (swVersion != 0xFFFFFFFF));
-}
-
 QString AliseSettings::versionStr(const std::uint32_t &version)
 {
     std::uint8_t mv = version >> 24;
