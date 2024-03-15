@@ -23,8 +23,8 @@ bool CommandLineParser::parseCommandLine(AliseSettings &settings)
 #endif
     QCommandLineOption serialNumber({ "m", "serial" }, "Sets module serial number", "serial");
     QCommandLineOption serialNumberB({ "b", "serialb" }, "Sets board serial number", "serialb");
-    QCommandLineOption hardware({ "w", "hardware" }, "Sets module hardware version", "hardware");
-    QCommandLineOption software({ "s", "software" }, "Sets module software version", "software");
+    QCommandLineOption hardware({ "w", "hardware" }, "Sets module hardware version (format: mv.lv-sv)", "hardware");
+    QCommandLineOption software({ "s", "software" }, "Sets module software version (format: mv.lv-sv)", "software");
     QCommandLineOption listversion({ "l", "list" }, "Lists module versions and numbers");
     parser.addOption(serialNumber);
     parser.addOption(serialNumberB);
@@ -56,8 +56,8 @@ bool CommandLineParser::parseCommandLine(AliseSettings &settings)
         {
             std::cout << "Module serial number: " << settings.serialNum << "\n";
             std::cout << "Board serial number: " << settings.serialNumB << "\n";
-            std::cout << "Hardware version: " << settings.hwVersion << "\n";
-            std::cout << "Software version: " << settings.swVersion << "\n";
+            std::cout << "Hardware version: " << settings.versionStr(settings.hwVersion).toStdString() << "\n";
+            std::cout << "Software version: " << settings.versionStr(settings.swVersion).toStdString() << "\n";
             return false;
         }
 #endif
@@ -68,7 +68,7 @@ bool CommandLineParser::parseCommandLine(AliseSettings &settings)
         if (parser.isSet(hardware))
             setHWVersion(parser.value("hardware"));
         if (parser.isSet(software))
-            settings.swVersion = parser.value("software").toUInt();
+            settings.swVersion = versionNum(parser.value("software"));
         settings.writeSetting();
         return false;
     }
@@ -96,11 +96,37 @@ void CommandLineParser::setHWVersion(const QString &hwversion)
 
 #ifdef AVTUK_STM
 
+std::uint32_t CommandLineParser::versionNum(const QString &str)
+{
+    std::uint8_t mv, lv;
+    std::uint16_t sv;
+    QStringList sl;
+    sl = str.split(".");
+    if (sl.size() > 1)
+    {
+        mv = sl.at(0).toUInt();
+        sl = sl.at(1).split("-");
+        lv = sl.at(0).toUInt();
+        if (sl.size() > 1)
+            sv = sl.at(1).toUInt();
+        else
+            sv = 0;
+    }
+    else
+    {
+        mv = 0;
+        lv = 0;
+        sv = sl.at(0).toUInt();
+    }
+    std::uint32_t version = (static_cast<std::uint32_t>(mv) << 24) | (static_cast<std::uint32_t>(lv) << 16) | sv;
+    return version;
+}
+
 void CommandLineParser::setSerialNumber(const QString &serialNum)
 {
     waitForBSIOrTimeout();
     Alise::AliseConstants::s_moduleInfo.ModuleSerialNumber = serialNum.toUInt();
-    std::cout << "Set module serial number: " << serialNum.toStdString();
+    std::cout << "Set module serial number: " << serialNum.toStdString() << "\n";
     writeHiddenBlock();
 }
 
@@ -108,15 +134,15 @@ void CommandLineParser::setSerialNumberB(const QString &serialNum)
 {
     waitForBSIOrTimeout();
     Alise::AliseConstants::s_moduleInfo.SerialNumber = serialNum.toUInt();
-    std::cout << "Set board serial number: " << serialNum.toStdString();
+    std::cout << "Set board serial number: " << serialNum.toStdString() << "\n";
     writeHiddenBlock();
 }
 
 void CommandLineParser::setHWVersion(const QString &hwversion)
 {
     waitForBSIOrTimeout();
-    Alise::AliseConstants::s_moduleInfo.HWVersion = hwversion.toUInt();
-    std::cout << "Set HW version: " << hwversion.toStdString();
+    Alise::AliseConstants::s_moduleInfo.HWVersion = versionNum(hwversion);
+    std::cout << "Set HW version: " << hwversion.toStdString() << "\n";
     writeHiddenBlock();
 }
 

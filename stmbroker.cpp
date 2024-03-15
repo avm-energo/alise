@@ -147,7 +147,7 @@ void StmBroker::rebootMyself()
 
 void StmBroker::currentIndicationReceived(const DataTypes::BlockStruct &blk)
 {
-    qDebug() << "[StmBroker] <= MCU : Block ID = " << blk.ID << ", data = " << blk.data;
+    //    qDebug() << "[StmBroker] <= MCU : Block ID = " << blk.ID << ", data = " << blk.data;
     if (blk.ID == AVTUK_CCU::IndicationBlock)
         memcpy(&m_currentIndication, blk.data.data(), sizeof(m_currentIndication));
 }
@@ -189,6 +189,9 @@ void StmBroker::updateBsi(AliseSettings &m_settings, const DataTypes::BitStringS
     }
     if (!m_BSINotCompleted)
     {
+        qDebug() << "BSI receiving complete: serialNum = " << m_settings.serialNum
+                 << ", serialNumB = " << m_settings.serialNumB << ", HWVersion = " << m_settings.hwVersion
+                 << ", SWVersion = " << m_settings.swVersion;
         Alise::AliseConstants::s_moduleInfo.ModuleSerialNumber = m_settings.serialNum;
         Alise::AliseConstants::s_moduleInfo.SerialNumber = m_settings.serialNumB;
         Alise::AliseConstants::s_moduleInfo.HWVersion = m_settings.hwVersion;

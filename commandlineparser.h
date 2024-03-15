@@ -21,6 +21,7 @@ private:
     void setSerialNumber(const QString &serialNum);
     void setSerialNumberB(const QString &serialNumB);
     void setHWVersion(const QString &hwversion);
+    std::uint32_t versionNum(const QString &str);
 
 #ifdef AVTUK_NO_STM
     void listPins();
