@@ -94,8 +94,6 @@ void CommandLineParser::setHWVersion(const QString &hwversion)
 
 #endif
 
-#ifdef AVTUK_STM
-
 std::uint32_t CommandLineParser::versionNum(const QString &str)
 {
     std::uint8_t mv, lv;
@@ -121,6 +119,8 @@ std::uint32_t CommandLineParser::versionNum(const QString &str)
     std::uint32_t version = (static_cast<std::uint32_t>(mv) << 24) | (static_cast<std::uint32_t>(lv) << 16) | sv;
     return version;
 }
+
+#ifdef AVTUK_STM
 
 void CommandLineParser::setSerialNumber(const QString &serialNum)
 {

@@ -29,6 +29,7 @@ public:
     bool connect(AliseSettings &asettings);
     void writeHiddenBlock();
     bool BSIReady();
+    void clearBSIReady();
 
 public slots:
     void checkPowerUnit() override;

@@ -9,7 +9,7 @@
 StmBroker::StmBroker(QObject *parent)
     : Broker(parent), m_manager(new Interface::ConnectionManager(this)), m_conn(nullptr)
 {
-    m_BSINotCompleted = 0x0F; // 4 LSBs are for SerialNums & Versions
+    clearBSIReady();
 }
 
 bool StmBroker::connect()
@@ -58,6 +58,7 @@ bool StmBroker::connect(AliseSettings &asettings)
     if (connect())
     {
         m_conn->connection(this, [&](const DataTypes::BitStringStruct &resp) { updateBsi(asettings, resp); });
+        clearBSIReady();
         m_conn->writeCommand(Interface::Commands::C_ReqBSI);
         return true;
     }
@@ -80,6 +81,11 @@ void StmBroker::writeHiddenBlock()
 bool StmBroker::BSIReady()
 {
     return !m_BSINotCompleted;
+}
+
+void StmBroker::clearBSIReady()
+{
+    m_BSINotCompleted = 0x0F; // 4 LSBs are for SerialNums & Versions
 }
 
 void StmBroker::checkPowerUnit()
@@ -168,6 +174,8 @@ timespec StmBroker::transform(google::protobuf::Timestamp timestamp) const
 
 void StmBroker::updateBsi(AliseSettings &m_settings, const DataTypes::BitStringStruct &resp)
 {
+    if (!m_BSINotCompleted)
+        return; // BSI is received already
     switch (resp.sigAdr)
     {
     case ModuleSerialNumAdr:
