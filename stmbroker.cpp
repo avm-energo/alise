@@ -153,9 +153,15 @@ void StmBroker::rebootMyself()
 
 void StmBroker::currentIndicationReceived(const DataTypes::BlockStruct &blk)
 {
-    //    qDebug() << "[StmBroker] <= MCU : Block ID = " << blk.ID << ", data = " << blk.data;
+    AVTUK_CCU::Indication indic;
+    // qDebug() << "[StmBroker] <= MCU : Block ID = " << blk.ID << ", data = " << blk.data;
     if (blk.ID == AVTUK_CCU::IndicationBlock)
-        memcpy(&m_currentIndication, blk.data.data(), sizeof(m_currentIndication));
+        memcpy(&indic, blk.data.data(), sizeof(indic));
+    if (!(indic == m_currentIndication))
+    {
+        m_currentIndication = indic;
+        m_oldCode = 0; // force setting indication
+    }
 }
 
 void StmBroker::writeCompleted(const DataTypes::GeneralResponseStruct &resp)

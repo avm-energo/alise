@@ -22,6 +22,7 @@ protected:
 public:
     explicit Broker(QObject *parent = nullptr);
     virtual bool connect() = 0;
+    uint32_t m_oldCode;
 
 public slots:
     void updateBlock(const DataTypes::BlockStruct &blk);
@@ -38,7 +39,6 @@ private:
     QTimer checkPowerTimer, m_clientTimeoutTimer;
     uint8_t m_worstProcessNumber;
     Alise::ProcessErrors m_worstProcessError;
-    uint32_t m_oldCode;
 
     void setStartingProcessError(int index);
     void setStoppedProcessError(int index);
