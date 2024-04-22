@@ -123,7 +123,7 @@ void Broker::healthReceived(uint32_t code)
                 }
             }
         }
-        if ((m_worstProcessError == Alise::NORMAL) || (m_worstProcessNumber == 0)) // all is good
+        if (m_worstProcessError == Alise::NORMAL) // all is good
             indic = AliseConstants::NormalIndication;
         else
         {
