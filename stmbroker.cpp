@@ -5,6 +5,7 @@
 #include <QRandomGenerator>
 #include <interfaces/connectionmanager.h>
 #include <interfaces/types/usbhidportinfo.h>
+#include <iostream>
 
 StmBroker::StmBroker(QObject *parent)
     : Broker(parent), m_manager(new Interface::ConnectionManager(this)), m_conn(nullptr)
