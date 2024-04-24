@@ -75,11 +75,10 @@ void RecoveryEngine::receiveBlock(const DataTypes::BlockStruct &blk)
         if (mainBlock.resetReq && (!resetInit))
         {
             setDefEth(0);
-#if defined(AVTUK_NO_STM)
-            setDefEth(1);
-#endif
 #if defined(AVTUK_STM)
             setDefEth(2);
+#else
+            setDefEth(1);
 #endif
             sync();
             restartNetwork();

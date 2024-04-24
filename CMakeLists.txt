@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.18)
-project(alise VERSION 2.0.4)
+project(alise VERSION 2.1.0)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -27,7 +27,6 @@ if (ALISE_STM)
 else()
     set(AVTUK_MODULE_PATH avtuk-12)
     set(ALISE_POSTFIX nostm)
-    add_compile_definitions(AVTUK_NO_STM)
     find_library(GPIODCXX_LIBRARY NAMES libgpiodcxx.so)
     if(NOT GPIODCXX_LIBRARY)
       message(FATAL_ERROR "gpiod library not found. Install apt install libgpiod-dev")
@@ -103,12 +102,11 @@ if (ALISE_STM)
     list(APPEND SOURCES
          stmbroker.cpp
          stmbroker.h)
- else()
+else()
     list(APPEND SOURCES
          gpiobroker.cpp
          gpiobroker.h)
 endif()
-
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 add_subdirectory(gitversion)
@@ -132,15 +130,17 @@ target_link_libraries(${PROJECT_NAME} PUBLIC Qt5::Xml pthread gitversion ZeroMQ:
 
 install(TARGETS ${PROJECT_NAME})
 
+
+
+
+
+
 ###### DEB PACKAGE SECTION ######
 
-if (ALISE_STM)
-    set(REQUIRED_SERVICE_PATH)
-endif()
 # Configure the service file so that it knows where the
 # binary was installed.
 set(SERVICE_NAME ${PROJECT_NAME}.service)
-if (REQUIRED_SERVICE_PATH)
+if (ALISE_STM)
     set(SERVICE_PATH_NAME ${PROJECT_NAME}.path)
 endif()
 set(EXE_PATH ${CPACK_PACKAGING_INSTALL_PREFIX}/bin/${PROJECT_NAME})
@@ -152,7 +152,7 @@ configure_file(${SERVICE_IN} ${SERVICE_OUT} @ONLY)
 # install DEB script will handle placing the file where
 # it's supposed to go.
 install(FILES ${SERVICE_OUT} DESTINATION share)
-if (REQUIRED_SERVICE_PATH)
+if (ALISE_STM)
     install(FILES ${SERVICE_PATH_NAME} DESTINATION share)
 endif()
 

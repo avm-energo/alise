@@ -17,10 +17,12 @@ bool CommandLineParser::parseCommandLine(AliseSettings &settings)
     QCommandLineParser parser;
 
     parser.setApplicationDescription("Avtuk LInux SErver");
-#ifdef AVTUK_NO_STM
+
+#ifndef AVTUK_STM
     QCommandLineOption showGpio("g", "List all gpios");
     parser.addOption(showGpio);
 #endif
+
     QCommandLineOption serialNumber({ "m", "serial" }, "Sets module serial number", "serial");
     QCommandLineOption serialNumberB({ "b", "serialb" }, "Sets board serial number", "serialb");
     QCommandLineOption hardware({ "w", "hardware" }, "Sets module hardware version (format: mv.lv-sv)", "hardware");
@@ -36,13 +38,7 @@ bool CommandLineParser::parseCommandLine(AliseSettings &settings)
     if (QCoreApplication::arguments().size() > 1)
     {
         parser.process(QCoreApplication::arguments());
-#ifdef AVTUK_NO_STM
-        bool showPins = parser.isSet(showGpio);
-        if (showPins)
-        {
-            listPins();
-        }
-#endif
+
 #ifdef AVTUK_STM
         m_broker = new StmBroker;
         if (!m_broker->connect(settings))
@@ -60,7 +56,14 @@ bool CommandLineParser::parseCommandLine(AliseSettings &settings)
             std::cout << "Software version: " << settings.versionStr(settings.swVersion).toStdString() << "\n";
             return false;
         }
+#else
+        bool showPins = parser.isSet(showGpio);
+        if (showPins)
+        {
+            listPins();
+        }
 #endif
+
         if (parser.isSet(serialNumber))
             setSerialNumber(parser.value("serial"));
         if (parser.isSet(serialNumberB))
@@ -74,25 +77,6 @@ bool CommandLineParser::parseCommandLine(AliseSettings &settings)
     }
     return true;
 }
-
-#ifdef AVTUK_NO_STM
-
-void CommandLineParser::setSerialNumber(const QString &serialNum)
-{
-    Alise::AliseConstants::s_moduleInfo.ModuleSerialNumber = serialNum.toUInt();
-}
-
-void CommandLineParser::setSerialNumberB(const QString &serialNum)
-{
-    Alise::AliseConstants::s_moduleInfo.SerialNumber = serialNum.toUInt();
-}
-
-void CommandLineParser::setHWVersion(const QString &hwversion)
-{
-    Alise::AliseConstants::s_moduleInfo.HWVersion = hwversion.toUInt();
-}
-
-#endif
 
 std::uint32_t CommandLineParser::versionNum(const QString &str)
 {
@@ -169,9 +153,23 @@ void CommandLineParser::writeHiddenBlock()
     loop->exec(QEventLoop::AllEvents);
 }
 
-#endif
+#else
 
-#ifdef AVTUK_NO_STM
+void CommandLineParser::setSerialNumber(const QString &serialNum)
+{
+    Alise::AliseConstants::s_moduleInfo.ModuleSerialNumber = serialNum.toUInt();
+}
+
+void CommandLineParser::setSerialNumberB(const QString &serialNum)
+{
+    Alise::AliseConstants::s_moduleInfo.SerialNumber = serialNum.toUInt();
+}
+
+void CommandLineParser::setHWVersion(const QString &hwversion)
+{
+    Alise::AliseConstants::s_moduleInfo.HWVersion = hwversion.toUInt();
+}
+
 void CommandLineParser::listPins()
 {
     for (auto &cit : ::gpiod::make_chip_iter())

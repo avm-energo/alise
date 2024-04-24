@@ -20,7 +20,7 @@ bool Controller::launchOnPort(int port)
     m_runner->runServer(port);
 #if defined(AVTUK_STM)
     m_deviceBroker->getTime();
-#elif defined(AVTUK_NO_STM)
+#else
     m_timeSynchronizer->systemTime();
 #endif
     return true;
@@ -78,7 +78,7 @@ void Controller::adminjaSetup()
 #if defined(AVTUK_STM)
     connect(m_runner, &ZeroRunner::timeReceived, m_deviceBroker, &Broker::setTime);
     connect(m_runner, &ZeroRunner::timeRequest, m_deviceBroker, &Broker::getTime);
-#elif defined(AVTUK_NO_STM)
+#else
     connect(m_runner, &ZeroRunner::timeRequest, m_timeSynchronizer, //
         [this] { m_deviceBroker->updateTime(m_timeSynchronizer->systemTime()); });
 #endif

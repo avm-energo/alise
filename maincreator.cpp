@@ -3,7 +3,7 @@
 #include "aliseconstants.h"
 #if defined(AVTUK_STM)
 #include "stmbroker.h"
-#elif defined(AVTUK_NO_STM)
+#else
 #include "gpiobroker.h"
 #endif
 
@@ -23,7 +23,7 @@ Broker *MainCreator::create(bool &ok)
     Broker *broker;
 #if defined(AVTUK_STM)
     broker = new StmBroker(this);
-#elif defined(AVTUK_NO_STM)
+#else
     broker = new GpioBroker(this);
 #endif
     ok = broker->connect();

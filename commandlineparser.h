@@ -23,7 +23,7 @@ private:
     void setHWVersion(const QString &hwversion);
     std::uint32_t versionNum(const QString &str);
 
-#ifdef AVTUK_NO_STM
+#ifndef AVTUK_STM
     void listPins();
 #else
     StmBroker *m_broker;

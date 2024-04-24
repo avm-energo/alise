@@ -161,6 +161,8 @@ void StmBroker::currentIndicationReceived(const DataTypes::BlockStruct &blk)
         memcpy(&indic, blk.data.data(), sizeof(indic));
         if (!(indic == m_currentIndication))
         {
+            qDebug() << "indications doens't equals: currentIndic = " << m_currentIndication.PulseCnt1 << " " << m_currentIndication.PulseFreq1 << " " << m_currentIndication.PulseCnt2 << " " << m_currentIndication.PulseFreq2 <<
+                " and received indication is: " << indic.PulseCnt1 << " " << indic.PulseFreq1 << " " << indic.PulseCnt2 << " " << indic.PulseFreq2;
             m_currentIndication = indic;
             m_oldCode = 0; // force setting indication
         }
