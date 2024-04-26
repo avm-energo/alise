@@ -1,0 +1,9 @@
+Source: alise
+Priority: optional
+Maintainer: AVM-Energo <support@avmenergo.ru>
+Section: embedded
+
+Package: alise
+Description: Avtuk LInux SErver
+Architecture: amd64
+Depends: ${shlibs:Depends}

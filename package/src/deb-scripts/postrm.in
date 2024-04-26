@@ -1,0 +1,3 @@
+rm /lib/systemd/system/alise.service 2>/dev/null
+systemctl daemon-reload
+systemctl reset-failed

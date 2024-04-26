@@ -1,0 +1,13 @@
+cp /usr/local/share/alise.service /lib/systemd/system/alise.service
+chmod 644 /lib/systemd/system/alise.service
+systemctl daemon-reload
+systemctl enable alise.service
+systemctl start alise.service
+systemctl status alise.service --no-pager || true
+
+if pgrep -x alise >/dev/null
+then
+    echo "$service_name started"
+else
+    echo "$service_name stopped"
+fi
