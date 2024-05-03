@@ -30,8 +30,6 @@ void Logger::messageHandler(QtMsgType type, const QMessageLogContext &context, c
     if (_logLevel < msgTypes.value(type).loglevel)
         return;
     QMutexLocker locker(&_mutex);
-    QStringList buffer = QString(context.file).split("\\");
-    QString sourceFile = buffer.isEmpty() ? "" : buffer.takeLast();
     QFile logFile;
     QTextStream out;
 
@@ -41,11 +39,14 @@ void Logger::messageHandler(QtMsgType type, const QMessageLogContext &context, c
 
     logFile.setFileName(logFilename);
     out.setDevice(&logFile);
-    logFile.open(QFile::ReadWrite | QFile::Text | QFile::Append);
-    out << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz "); // Log datetime
-    out << msgTypes.value(type).prefix << msg << "\n";
-    out.flush(); // Flush buffer
-    Files::checkNGzip(&logFile);
+    if (logFile.open(QFile::ReadWrite | QFile::Text | QFile::Append))
+    {
+        out << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz "); // Log datetime
+        out << msgTypes.value(type).prefix << msg << "\n";
+        out.flush(); // Flush buffer
+        Files::checkNGzip(&logFile);
+        logFile.close();
+    }
 }
 
 void Logger::writeStart(const QString &filename)
