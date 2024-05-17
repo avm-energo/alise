@@ -136,6 +136,11 @@ void Broker::healthReceived(uint32_t code)
     setIndication(indic);
 }
 
+void Broker::setFailedIndication()
+{
+    setIndication(AliseConstants::FailureIndication);
+}
+
 void Broker::setStartingProcessError(int index)
 {
     if ((m_worstProcessError != Alise::RED) && (m_worstProcessError != Alise::VIOLET)

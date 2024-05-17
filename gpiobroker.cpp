@@ -32,6 +32,7 @@ bool GpioBroker::connect()
     m_resetTimer.start();
     m_gpioTimer.start();
 
+#ifndef ALISE_LOCALDEBUG
     chip0.open(std::to_string(0));
     {
         auto line = chip0.get_line(PowerStatusPin0.offset);
@@ -53,15 +54,20 @@ bool GpioBroker::connect()
         line.request({ PROGNAME, ::gpiod::line_request::DIRECTION_INPUT, 0 });
     }
     chip1.get_line(LedPin.offset).set_value(m_blinkStatus);
+#endif
     return true;
 }
 
 void GpioBroker::checkPowerUnit()
 {
     QMutexLocker locker(&_mutex);
+#ifndef ALISE_LOCALDEBUG
     auto status1 = chip0.get_line(PowerStatusPin0.offset).get_value();
     auto status2 = chip3.get_line(PowerStatusPin1.offset).get_value();
-    qDebug() << "[GPIO] PWR status 1: " << status1 << ", PWR status 2: " << status2;
+#else
+    int status1 = 0;
+    int status2 = 0;
+#endif
     DataTypes::BlockStruct blk;
     blk.data.resize(sizeof(AVTUK_CCU::Main));
     AVTUK_CCU::Main str;
@@ -90,13 +96,11 @@ void GpioBroker::setIndication(const AVTUK_CCU::Indication &indication)
     m_currentIndication = indic;
     m_blinkCount = indic.PulseCnt1;
     m_blinkFreq = indic.PulseFreq1;
-    bool blinkIsZero = false;
     if ((m_currentIndication.PulseCnt1 == 0) || (m_currentIndication.PulseFreq1 == 0))
     {
         m_blinkCount = c_maxBlinks;
         m_blinkFreq = indic.PulseFreq2;
         m_blinkMode = BlinkMode::ONEBLINK;
-        blinkIsZero = true;
         qDebug() << "1. restartBlinkTimer: blinkCount = " << m_blinkCount << ", blinkMode = " << m_blinkMode
                  << ", blinkFreq = " << m_blinkFreq;
         restartBlinkTimer();
@@ -104,14 +108,6 @@ void GpioBroker::setIndication(const AVTUK_CCU::Indication &indication)
     }
     if ((m_currentIndication.PulseCnt2 == 0) || (m_currentIndication.PulseFreq2 == 0))
     {
-        if (blinkIsZero)
-        {
-            Q_ASSERT(
-                !(AliseConstants::FailureIndication == AVTUK_CCU::Indication(0, 0, 0, 0))); // failure mustn't be zeroed
-            qDebug() << "Blink is zero!";
-            setIndication(AliseConstants::FailureIndication); // all blinks are zero - failure
-            return;
-        }
         m_blinkCount = c_maxBlinks;
         m_blinkMode = BlinkMode::ONEBLINK;
         qDebug() << "2. restartBlinkTimer: blinkCount = " << m_blinkCount << ", blinkMode = " << m_blinkMode
@@ -125,27 +121,21 @@ void GpioBroker::setIndication(const AVTUK_CCU::Indication &indication)
     restartBlinkTimer();
 }
 
-void GpioBroker::setTime(const timespec &time)
-{
-    Q_UNUSED(time)
-}
-
-void GpioBroker::getTime()
-{
-}
-
 void GpioBroker::rebootMyself()
 {
     qDebug() << "[GPIO] Rebooting...";
     m_gpioTimer.stop();
     m_resetTimer.stop();
+#ifndef ALISE_LOCALDEBUG
     chip1.get_line(LedPin.offset).set_value(false);
+#endif
     reboot(RB_AUTOBOOT);
 }
 
 void GpioBroker::reset()
 {
     QMutexLocker locker(&_mutex);
+#ifndef ALISE_LOCALDEBUG
     bool value = !chip2.get_line(ResetPin.offset).get_value();
 
     if (value) // button pushed, counting seconds...
@@ -182,6 +172,7 @@ void GpioBroker::reset()
         blk.ID = AVTUK_CCU::MainBlock;
         emit receivedBlock(blk);
     }
+#endif
     resetCounter = 0;
 }
 
@@ -192,6 +183,7 @@ void GpioBroker::restartBlinkTimer()
 
 void GpioBroker::blink()
 {
+#ifndef ALISE_LOCALDEBUG
     --m_blinkCount;
     chip1.get_line(LedPin.offset).set_value(m_blinkStatus);
     m_blinkStatus = !m_blinkStatus;
@@ -217,4 +209,5 @@ void GpioBroker::blink()
             restartBlinkTimer();
         }
     }
+#endif
 }

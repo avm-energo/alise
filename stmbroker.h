@@ -42,7 +42,6 @@ public slots:
     void writeCompleted(const DataTypes::GeneralResponseStruct &resp);
 
 private:
-    timespec transform(google::protobuf::Timestamp timestamp) const;
     QMutex _mutex;
     Interface::ConnectionManager *m_manager;
     Interface::AsyncConnection *m_conn;

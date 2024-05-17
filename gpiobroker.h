@@ -2,7 +2,6 @@
 #define GPIOBROKER_H
 
 #include "broker.h"
-#include "protos/protos.pb.h"
 
 #include <QMutex>
 #include <QObject>
@@ -30,12 +29,11 @@ public:
     bool connect() override;
 
 public slots:
-    // void currentIndicationReceived(const QVariant &) override {};
     void checkIndication() override {};
     void checkPowerUnit() override;
     void setIndication(const AVTUK_CCU::Indication &indication) override;
-    void setTime(const timespec &time) override;
-    void getTime() override;
+    void setTime(const timespec &time) override {};
+    void getTime() override {};
     void rebootMyself() override;
 
 private:

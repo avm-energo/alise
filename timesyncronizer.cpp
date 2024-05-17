@@ -80,7 +80,6 @@ timespec TimeSyncronizer::systemTime() const
     timespec time;
     struct timeval timeToGet;
     gettimeofday(&timeToGet, NULL);
-    //    clock_gettime(CLOCK_REALTIME, &time);
     time.tv_sec = timeToGet.tv_sec;
     time.tv_nsec = timeToGet.tv_usec * 1000;
     return time;
@@ -95,7 +94,6 @@ void TimeSyncronizer::setSystemTime(const timespec &systemTime)
     timeToSet.tv_sec = systemTime.tv_sec;
     timeToSet.tv_usec = 0;
     settimeofday(&timeToSet, NULL);
-    //    clock_settime(CLOCK_REALTIME, &systemTime); // set current datetime
     QProcess *myProcess = new QProcess(this); // set datetime to RTC
     qInfo() << "Set hwclock time: " << systemTime.tv_sec;
     myProcess->start(program, arguments);

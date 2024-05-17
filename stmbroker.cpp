@@ -175,14 +175,6 @@ void StmBroker::writeCompleted(const DataTypes::GeneralResponseStruct &resp)
     emit operationCompleted();
 }
 
-timespec StmBroker::transform(google::protobuf::Timestamp timestamp) const
-{
-    timespec temp;
-    temp.tv_nsec = timestamp.nanos();
-    temp.tv_sec = timestamp.seconds();
-    return temp;
-}
-
 void StmBroker::updateBsi(AliseSettings &m_settings, const DataTypes::BitStringStruct &resp)
 {
     if (!m_BSINotCompleted)

@@ -1,12 +1,12 @@
 #include "alisesettings.h"
 #include "commandlineparser.h"
-#include "controllerfabric.h"
+#include "engine.h"
 #include "gitversion/gitversion.h"
 #include "logger.h"
-#include "maincreator.h"
 
 #include <QCoreApplication>
 #include <config.h>
+#include <gen/stdfunc.h>
 #include <iostream>
 #include <memory>
 
@@ -15,11 +15,8 @@ constexpr char ethResourcePathString[] = ":/network/eth";
 
 int main(int argc, char *argv[])
 {
-    MainCreator creator;
+    Engine *engine = new Engine;
     bool ok;
-    Broker *broker;
-    TimeSyncronizer *tm;
-    ControllerFabric fabric;
     AliseSettings settings;
     CommandLineParser parser;
 
@@ -55,30 +52,13 @@ int main(int argc, char *argv[])
 
     qInfo() << "=========================\n";
 
-    creator.init();
-    broker = creator.create(ok);
-    if (!ok)
+    if (!engine->init(settings.httpPort))
     {
-        qCritical() << "Can't create broker, exiting";
+        qCritical() << "Can't create engine, exiting";
         return 11;
     }
-    tm = creator.getTimeSynchronizer();
 
-    if (!fabric.createController(Controller::ContrTypes::IS_BOOTER, settings.portBooter, broker, tm))
-    {
-        qCritical() << "Booter controller was not created, exiting";
-        return 12;
-    }
-    if (!fabric.createController(Controller::ContrTypes::IS_CORE, settings.portCore, broker, tm))
-    {
-        qCritical() << "Core controller was not created, exiting";
-        return 13;
-    }
-    if (!fabric.createController(Controller::ContrTypes::IS_ADMINJA, settings.portAdminja, broker, tm))
-    {
-        qCritical() << "Core controller was not created, exiting";
-        return 14;
-    }
+    engine->start();
 
     std::cout << "Enter the event loop" << std::endl;
     return a.exec();

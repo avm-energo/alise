@@ -24,9 +24,7 @@ void AliseSettings::readSettings()
     int logcounter = m_settings->value("Test/counter", "1").toInt();
     m_settings->setValue("Test/counter", ++logcounter);
     logLevel = m_settings->value("Logs/Loglevel", "Info").toString();
-    portCore = m_settings->value("Main/CorePort", "5555").toInt();
-    portBooter = m_settings->value("Main/BooterPort", "5556").toInt();
-    portAdminja = m_settings->value("Main/AdminjaPort", "5557").toInt();
+    httpPort = m_settings->value("Main/HttpPort", "5555").toInt();
     Alise::AliseConstants::setFailureBlinkFreq(m_settings->value("Timers/FailureBlink", "50").toInt());
     Alise::AliseConstants::setProcessStartingBlinkFreq(m_settings->value("Timers/StartingBlink", "250").toInt());
     Alise::AliseConstants::setProcessSemiWorkingBlinkFreq(m_settings->value("Timers/SemiWorkingBlink", "1000").toInt());
@@ -35,8 +33,9 @@ void AliseSettings::readSettings()
     Alise::AliseConstants::setProcessFailedBlinkFreq(m_settings->value("Timers/FailedBlink", "125").toInt());
     Alise::AliseConstants::setPowerCheckPeriod(m_settings->value("Timers/PowerCheckPeriod", "1000").toInt());
     Alise::AliseConstants::setResetCheckPeriod(m_settings->value("Timers/ResetCheckPeriod", "1000").toInt());
+    Alise::AliseConstants::setResetCheckPeriod(m_settings->value("Timers/UpdateTimePeriod", "3000").toInt());
     Alise::AliseConstants::setHealthQueryPeriod(m_settings->value("Timers/HealthQueryPeriod", "1500").toInt());
-    Alise::AliseConstants::setReplyTimeoutPeriod(m_settings->value("Timers/ReplyTimeoutPeriod", "4000").toInt());
+    Alise::AliseConstants::setReplyTimeoutPeriod(m_settings->value("Timers/ReplyTimeoutPeriod", "8000").toInt());
     Alise::AliseConstants::setSecondsToHardReset(m_settings->value("Reset/TimeToWaitForHardReset", "4").toInt());
     serialNum = m_settings->value("Module/SerialNumber", "FFFFFFFF").toString().toUInt();
     serialNumB = m_settings->value("Module/BoardSerialNumber", "FFFFFFFF").toString().toUInt();
@@ -52,9 +51,7 @@ void AliseSettings::logSettings()
     qInfo() << "Startup information:";
     qInfo() << "=========================";
     qInfo() << "LogLevel: " << logLevel;
-    qInfo() << "CorePort: " << portCore;
-    qInfo() << "BooterPort: " << portBooter;
-    qInfo() << "AdminjaPort: " << portAdminja;
+    qInfo() << "HttpPort: " << httpPort;
     qInfo() << "NormalBlink period:" << Alise::AliseConstants::ProcessBlink(Alise::NORMAL) << " ms";
     qInfo() << "StartingBlink period:" << Alise::AliseConstants::ProcessBlink(Alise::YELLOW) << " ms";
     qInfo() << "StoppedBlink period:" << Alise::AliseConstants::ProcessBlink(Alise::ORANGE) << " ms";
@@ -63,6 +60,7 @@ void AliseSettings::logSettings()
     qInfo() << "FailureBlink period:" << Alise::AliseConstants::FailureBlink() << " ms";
     qInfo() << "Power check period:" << Alise::AliseConstants::PowerCheckPeriod() << " ms";
     qInfo() << "Reset check period:" << Alise::AliseConstants::ResetCheckPeriod() << " ms";
+    qInfo() << "Time update period:" << Alise::AliseConstants::UpdateTimePeriod() << " ms";
     qInfo() << "Health query period:" << Alise::AliseConstants::HealthQueryPeriod() << " ms";
     qInfo() << "Reply timeout period:" << Alise::AliseConstants::ReplyTimeoutPeriod() << " ms";
     qInfo() << "Module serial: " << serialNum;

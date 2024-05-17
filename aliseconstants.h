@@ -36,6 +36,7 @@ public:
     {
         int ResetCheckPeriod;
         int PowerCheckPeriod;
+        int UpdateTimePeriod;
         int GpioBlinkCheckPeriod;
         int HealthQueryPeriod;
         int ReplyTimeoutPeriod;
@@ -62,6 +63,7 @@ public:
     AliseConstants();
     static void setResetCheckPeriod(int period);
     static void setPowerCheckPeriod(int period);
+    static void setUpdateTimePeriod(int period);
     static void setHealthQueryPeriod(int period);
     static void setReplyTimeoutPeriod(int period);
     static void setFailureBlinkFreq(uint16_t period);
@@ -73,6 +75,7 @@ public:
     static void setSecondsToHardReset(int seconds);
     static int ResetCheckPeriod();
     static int PowerCheckPeriod();
+    static int UpdateTimePeriod();
     static int HealthQueryPeriod();
     static int ReplyTimeoutPeriod();
     static int SecondsToHardReset();

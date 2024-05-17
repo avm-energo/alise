@@ -21,9 +21,7 @@ public:
     std::uint32_t serialNumB;
     std::uint32_t hwVersion;
     std::uint32_t swVersion;
-    int portCore;
-    int portBooter;
-    int portAdminja;
+    int httpPort;
 
 private:
     QSettings *m_settings;

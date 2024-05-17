@@ -38,6 +38,11 @@ void AliseConstants::setPowerCheckPeriod(int period)
     _timersConstants.PowerCheckPeriod = period;
 }
 
+void AliseConstants::setUpdateTimePeriod(int period)
+{
+    _timersConstants.UpdateTimePeriod = period;
+}
+
 void AliseConstants::setHealthQueryPeriod(int period)
 {
     _timersConstants.HealthQueryPeriod = period;
@@ -93,6 +98,11 @@ int AliseConstants::ResetCheckPeriod()
 int AliseConstants::PowerCheckPeriod()
 {
     return _timersConstants.PowerCheckPeriod;
+}
+
+int AliseConstants::UpdateTimePeriod()
+{
+    return _timersConstants.UpdateTimePeriod;
 }
 
 int AliseConstants::HealthQueryPeriod()

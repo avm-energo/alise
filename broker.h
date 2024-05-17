@@ -1,8 +1,6 @@
-#ifndef BROKER_H
-#define BROKER_H
+#pragma once
 
 #include "aliseconstants.h"
-#include "protos/protos.pb.h"
 
 #include <QObject>
 #include <QTimer>
@@ -34,6 +32,7 @@ public slots:
     virtual void getTime() = 0;
     virtual void rebootMyself() = 0;
     virtual void setIndication(const AVTUK_CCU::Indication &indication) = 0;
+    void setFailedIndication();
 
 private:
     QTimer checkPowerTimer, m_clientTimeoutTimer;
@@ -49,5 +48,3 @@ signals:
     void receivedBlock(const DataTypes::BlockStruct &blk);
     void receivedTime(const timespec &time);
 };
-
-#endif // BROKER_H
