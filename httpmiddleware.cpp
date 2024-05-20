@@ -60,8 +60,10 @@ void HttpMiddleware::timePost(const QByteArray &arr)
 {
     const QJsonObject json = byteArrayToJsonObject(arr);
     QString timeString = json["Timestamp"].toString();
+    qDebug() << "Timestamp received: " << timeString;
     QDateTime dt = QDateTime::fromString(timeString, "yyyy-MM-dd hh:mm:ss");
     m_time.tv_sec = dt.toSecsSinceEpoch();
+    qDebug() << "that is " << m_time.tv_sec << " ms from 01-01-1970";
     emit timeReceived(m_time);
 }
 
@@ -69,6 +71,7 @@ void HttpMiddleware::healthPost(const QByteArray &arr)
 {
     const QJsonObject json = byteArrayToJsonObject(arr);
     uint32_t code = json["Health"].toInt();
+    qDebug() << "Health code received: " << code;
     emit healthReceived(code);
 }
 
