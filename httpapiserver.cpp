@@ -52,15 +52,19 @@ void HttpApiServer::setRoutes()
     });
 
     // POST requests
-    m_server.route("/sethealth", QHttpServerRequest::Method::Post, [&](const QHttpServerRequest &request) {
-        m_mw->healthPost(request.body());
-        return QHttpServerResponse(QHttpServerResponder::StatusCode::Created);
-    });
+    m_server.route(
+        "/sethealth/<arg>", QHttpServerRequest::Method::Post, [&](QString identity, const QHttpServerRequest &request) {
+            qDebug() << identity << " [POST] SetHealth";
+            m_mw->healthPost(request.body());
+            return QHttpServerResponse(m_mw->pingReply());
+        });
 
-    m_server.route("/settimestamp", QHttpServerRequest::Method::Post, [&](const QHttpServerRequest &request) {
-        m_mw->timePost(request.body());
-        return QHttpServerResponse(QHttpServerResponder::StatusCode::Created);
-    });
+    m_server.route("/settimestamp/<arg>", QHttpServerRequest::Method::Post,
+        [&](QString identity, const QHttpServerRequest &request) {
+            qDebug() << identity << " [POST] SetTime";
+            m_mw->timePost(request.body());
+            return QHttpServerResponse(m_mw->pingReply());
+        });
 }
 
 void HttpApiServer::pingTimeoutTimerTimeout()

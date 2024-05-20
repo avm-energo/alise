@@ -33,7 +33,7 @@ void AliseSettings::readSettings()
     Alise::AliseConstants::setProcessFailedBlinkFreq(m_settings->value("Timers/FailedBlink", "125").toInt());
     Alise::AliseConstants::setPowerCheckPeriod(m_settings->value("Timers/PowerCheckPeriod", "1000").toInt());
     Alise::AliseConstants::setResetCheckPeriod(m_settings->value("Timers/ResetCheckPeriod", "1000").toInt());
-    Alise::AliseConstants::setResetCheckPeriod(m_settings->value("Timers/UpdateTimePeriod", "3000").toInt());
+    Alise::AliseConstants::setUpdateTimePeriod(m_settings->value("Timers/UpdateTimePeriod", "3000").toInt());
     Alise::AliseConstants::setHealthQueryPeriod(m_settings->value("Timers/HealthQueryPeriod", "1500").toInt());
     Alise::AliseConstants::setReplyTimeoutPeriod(m_settings->value("Timers/ReplyTimeoutPeriod", "8000").toInt());
     Alise::AliseConstants::setSecondsToHardReset(m_settings->value("Reset/TimeToWaitForHardReset", "4").toInt());
