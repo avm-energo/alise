@@ -64,7 +64,7 @@ void RecoveryEngine::restartNetwork()
 
 void RecoveryEngine::receiveBlock(const DataTypes::BlockStruct &blk)
 {
-    qDebug() << "[Recovery] <= MCU : Block ID = " << blk.ID << ", data = " << blk.data;
+    //    qDebug() << "[Recovery] <= MCU : Block ID = " << blk.ID << ", data = " << blk.data;
     switch (blk.ID)
     {
     case AVTUK_CCU::MainBlock:

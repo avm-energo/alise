@@ -129,13 +129,14 @@ void DefaultQueryExecutor::writeToLog(const QByteArray &ba, const Direction dir)
     }
     msg += ba.toHex();
     //    m_log.info(msg);
-    qDebug() << msg;
+    // qDebug() << msg; // excluded from log to prevent overlogging
 }
 
 void DefaultQueryExecutor::logFromParser(const QString &message, const LogLevel level)
 {
     //    m_log.logging("DeviceQueryExecutor: " + message, level);
-    qDebug() << "DeviceQueryExecutor: " << message;
+    // qDebug() << "DeviceQueryExecutor: " << message; // excluded from log to prevent overlogging
+    Q_UNUSED(message)
     Q_UNUSED(level)
 }
 

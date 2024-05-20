@@ -30,7 +30,8 @@ QJsonObject HttpMiddleware::helloReply()
 QJsonObject HttpMiddleware::timeStamp()
 {
     QJsonObject json;
-    json["Timestamp"] = QString::number(m_time.tv_sec);
+    QDateTime dt = QDateTime::fromSecsSinceEpoch(m_time.tv_sec);
+    json["Timestamp"] = dt.toString("yyyy-MM-dd hh:mm:ss");
     return json;
 }
 
@@ -70,8 +71,10 @@ void HttpMiddleware::timePost(const QByteArray &arr)
 void HttpMiddleware::healthPost(const QByteArray &arr)
 {
     const QJsonObject json = byteArrayToJsonObject(arr);
-    uint32_t code = json["Health"].toInt();
-    qDebug() << "Health code received: " << code;
+    QString healthString = json["Health"].toString();
+    qDebug() << "Health code received: " << healthString;
+    bool ok;
+    uint32_t code = healthString.toUInt(&ok, 16);
     emit healthReceived(code);
 }
 

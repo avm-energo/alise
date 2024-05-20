@@ -29,17 +29,17 @@ void BaseInterface::writeLog(const QByteArray &ba, Interface::Direction dir)
 {
     if (m_isLoggingEnabled)
     {
-        QByteArray tmpba = QByteArray(metaObject()->className());
+        QByteArray tmpba = "[" + QByteArray(metaObject()->className()) + "]";
         switch (dir)
         {
         case Interface::FromDevice:
-            tmpba.append(": -> ");
+            tmpba.append(" <- ");
             break;
         case Interface::ToDevice:
-            tmpba.append(": <- ");
+            tmpba.append(" -> ");
             break;
         default:
-            tmpba.append(":  ");
+            tmpba.append(" ");
             break;
         }
         tmpba.append(ba).append("\n");
