@@ -28,13 +28,13 @@ signals:
 
 public slots:
     void setTimeStamp(const timespec &systemTime); ///< установка текущего времени по сигналу из брокера
-    void setNtpState(bool state); ///< установка состояния сервера времени (false - не работает, true - работает) по
-                                  ///< сигналу из timeSynchronizer
+    void setNtpState(int state); ///< установка состояния сервера времени (false - не работает, true - работает) по
+                                 ///< сигналу из timeSynchronizer
     void setBlock(const DataTypes::BlockStruct &blk);
 
 private:
     timespec m_time;
-    bool m_ntpState;
+    int m_ntpState;
     int m_pwrIn, m_resetReq;
 
     /// \brief Конвертация POST-запроса в JSON объект

@@ -103,11 +103,11 @@ void TimeSyncronizer::setSystemTime(const timespec &systemTime)
 
 void TimeSyncronizer::checkNtpAndSetTime()
 {
-    bool status = ntpStatus();
+    int status = ntpStatus();
     ++m_timeCounter;
     if (m_timeCounter >= 20) // one time per minute
     {
-        if (status)
+        if (status != 0) // ntp is working
         {
             m_timeCounter = 0;
             emit setTime(systemTime());
@@ -116,7 +116,7 @@ void TimeSyncronizer::checkNtpAndSetTime()
     }
 }
 
-bool TimeSyncronizer::ntpStatus() const
+int TimeSyncronizer::ntpStatus() const
 {
     QString output;
 #if defined(Q_OS_LINUX)
@@ -128,7 +128,7 @@ bool TimeSyncronizer::ntpStatus() const
     if (!process.waitForFinished(1000))
     {
         qWarning() << "ntpq start error: " << process.errorString();
-        return false;
+        return NO_SYNC;
     }
     output = process.readAllStandardOutput();
 #else
@@ -143,12 +143,12 @@ bool TimeSyncronizer::ntpStatus() const
     if (output.isEmpty())
     {
         qWarning() << "ntpq output is empty!";
-        return false;
+        return NO_SYNC;
     }
     if (output.contains("Connection refused"))
     {
         qWarning() << "ntpq error: connection refused";
-        return false;
+        return NO_SYNC;
     }
 
     // Split ntpq output
@@ -156,15 +156,17 @@ bool TimeSyncronizer::ntpStatus() const
     if (lines.size() < 2)
     {
         qWarning() << "ntpq output is wrong!";
-        return false;
+        return NO_SYNC;
     }
     // Removing ntpq table header
     lines.removeFirst(); //     remote           refid      st t when poll reach   delay   offset  jitter
     lines.removeFirst(); //==============================================================================
     foreach (QString str, lines)
     {
-        if (str.startsWith("*")) // ntp is synchronized
-            return true;
+        if (str.startsWith("*LOCAL")) // ntp is synchronized locally
+            return SYNC_LOCAL;
+        else if (str.startsWith("*")) // ntp is synchronized externally
+            return SYNC_EXT;
     }
-    return false;
+    return NO_SYNC;
 }

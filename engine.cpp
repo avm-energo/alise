@@ -106,7 +106,7 @@ void Engine::createHttpConnections()
     connect(m_broker, &Broker::receivedTime, m_mw, &HttpMiddleware::setTimeStamp);
 
     connect(
-        m_timeSynchronizer, &TimeSyncronizer::ntpStatusChanged, this, [&](bool status) { m_mw->setNtpState(status); });
+        m_timeSynchronizer, &TimeSyncronizer::ntpStatusChanged, this, [&](int status) { m_mw->setNtpState(status); });
 
     connect(m_mw, &HttpMiddleware::healthReceived, m_broker, &Broker::healthReceived);
     connect(m_mw, &HttpMiddleware::booterConnectionIsLost, m_broker, &Broker::setFailedIndication);

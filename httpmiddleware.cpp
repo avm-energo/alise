@@ -53,7 +53,7 @@ QJsonObject HttpMiddleware::powerStatus()
 QJsonObject HttpMiddleware::ntpStatus()
 {
     QJsonObject json;
-    json["NTPState"] = (m_ntpState) ? "1" : "0";
+    json["NTPState"] = QString::number(m_ntpState);
     return json;
 }
 
@@ -88,7 +88,7 @@ void HttpMiddleware::setTimeStamp(const timespec &systemTime)
     m_time = systemTime;
 }
 
-void HttpMiddleware::setNtpState(bool state)
+void HttpMiddleware::setNtpState(int state)
 {
     m_ntpState = state;
 }
