@@ -9,9 +9,9 @@ class TimeSyncronizer : public QObject
 public:
     enum NtpStatusEnum
     {
-        NO_SYNC = 0,
-        SYNC_EXT = 1,
-        SYNC_LOCAL = 2
+        NO_SYNC = 1,
+        SYNC_EXT = 2,
+        SYNC_LOCAL = 3
     };
 
     explicit TimeSyncronizer(QObject *parent = nullptr);
@@ -26,7 +26,6 @@ public slots:
 
 private:
     void setSystemTime(const timespec &systemTime);
-    int m_ntpStatus;
     int m_timeCounter;
 
 private slots:

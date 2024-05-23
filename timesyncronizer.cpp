@@ -107,7 +107,7 @@ void TimeSyncronizer::checkNtpAndSetTime()
     ++m_timeCounter;
     if (m_timeCounter >= 20) // one time per minute
     {
-        if (status != 0) // ntp is working
+        if (status != NO_SYNC) // ntp is working
         {
             m_timeCounter = 0;
             emit setTime(systemTime());
