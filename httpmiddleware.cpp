@@ -11,6 +11,7 @@
 HttpMiddleware::HttpMiddleware(QObject *parent)
     : QObject{parent}
 {
+    setNtpState(0);
 }
 
 QJsonObject HttpMiddleware::helloReply()

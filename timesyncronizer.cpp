@@ -122,7 +122,7 @@ int TimeSyncronizer::ntpStatus() const
 #if defined(Q_OS_LINUX)
     QProcess process;
     QString program = "/usr/bin/ntpq";
-    QStringList arguments { "-pn" };
+    QStringList arguments { "-p" };
     process.start(program, arguments);
 
     if (!process.waitForFinished(1000))
@@ -139,7 +139,7 @@ int TimeSyncronizer::ntpStatus() const
         file.close();
     }
 #endif
-    //    qDebug() << "Ntpq -pn output: " << output;
+    //    qDebug() << "Ntpq -p output: " << output;
     if (output.isEmpty())
     {
         qWarning() << "ntpq output is empty!";
