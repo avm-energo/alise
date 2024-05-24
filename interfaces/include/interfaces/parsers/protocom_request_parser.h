@@ -31,6 +31,10 @@ public:
     QByteArray parse(const CommandStruct &cmd) override;
     QByteArray getNextContinueCommand() noexcept override;
     void exceptionalAction(const CommandStruct &cmd) noexcept override;
+
+signals:
+    /// \brief Сигнал для эмуляции ответов на команды, отсутствующие в Protocom.
+    void emulateOkAnswer();
 };
 
 } // namespace Interface

@@ -12,18 +12,6 @@ class ProtocomResponseParser final : public BaseResponseParser
 private:
     Proto::Commands m_receivedCommand;
 
-    /// \brief Anonymous structure for representing type of the connected board.
-    struct
-    {
-        quint8 mTypeB = 0;
-        quint8 mTypeM = 0;
-
-        bool isEmpty() noexcept
-        {
-            return ((mTypeB == 0) && (mTypeM == 0));
-        }
-    } boardType;
-
 #ifdef Q_OS_LINUX
     void processUnixTime(const QByteArray &data);
 #endif
@@ -42,6 +30,8 @@ public:
     bool isCompleteResponse() override;
     Error::Msg validate() override;
     void parse() override;
+
+public slots:
 };
 
 } // namespace Interface

@@ -28,7 +28,8 @@ const std::map<Interface::Commands, Proto::Commands> ProtocomRequestParser::s_pr
     { Commands::C_Reboot, Proto::WriteBlkCmd },                    //
     { Commands::C_GetMode, Proto::ReadMode },                      //
     { Commands::C_SetMode, Proto::WriteMode },                     //
-    { Commands::C_WriteHiddenBlock, Proto::WriteHiddenBlock }            //
+    { Commands::C_WriteHiddenBlock, Proto::WriteHardware },        //
+    { Commands::C_WriteTypeOsc, Proto::WriteBlkData }              //
 };
 
 ProtocomRequestParser::ProtocomRequestParser(QObject *parent) : BaseRequestParser(parent)
@@ -95,14 +96,6 @@ QByteArray ProtocomRequestParser::parse(const CommandStruct &cmd)
         }
         break;
     }
-    // file request: known file types should be download from disk and others must be taken from module by Protocom,
-    // arg1 - file number
-    case Commands::C_ReqFile:
-    {
-        m_request = prepareBlock(Proto::Commands::ReadFile, StdFunc::toByteArray(cmd.arg1.value<quint16>()));
-        m_continueCommand = createContinueCommand(Proto::Commands::ReadFile);
-        break;
-    }
     // commands with one bytearray argument arg2
     case Commands::C_WriteFile:
     {
@@ -134,6 +127,7 @@ QByteArray ProtocomRequestParser::parse(const CommandStruct &cmd)
     case Commands::C_WriteBlkDataTech:
     case Commands::C_SetNewConfiguration:
     case Commands::C_WriteTuningCoef:
+    case Commands::C_WriteTypeOsc:
     {
         if (cmd.arg1.canConvert<DataTypes::BlockStruct>())
         {
@@ -144,15 +138,25 @@ QByteArray ProtocomRequestParser::parse(const CommandStruct &cmd)
         }
         break;
     }
-    // Block write
+    // QVariantList write
     case Commands::C_WriteUserValues:
     {
-        if (cmd.arg1.canConvert<DataTypes::BlockStruct>())
+        if (cmd.arg1.canConvert<QVariantList>())
         {
-            DataTypes::BlockStruct bs = cmd.arg1.value<DataTypes::BlockStruct>();
-            QByteArray tmpba = StdFunc::toByteArray(static_cast<quint8>(bs.ID));
-            tmpba.append(bs.data);
-            m_request = writeLongData(s_protoCmdMap.at(cmd.command), tmpba);
+            auto vList = cmd.arg1.value<QVariantList>();
+            const quint16 start_addr = vList.first().value<DataTypes::FloatStruct>().sigAdr;
+            const auto group = getGroupByAddress(start_addr);
+            if (group.m_startAddr == start_addr)
+            {
+                const auto block = static_cast<quint8>(group.m_block); // сужающий каст
+                QByteArray tmpba = StdFunc::toByteArray(block);
+                for (const auto &item : vList)
+                {
+                    const float value = item.value<DataTypes::FloatStruct>().sigVal;
+                    tmpba.append(StdFunc::toByteArray(value));
+                }
+                m_request = writeLongData(s_protoCmdMap.at(cmd.command), tmpba);
+            }
         }
         break;
     }
@@ -184,7 +188,7 @@ QByteArray ProtocomRequestParser::parse(const CommandStruct &cmd)
         m_request = prepareBlock(Proto::WriteSingleCommand, tmpba);
         break;
     }
-    case Commands::C_EnableHardwareWriting:
+    case Commands::C_EnableHiddenBlockWriting:
     {
         setExceptionalSituationStatus(true);
         break;
@@ -202,7 +206,8 @@ QByteArray ProtocomRequestParser::getNextContinueCommand() noexcept
 
 void ProtocomRequestParser::exceptionalAction(const CommandStruct &cmd) noexcept
 {
-    Q_UNUSED(cmd);
+    if (cmd.command == Commands::C_EnableHiddenBlockWriting)
+        emit emulateOkAnswer();
     setExceptionalSituationStatus(false);
 }
 

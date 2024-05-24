@@ -72,12 +72,12 @@ void ProtocomResponseParser::parse()
             processU32(m_responseBuffer, addr);
         break;
     case Proto::Commands::ReadBlkStartInfo:
-    case Proto::Commands::ReadBlkStartInfoExt:
+    {
         // Update data
-        if (boardType.mTypeB != m_responseBuffer[0])
-            boardType.mTypeB = m_responseBuffer[0];
-        if (boardType.mTypeM != m_responseBuffer[4])
-            boardType.mTypeM = m_responseBuffer[4];
+        Q_ASSERT(m_responseBuffer.size() == sizeof(quint32) * 15); // check bsi size
+        [[fallthrough]];
+    }
+    case Proto::Commands::ReadBlkStartInfoExt:
         processU32(m_responseBuffer, addr);
         break;
     case Proto::Commands::ReadBlkAC:
@@ -204,8 +204,11 @@ void ProtocomResponseParser::processDataSection(const QByteArray &dataSection)
     // Добавляем полученные данные в буфер
     m_longDataBuffer.append(dataSection);
     // Если получили первую секцию
-    if (m_isFirstSectionReceived && !m_isLastSectionReceived)
-        emit readingLongData();
+    if (m_isFirstSectionReceived)
+    {
+        if (!m_isLastSectionReceived)
+            emit readingLongData();
+    }
     if (m_receivedCommand == Proto::Commands::ReadFile)
         processProgressCount(m_longDataBuffer.size()); // Отсылаем текущий прогресс
     // Восстанавливаем флаг, когда получаем последнюю секцию

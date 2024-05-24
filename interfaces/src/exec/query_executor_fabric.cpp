@@ -13,6 +13,9 @@ DefaultQueryExecutor *QueryExecutorFabric::makeProtocomExecutor(RequestQueue &qu
     // NOTE: query executor must be parent for all parsers
     auto requestParser = new ProtocomRequestParser(executor);
     auto responseParser = new ProtocomResponseParser(executor);
+    // Эмуляция ответа "Ок"
+    QObject::connect(requestParser, &ProtocomRequestParser::emulateOkAnswer, //
+        responseParser, &ProtocomResponseParser::processOk);
     executor->setParsers(requestParser, responseParser);
     return executor;
 }

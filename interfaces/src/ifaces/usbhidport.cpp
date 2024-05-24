@@ -2,6 +2,7 @@
 
 #include <QCoreApplication>
 #include <QDebug>
+#include <QEventLoop>
 #include <hidapi/hidapi.h>
 
 constexpr int MaxSegmenthLength = 64; ///< Максимальная длина одного сегмента (0x40)
@@ -112,7 +113,9 @@ bool UsbHidPort::writeDataToPort(QByteArray &command)
     command.prepend(static_cast<char>(0x00)); // Добавляем поле ID для HID protocol
 
     auto tmpt = static_cast<size_t>(command.size());
+    m_dataGuard.lock();
     auto writtenBytes = hid_write(m_hidDevice, reinterpret_cast<unsigned char *>(command.data()), tmpt);
+    m_dataGuard.unlock();
     if (writtenBytes == hidApiErrorCode)
     {
         writeLog(Error::Msg::WriteError);
@@ -125,8 +128,11 @@ bool UsbHidPort::writeDataToPort(QByteArray &command)
 
 void UsbHidPort::hidErrorHandle()
 {
-    auto errString = "HID API Error: " + QString::fromStdWString(hid_error(m_hidDevice));
-    writeLog(errString.toLocal8Bit());
+    if (m_isLoggingEnabled)
+    {
+        auto errString = "HID API Error: " + QString::fromStdWString(hid_error(m_hidDevice));
+        m_log.error(errString);
+    }
 }
 
 const UsbHidSettings &UsbHidPort::deviceInfo() const

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <interfaces/types/usbhidsettings.h>
+#include <interfaces/types/settingstypes.h>
 
 namespace HID
 {

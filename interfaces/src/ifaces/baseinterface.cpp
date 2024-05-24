@@ -10,8 +10,7 @@ BaseInterface::BaseInterface(const QString &logFilename, const BaseSettings &set
     , m_isLoggingEnabled(settings.m_isLoggingEnabled)
 {
     qRegisterMetaType<InterfaceError>();
-    //    m_log.init(logFilename + "." + ::logExt);
-    Q_UNUSED(logFilename)
+    m_log.init(logFilename + "." + ::logExt);
 }
 
 void BaseInterface::setState(const Interface::State state) noexcept
@@ -29,29 +28,28 @@ void BaseInterface::writeLog(const QByteArray &ba, Interface::Direction dir)
 {
     if (m_isLoggingEnabled)
     {
-        QByteArray tmpba = "[" + QByteArray(metaObject()->className()) + "]";
+        QString msg = metaObject()->className();
         switch (dir)
         {
         case Interface::FromDevice:
-            tmpba.append(" <- ");
+            msg += ": -> ";
             break;
         case Interface::ToDevice:
-            tmpba.append(" -> ");
+            msg += ": <- ";
             break;
         default:
-            tmpba.append(" ");
+            msg += ": ";
             break;
         }
-        tmpba.append(ba).append("\n");
-        //        m_log.writeRaw(tmpba);
-        qDebug() << tmpba;
+        msg += ba.toHex();
+        m_log.debug(msg);
     }
 }
 
-void BaseInterface::writeLog(const Error::Msg msg, Interface::Direction dir)
+void BaseInterface::writeLog(const Error::Msg msg)
 {
     if (m_isLoggingEnabled)
-        writeLog(QVariant::fromValue(msg).toByteArray(), dir);
+        m_log.error(QVariant::fromValue(msg).toString());
 }
 
 void BaseInterface::poll()
@@ -71,6 +69,7 @@ void BaseInterface::poll()
             {
                 writeLog(data.toHex(), Interface::Direction::FromDevice);
                 emit dataReceived(data);
+                emit executorWakeUp();
             }
         }
         else
@@ -82,8 +81,7 @@ void BaseInterface::poll()
 
     // Finish thread
     disconnect();
-    //    m_log.info(QString(metaObject()->className()) + " is finished\n");
-    qDebug() << metaObject()->className() << " is finished\n";
+    m_log.info(QString(metaObject()->className()) + " is finished\n");
     emit finished();
     QCoreApplication::processEvents();
 }

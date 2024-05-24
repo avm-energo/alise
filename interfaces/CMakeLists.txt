@@ -8,6 +8,7 @@ set(SRC_PATH     "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(files_h
     "${INCLUDE_PATH}/connectioncontext.h"
     "${INCLUDE_PATH}/connectionmanager.h"
+    "${INCLUDE_PATH}/moduledataupdater.h"
     "${INCLUDE_PATH}/conn/async_connection.h"
     "${INCLUDE_PATH}/conn/sync_connection.h"
     "${INCLUDE_PATH}/exec/default_query_executor.h"
@@ -22,6 +23,7 @@ set(files_h
     "${INCLUDE_PATH}/types/common_types.h"
     "${INCLUDE_PATH}/types/protocol_settings.h"
     "${INCLUDE_PATH}/types/protocom_types.h"
+    "${INCLUDE_PATH}/types/settingstypes.h"
     "${INCLUDE_PATH}/types/usbhidportinfo.h"
     "${INCLUDE_PATH}/types/usbhidsettings.h"
     "${INCLUDE_PATH}/utils/request_queue.h"
@@ -32,6 +34,7 @@ set(files_h
 set(files_cpp
     "${SRC_PATH}/connectioncontext.cpp"
     "${SRC_PATH}/connectionmanager.cpp"
+    "${SRC_PATH}/moduledataupdater.cpp"
     "${SRC_PATH}/conn/async_connection.cpp"
     "${SRC_PATH}/conn/sync_connection.cpp"
     "${SRC_PATH}/exec/default_query_executor.cpp"
@@ -55,9 +58,11 @@ target_include_directories(${PROJECT_NAME} PUBLIC
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
   "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
 
-if(MSVC)
+# Visual Studio C++ compile options
+if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
   target_compile_options(${PROJECT_NAME} PRIVATE /W4)
-else()
+# GCC and Clang compile options
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic)
 endif()
 

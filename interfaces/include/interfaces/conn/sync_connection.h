@@ -18,13 +18,17 @@ private:
     QByteArray m_byteArrayResult;
     bool m_busy, m_timeout, m_responseResult;
 
+    void eventloop() noexcept;
+    void longEventLoop(int scale) noexcept;
+    void reset() noexcept;
+
 public:
     explicit SyncConnection(AsyncConnection *connection) noexcept;
 
+    Error::Msg reqBSI();
     bool supportBSIExt();
     Error::Msg reqBlockSync(quint32 blocknum, DataTypes::DataBlockTypes blocktype, void *block, quint32 blocksize);
     Error::Msg writeBlockSync(quint32 blocknum, DataTypes::DataBlockTypes blocktype, void *block, quint32 blocksize);
-    Error::Msg writeConfigurationSync(const QByteArray &ba);
     Error::Msg reqTimeSync(void *block, quint32 blocksize);
 
 private slots:
