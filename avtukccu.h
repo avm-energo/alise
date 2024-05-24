@@ -1,6 +1,7 @@
 #ifndef AVTUKCCU_H
 #define AVTUKCCU_H
 
+#include <QByteArray>
 #include <cstdint>
 
 /// AVTUK Central Controller Unit
@@ -36,7 +37,18 @@ struct Indication
         return ((lhs.PulseCnt1 == rhs.PulseCnt1) && (lhs.PulseCnt2 == rhs.PulseCnt2)
             && (lhs.PulseFreq1 == rhs.PulseFreq1) && (lhs.PulseFreq2 == rhs.PulseFreq2));
     }
+
+    inline QByteArray toByteArray()
+    {
+        QByteArray ba;
+        ba.append((char *)&PulseCnt1, sizeof(PulseCnt1));
+        ba.append((char *)&PulseFreq1, sizeof(PulseFreq1));
+        ba.append((char *)&PulseCnt2, sizeof(PulseCnt2));
+        ba.append((char *)&PulseFreq2, sizeof(PulseFreq2));
+        return ba;
+    }
 };
+
 }
 
 #endif // AVTUKCCU_H
