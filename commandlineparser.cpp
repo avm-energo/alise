@@ -5,7 +5,7 @@
 #include <QCommandLineParser>
 #include <QEventLoop>
 #include <QTimer>
-#include <gpiod.hpp>
+#include <gpiod.h>
 #include <iostream>
 
 CommandLineParser::CommandLineParser(QObject *parent) : QObject(parent)
@@ -172,30 +172,36 @@ void CommandLineParser::setHWVersion(const QString &hwversion)
 
 void CommandLineParser::listPins()
 {
-    for (auto &cit : ::gpiod::make_chip_iter())
-    {
-        std::cout << cit.name() << " - " << cit.num_lines() << " lines:" << ::std::endl;
+    struct gpiod_chip *chip;
+    struct gpiod_chip_iter *iter = gpiod_chip_iter_new();
+    struct gpiod_line_bulk *lineBulk;
+    struct gpiod_line *line;
 
-        for (auto &lit : ::gpiod::line_iter(cit))
+    while ((chip = gpiod_chip_iter_next(iter)) != NULL)
+    {
+        std::cout << gpiod_chip_name(chip) << " - " << gpiod_chip_num_lines(chip) << " lines:" << ::std::endl;
+        gpiod_chip_get_all_lines(chip, lineBulk);
+        for (int i = 0; i < lineBulk->num_lines; ++i)
         {
+            line = lineBulk->lines[i];
             std::cout << "\tline ";
             std::cout.width(3);
-            std::cout << lit.offset() << ": ";
+            std::cout << gpiod_line_offset(line) << ": ";
 
             std::cout.width(12);
-            std::cout << (lit.name().empty() ? "unnamed" : lit.name());
+            std::cout << gpiod_line_name(line);
             std::cout << " ";
 
             std::cout.width(12);
-            std::cout << (lit.consumer().empty() ? "unused" : lit.consumer());
+            std::cout << gpiod_line_consumer(line);
             std::cout << " ";
 
             std::cout.width(8);
-            std::cout << (lit.direction() == ::gpiod::line::DIRECTION_INPUT ? "input" : "output");
+            std::cout << (gpiod_line_direction(line) == GPIOD_LINE_DIRECTION_INPUT ? "input" : "output");
             std::cout << " ";
 
             std::cout.width(10);
-            std::cout << (lit.active_state() == ::gpiod::line::ACTIVE_LOW ? "active-low" : "active-high");
+            std::cout << (gpiod_line_active_state(line) == GPIOD_LINE_ACTIVE_STATE_LOW ? "active-low" : "active-high");
 
             std::cout << ::std::endl;
         }

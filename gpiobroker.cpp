@@ -10,10 +10,10 @@
 #include <sys/reboot.h>
 #include <unistd.h>
 
-constexpr GpioBroker::GpioPin PowerStatusPin0 { 3, 5 };
-constexpr GpioBroker::GpioPin PowerStatusPin1 { 2, 17 };
-constexpr GpioBroker::GpioPin LedPin { 0, 31 };
-constexpr GpioBroker::GpioPin ResetPin { 1, 6 };
+GpioBroker::GpioPin PowerStatusPin0 { "PWR1", 3, 5, GpioBroker::PinDirections::INPUT };
+GpioBroker::GpioPin PowerStatusPin1 { "PWR2", 2, 17, GpioBroker::PinDirections::INPUT };
+GpioBroker::GpioPin LedPin { "MODELED", 0, 31, GpioBroker::PinDirections::OUTPUT };
+GpioBroker::GpioPin ResetPin { "RESET", 1, 6, GpioBroker::PinDirections::INPUT };
 
 using namespace Alise;
 
@@ -23,8 +23,13 @@ GpioBroker::GpioBroker(QObject *parent) : Broker(parent)
     m_blinkMode = BlinkMode::ONEBLINK;
 }
 
+GpioBroker::~GpioBroker()
+{
+}
+
 bool GpioBroker::connect()
 {
+    const QList<GpioPin> pinList = { LedPin, ResetPin, PowerStatusPin0, PowerStatusPin1 };
     m_resetTimer.setInterval(AliseConstants::ResetCheckPeriod());
     setIndication(AliseConstants::FailureIndication);
     QObject::connect(&m_resetTimer, &QTimer::timeout, this, &GpioBroker::reset);
@@ -33,27 +38,57 @@ bool GpioBroker::connect()
     m_gpioTimer.start();
 
 #ifndef ALISE_LOCALDEBUG
-    chip0.open(std::to_string(0));
+    for (auto pin : pinList)
     {
-        auto line = chip0.get_line(PowerStatusPin0.offset);
-        line.request({ PROGNAME, ::gpiod::line_request::DIRECTION_INPUT, 0 });
+        if (!chipMap.contains(pin.chip)) // if chip is not already opened
+        {
+            const std::string chipstr = "/dev/gpiochip" + std::to_string(pin.chip);
+            gpiod_chip *chip = gpiod_chip_open(chipstr.c_str());
+            if (chip == NULL)
+            {
+                qCritical() << "cannot open chip " << chipstr.c_str() << "!";
+                return false;
+            }
+            chipMap[pin.chip] = chip;
+            qDebug() << "chip " << chipstr.c_str() << " has been opened";
+            gpiod_line *line = gpiod_chip_get_line(chip, pin.offset);
+            if (line == NULL)
+            {
+                qCritical() << "cannot get line " << chipstr.c_str() << ":" << pin.offset << "!";
+                return false;
+            }
+            lineMap[pin.name] = line;
+            if (pin.direction == GpioBroker::PinDirections::OUTPUT)
+            {
+                int ret = gpiod_line_request_output(line, "gpio", 0);
+                if (ret != 0)
+                {
+                    qCritical() << "cannot request line " << chipstr.c_str() << ":" << pin.offset << " for output!";
+                    return false;
+                }
+            }
+            else
+            {
+                int ret = gpiod_line_request_input(line, "gpio");
+                if (ret != 0)
+                {
+                    qCritical() << "cannot request line " << chipstr.c_str() << ":" << pin.offset << " for input!";
+                    return false;
+                }
+            }
+            qDebug() << "line " << chipstr.c_str() << ":" << pin.offset << " has been opened";
+        }
     }
-    chip1.open(std::to_string(1));
+    modeLine = lineMap["MODELED"];
+    pwr1Line = lineMap["PWR1"];
+    pwr2Line = lineMap["PWR2"];
+    resetLine = lineMap["RESET"];
+    if ((modeLine == NULL) || (pwr1Line == NULL) || (pwr2Line == NULL) || (resetLine == NULL))
     {
-        auto line = chip1.get_line(LedPin.offset);
-        line.request({ PROGNAME, ::gpiod::line_request::DIRECTION_OUTPUT, 0 });
+        qCritical() << "One of the line is NULL!";
+        return false;
     }
-    chip2.open(std::to_string(2));
-    {
-        auto line = chip2.get_line(ResetPin.offset);
-        line.request({ PROGNAME, ::gpiod::line_request::DIRECTION_INPUT, 0 });
-    }
-    chip3.open(std::to_string(3));
-    {
-        auto line = chip3.get_line(PowerStatusPin1.offset);
-        line.request({ PROGNAME, ::gpiod::line_request::DIRECTION_INPUT, 0 });
-    }
-    chip1.get_line(LedPin.offset).set_value(m_blinkStatus);
+    gpiod_line_set_value(modeLine, 1);
 #endif
     return true;
 }
@@ -62,8 +97,8 @@ void GpioBroker::checkPowerUnit()
 {
     QMutexLocker locker(&_mutex);
 #ifndef ALISE_LOCALDEBUG
-    auto status1 = chip0.get_line(PowerStatusPin0.offset).get_value();
-    auto status2 = chip3.get_line(PowerStatusPin1.offset).get_value();
+    auto status1 = gpiod_line_get_value(pwr1Line);
+    auto status2 = gpiod_line_get_value(pwr2Line);
 #else
     int status1 = 0;
     int status2 = 0;
@@ -127,7 +162,7 @@ void GpioBroker::rebootMyself()
     m_gpioTimer.stop();
     m_resetTimer.stop();
 #ifndef ALISE_LOCALDEBUG
-    chip1.get_line(LedPin.offset).set_value(false);
+    gpiod_line_set_value(modeLine, PinOutputs::OFF);
 #endif
     reboot(RB_AUTOBOOT);
 }
@@ -136,7 +171,7 @@ void GpioBroker::reset()
 {
     QMutexLocker locker(&_mutex);
 #ifndef ALISE_LOCALDEBUG
-    bool value = !chip2.get_line(ResetPin.offset).get_value();
+    bool value = !gpiod_line_get_value(resetLine);
 
     if (value) // button pushed, counting seconds...
     {
@@ -159,8 +194,8 @@ void GpioBroker::reset()
     {
         qDebug() << "[GPIO] Reset interface settings...";
 
-        auto status1 = chip0.get_line(PowerStatusPin0.offset).get_value();
-        auto status2 = chip3.get_line(PowerStatusPin1.offset).get_value();
+        auto status1 = gpiod_line_get_value(pwr1Line);
+        auto status2 = gpiod_line_get_value(pwr2Line);
 
         DataTypes::BlockStruct blk;
         blk.data.resize(sizeof(AVTUK_CCU::Main));
@@ -185,7 +220,7 @@ void GpioBroker::blink()
 {
 #ifndef ALISE_LOCALDEBUG
     --m_blinkCount;
-    chip1.get_line(LedPin.offset).set_value(m_blinkStatus);
+    gpiod_line_set_value(modeLine, (m_blinkStatus) ? PinOutputs::ON : PinOutputs::OFF);
     m_blinkStatus = !m_blinkStatus;
     if (m_blinkCount <= 0)
     {
