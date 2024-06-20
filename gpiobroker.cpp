@@ -10,10 +10,10 @@
 #include <sys/reboot.h>
 #include <unistd.h>
 
-constexpr GpioBroker::GpioPin PowerStatusPin0 { 0, 5 };
-constexpr GpioBroker::GpioPin PowerStatusPin1 { 3, 17 };
-constexpr GpioBroker::GpioPin LedPin { 1, 31 };
-constexpr GpioBroker::GpioPin ResetPin { 2, 6 };
+constexpr GpioBroker::GpioPin PowerStatusPin0 { 3, 5 };
+constexpr GpioBroker::GpioPin PowerStatusPin1 { 2, 17 };
+constexpr GpioBroker::GpioPin LedPin { 0, 31 };
+constexpr GpioBroker::GpioPin ResetPin { 1, 6 };
 
 using namespace Alise;
 
