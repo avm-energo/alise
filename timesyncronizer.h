@@ -2,11 +2,18 @@
 
 #include <QObject>
 #include <ctime>
+#include <gen/executecommand.h>
 
 class TimeSyncronizer : public QObject
 {
     Q_OBJECT
 public:
+    enum CurrentCommandEnum
+    {
+        NTP,
+        HWCLOCK
+    };
+
     enum NtpStatusEnum
     {
         NO_SYNC = 1,
@@ -19,7 +26,7 @@ public:
 
     void init();
     timespec systemTime() const;
-    int ntpStatus() const;
+    void requestNtpStatus();
 
 public slots:
     void printAndSetSystemTime(const timespec time);
@@ -27,9 +34,14 @@ public slots:
 private:
     void setSystemTime(const timespec &systemTime);
     int m_timeCounter;
+    CurrentCommandEnum curCommand;
+    ExecuteCommandAsync *executor;
 
 private slots:
     void checkNtpAndSetTime();
+    void commandResultAcquired(std::string &res);
+    void commandExitCodeAcuired(int exitCode);
+    void ntpStatusReceived(int status);
 
 signals:
     void ntpStatusChanged(int);

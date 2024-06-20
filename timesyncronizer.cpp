@@ -1,7 +1,6 @@
 #include "timesyncronizer.h"
 
 #include <QDateTime>
-#include <QProcess>
 #include <QTimer>
 #include <QtDebug>
 #include <arpa/inet.h>
@@ -9,6 +8,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <error.h>
+#include <gen/stdfunc.h>
 #include <iostream>
 #include <sys/socket.h>
 #include <sys/time.h>
@@ -47,6 +47,10 @@
 
 TimeSyncronizer::TimeSyncronizer(QObject *parent) : QObject(parent)
 {
+    executor = new ExecuteCommandAsync;
+    connect(executor, &ExecuteCommandAsync::resultAcquired, this, &TimeSyncronizer::commandResultAcquired);
+    connect(executor, &ExecuteCommandAsync::finished, this, &TimeSyncronizer::commandExitCodeAcuired);
+    connect(this, &TimeSyncronizer::ntpStatusChanged, this, &TimeSyncronizer::ntpStatusChanged);
 }
 
 TimeSyncronizer::~TimeSyncronizer()
@@ -56,7 +60,7 @@ TimeSyncronizer::~TimeSyncronizer()
 void TimeSyncronizer::init()
 {
     m_timeCounter = 0;
-    emit ntpStatusChanged(ntpStatus()); // first time we must emit ntpStatus
+    requestNtpStatus(); // first time we must emit ntpStatus
     QTimer *timer = new QTimer(this);
     timer->setInterval(NTPSTATUSPERIOD);
     connect(timer, &QTimer::timeout, this, &TimeSyncronizer::checkNtpAndSetTime);
@@ -87,24 +91,73 @@ timespec TimeSyncronizer::systemTime() const
 
 void TimeSyncronizer::setSystemTime(const timespec &systemTime)
 {
-    QString program = "/usr/sbin/hwclock";
-    QStringList arguments { "-w" };
+#if defined(Q_OS_LINUX)
+    std::string program = "/usr/sbin/hwclock -w";
 
     struct timeval timeToSet;
     timeToSet.tv_sec = systemTime.tv_sec;
     timeToSet.tv_usec = 0;
     settimeofday(&timeToSet, NULL);
-    QProcess *myProcess = new QProcess(this); // set datetime to RTC
-    qInfo() << "Set hwclock time: " << systemTime.tv_sec;
-    myProcess->start(program, arguments);
-    myProcess->waitForFinished();
-    qInfo() << "HWClock exited with code: " << myProcess->exitCode() << " and status: " << myProcess->exitStatus();
+    qInfo() << "Setting hwclock time: " << systemTime.tv_sec;
+    curCommand = CurrentCommandEnum::HWCLOCK;
+    executor->execute(program);
+#else
+    // to be written...
+#endif
 }
 
 void TimeSyncronizer::checkNtpAndSetTime()
 {
-    int status = ntpStatus();
+    requestNtpStatus();
     ++m_timeCounter;
+}
+
+void TimeSyncronizer::commandResultAcquired(std::string &res)
+{
+    QString output = res.c_str();
+    if (curCommand == CurrentCommandEnum::NTP)
+    {
+        //    qDebug() << "Ntpq -p output: " << output;
+        if (output.isEmpty())
+        {
+            qWarning() << "ntpq output is empty!";
+            emit ntpStatusChanged(NO_SYNC);
+        }
+        if (output.contains("Connection refused"))
+        {
+            qWarning() << "ntpq error: connection refused";
+            emit ntpStatusChanged(NO_SYNC);
+        }
+
+        // Split ntpq output
+        QStringList lines = output.split('\n');
+        if (lines.size() < 2)
+        {
+            qWarning() << "ntpq output is wrong!";
+            emit ntpStatusChanged(NO_SYNC);
+        }
+        // Removing ntpq table header
+        lines.removeFirst(); //     remote           refid      st t when poll reach   delay   offset  jitter
+        lines.removeFirst(); //==============================================================================
+        foreach (QString str, lines)
+        {
+            if (str.startsWith("*LOCAL")) // ntp is synchronized locally
+                emit ntpStatusChanged(SYNC_LOCAL);
+            else if (str.startsWith("*")) // ntp is synchronized externally
+                emit ntpStatusChanged(SYNC_EXT);
+        }
+        emit ntpStatusChanged(NO_SYNC);
+    }
+}
+
+void TimeSyncronizer::commandExitCodeAcuired(int exitCode)
+{
+    if (exitCode != 0)
+        qWarning() << "Error executing command, status: " << exitCode;
+}
+
+void TimeSyncronizer::ntpStatusReceived(int status)
+{
     if (m_timeCounter >= 20) // one time per minute
     {
         if (status != NO_SYNC) // ntp is working
@@ -112,61 +165,13 @@ void TimeSyncronizer::checkNtpAndSetTime()
             m_timeCounter = 0;
             emit setTime(systemTime());
         }
-        emit ntpStatusChanged(status);
     }
 }
 
-int TimeSyncronizer::ntpStatus() const
+void TimeSyncronizer::requestNtpStatus()
 {
-    QString output;
-#if defined(Q_OS_LINUX)
-    QProcess process;
-    QString program = "/usr/bin/ntpq";
-    QStringList arguments { "-p" };
-    process.start(program, arguments);
-
-    if (!process.waitForFinished(1000))
-    {
-        qWarning() << "ntpq start error: " << process.errorString();
-        return NO_SYNC;
-    }
-    output = process.readAllStandardOutput();
-#else
-    QFile file(qApp->applicationDirPath() + "/ntpq_output.txt");
-    if (file.exists() && file.open(QIODevice::ReadOnly))
-    {
-        output = file.readAll();
-        file.close();
-    }
-#endif
-    //    qDebug() << "Ntpq -p output: " << output;
-    if (output.isEmpty())
-    {
-        qWarning() << "ntpq output is empty!";
-        return NO_SYNC;
-    }
-    if (output.contains("Connection refused"))
-    {
-        qWarning() << "ntpq error: connection refused";
-        return NO_SYNC;
-    }
-
-    // Split ntpq output
-    QStringList lines = output.split('\n');
-    if (lines.size() < 2)
-    {
-        qWarning() << "ntpq output is wrong!";
-        return NO_SYNC;
-    }
-    // Removing ntpq table header
-    lines.removeFirst(); //     remote           refid      st t when poll reach   delay   offset  jitter
-    lines.removeFirst(); //==============================================================================
-    foreach (QString str, lines)
-    {
-        if (str.startsWith("*LOCAL")) // ntp is synchronized locally
-            return SYNC_LOCAL;
-        else if (str.startsWith("*")) // ntp is synchronized externally
-            return SYNC_EXT;
-    }
-    return NO_SYNC;
+    curCommand = CurrentCommandEnum::NTP;
+    std::string program = "/usr/bin/ntpq -p";
+    std::string output;
+    executor->execute(program);
 }

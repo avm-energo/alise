@@ -194,14 +194,12 @@ void GpioBroker::reset()
     {
         qDebug() << "[GPIO] Reset interface settings...";
 
-        auto status1 = gpiod_line_get_value(pwr1Line);
-        auto status2 = gpiod_line_get_value(pwr2Line);
-
+        // set resetReq flag to RecoveryEngine to drop down eth settings to default
         DataTypes::BlockStruct blk;
         blk.data.resize(sizeof(AVTUK_CCU::Main));
         AVTUK_CCU::Main str;
 
-        str.PWRIN = status2 | (status1 << 1);
+        str.PWRIN = 0;
         str.resetReq = true;
         std::memcpy(blk.data.data(), &str, sizeof(AVTUK_CCU::Main));
         blk.ID = AVTUK_CCU::MainBlock;

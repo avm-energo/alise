@@ -180,10 +180,19 @@ void CommandLineParser::listPins()
     while ((chip = gpiod_chip_iter_next(iter)) != NULL)
     {
         std::cout << gpiod_chip_name(chip) << " - " << gpiod_chip_num_lines(chip) << " lines:" << ::std::endl;
-        gpiod_chip_get_all_lines(chip, lineBulk);
+        if (!gpiod_chip_get_all_lines(chip, lineBulk))
+        {
+            std::cout << "Error while get all lines from chip";
+            return;
+        }
         for (int i = 0; i < lineBulk->num_lines; ++i)
         {
             line = lineBulk->lines[i];
+            if (line == NULL)
+            {
+                std::cout << "Error while get line " << i << " from chip";
+                return;
+            }
             std::cout << "\tline ";
             std::cout.width(3);
             std::cout << gpiod_line_offset(line) << ": ";
