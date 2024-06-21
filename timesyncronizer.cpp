@@ -50,7 +50,6 @@ TimeSyncronizer::TimeSyncronizer(QObject *parent) : QObject(parent)
     executor = new ExecuteCommandAsync;
     connect(executor, &ExecuteCommandAsync::resultAcquired, this, &TimeSyncronizer::commandResultAcquired);
     connect(executor, &ExecuteCommandAsync::finished, this, &TimeSyncronizer::commandExitCodeAcuired);
-    connect(this, &TimeSyncronizer::ntpStatusChanged, this, &TimeSyncronizer::ntpStatusChanged);
 }
 
 TimeSyncronizer::~TimeSyncronizer()
