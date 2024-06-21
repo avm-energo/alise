@@ -92,7 +92,7 @@ timespec TimeSyncronizer::systemTime() const
 void TimeSyncronizer::setSystemTime(const timespec &systemTime)
 {
 #if defined(Q_OS_LINUX)
-    std::string program = "/usr/sbin/hwclock -w";
+    QString program = "/usr/sbin/hwclock -w";
 
     struct timeval timeToSet;
     timeToSet.tv_sec = systemTime.tv_sec;
@@ -112,9 +112,8 @@ void TimeSyncronizer::checkNtpAndSetTime()
     ++m_timeCounter;
 }
 
-void TimeSyncronizer::commandResultAcquired(std::string &res)
+void TimeSyncronizer::commandResultAcquired(const QString &output)
 {
-    QString output = res.c_str();
     if (curCommand == CurrentCommandEnum::NTP)
     {
         //    qDebug() << "Ntpq -p output: " << output;
@@ -171,7 +170,6 @@ void TimeSyncronizer::ntpStatusReceived(int status)
 void TimeSyncronizer::requestNtpStatus()
 {
     curCommand = CurrentCommandEnum::NTP;
-    std::string program = "/usr/bin/ntpq -p";
-    std::string output;
+    QString program = "/usr/bin/ntpq -p";
     executor->execute(program);
 }

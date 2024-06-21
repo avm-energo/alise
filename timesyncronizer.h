@@ -39,7 +39,7 @@ private:
 
 private slots:
     void checkNtpAndSetTime();
-    void commandResultAcquired(std::string &res);
+    void commandResultAcquired(const QString &output);
     void commandExitCodeAcuired(int exitCode);
     void ntpStatusReceived(int status);
 
