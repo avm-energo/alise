@@ -116,7 +116,7 @@ void TimeSyncronizer::commandResultAcquired(const QString &output)
 {
     if (curCommand == CurrentCommandEnum::NTP)
     {
-        //    qDebug() << "Ntpq -p output: " << output;
+        qDebug() << "Ntpq -p output: " << output;
         if (output.isEmpty())
         {
             qWarning() << "ntpq output is empty!";
@@ -144,8 +144,10 @@ void TimeSyncronizer::commandResultAcquired(const QString &output)
                 emit ntpStatusChanged(SYNC_LOCAL);
             else if (str.startsWith("*")) // ntp is synchronized externally
                 emit ntpStatusChanged(SYNC_EXT);
+            qDebug() << "Sync";
         }
         emit ntpStatusChanged(NO_SYNC);
+        qDebug() << "Not sync";
     }
 }
 
@@ -171,5 +173,6 @@ void TimeSyncronizer::requestNtpStatus()
 {
     curCommand = CurrentCommandEnum::NTP;
     QString program = "/usr/bin/ntpq -p";
+    qDebug() << "Requesting NTP status...";
     executor->execute(program);
 }
