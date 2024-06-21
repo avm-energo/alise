@@ -1,5 +1,7 @@
 #include "timesyncronizer.h"
 
+#include "aliseconstants.h"
+
 #include <QDateTime>
 #include <QTimer>
 #include <QtDebug>
@@ -43,8 +45,6 @@
 #define MMASK 0x20      /* bit mask for the more bit in Status Byte2 */
 #define PAYLOADSIZE 468 /* size in bytes of the message payload string */
 
-#define NTPSTATUSPERIOD 3000
-
 TimeSyncronizer::TimeSyncronizer(QObject *parent) : QObject(parent)
 {
     executor = new ExecuteCommandAsync;
@@ -61,7 +61,7 @@ void TimeSyncronizer::init()
     m_timeCounter = 0;
     requestNtpStatus(); // first time we must emit ntpStatus
     QTimer *timer = new QTimer(this);
-    timer->setInterval(NTPSTATUSPERIOD);
+    timer->setInterval(Alise::AliseConstants::UpdateTimePeriod());
     connect(timer, &QTimer::timeout, this, &TimeSyncronizer::checkNtpAndSetTime);
     timer->start();
 }
@@ -115,16 +115,18 @@ void TimeSyncronizer::commandResultAcquired(const QString &output)
 {
     if (curCommand == CurrentCommandEnum::NTP)
     {
-        qDebug() << "Ntpq -p output: " << output;
+        //        qDebug() << "Ntpq -p output: " << output;
         if (output.isEmpty())
         {
             qWarning() << "ntpq output is empty!";
             emit ntpStatusChanged(NO_SYNC);
+            return;
         }
         if (output.contains("Connection refused"))
         {
             qWarning() << "ntpq error: connection refused";
             emit ntpStatusChanged(NO_SYNC);
+            return;
         }
 
         // Split ntpq output
@@ -133,6 +135,7 @@ void TimeSyncronizer::commandResultAcquired(const QString &output)
         {
             qWarning() << "ntpq output is wrong!";
             emit ntpStatusChanged(NO_SYNC);
+            return;
         }
         // Removing ntpq table header
         lines.removeFirst(); //     remote           refid      st t when poll reach   delay   offset  jitter
@@ -140,13 +143,17 @@ void TimeSyncronizer::commandResultAcquired(const QString &output)
         foreach (QString str, lines)
         {
             if (str.startsWith("*LOCAL")) // ntp is synchronized locally
+            {
                 emit ntpStatusChanged(SYNC_LOCAL);
+                return;
+            }
             else if (str.startsWith("*")) // ntp is synchronized externally
+            {
                 emit ntpStatusChanged(SYNC_EXT);
-            qDebug() << "Sync";
+                return;
+            }
         }
         emit ntpStatusChanged(NO_SYNC);
-        qDebug() << "Not sync";
     }
 }
 
