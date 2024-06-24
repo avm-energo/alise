@@ -64,7 +64,10 @@ void Broker::healthReceived(uint32_t code)
 {
     m_clientTimeoutTimer.start(); // restart health query timeout timer
     if (code == m_oldCode)
+    {
+        qDebug() << "code = " << code << ", oldcode = " << m_oldCode;
         return;
+    }
     m_oldCode = code;
     uint8_t processStatus;
     uint8_t mainHealthBits = (code >> 29) & 0x07;             // main health bits - three MSB's
