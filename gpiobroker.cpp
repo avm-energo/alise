@@ -136,8 +136,8 @@ void GpioBroker::setIndication(const AVTUK_CCU::Indication &indication)
         m_blinkCount = c_maxBlinks;
         m_blinkFreq = indic.PulseFreq2;
         m_blinkMode = BlinkMode::ONEBLINK;
-        qDebug() << "1. restartBlinkTimer: blinkCount = " << m_blinkCount << ", blinkMode = " << m_blinkMode
-                 << ", blinkFreq = " << m_blinkFreq;
+        //        qDebug() << "1. restartBlinkTimer: blinkCount = " << m_blinkCount << ", blinkMode = " << m_blinkMode
+        //                 << ", blinkFreq = " << m_blinkFreq;
         restartBlinkTimer();
         return;
     }
@@ -145,14 +145,14 @@ void GpioBroker::setIndication(const AVTUK_CCU::Indication &indication)
     {
         m_blinkCount = c_maxBlinks;
         m_blinkMode = BlinkMode::ONEBLINK;
-        qDebug() << "2. restartBlinkTimer: blinkCount = " << m_blinkCount << ", blinkMode = " << m_blinkMode
-                 << ", blinkFreq = " << m_blinkFreq;
+        //        qDebug() << "2. restartBlinkTimer: blinkCount = " << m_blinkCount << ", blinkMode = " << m_blinkMode
+        //                 << ", blinkFreq = " << m_blinkFreq;
         restartBlinkTimer();
         return;
     }
     else
         m_blinkMode = BlinkMode::TWOBLINKS;
-    qDebug() << "Two blinks mode";
+    //    qDebug() << "Two blinks mode";
     restartBlinkTimer();
 }
 
@@ -224,21 +224,21 @@ void GpioBroker::blink()
     {
         if (m_blinkMode != BlinkMode::TWOBLINKS)
         {
-            qDebug() << "Setting maxBlinks";
+            //            qDebug() << "Setting maxBlinks";
             m_blinkCount = c_maxBlinks;
         }
         else if (m_blinkFreq == m_currentIndication.PulseFreq1)
         {
             m_blinkFreq = m_currentIndication.PulseFreq2;
             m_blinkCount = m_currentIndication.PulseCnt2;
-            qDebug() << "Setting PulseFreq2 = " << m_blinkFreq << ", PulseCnt2 = " << m_blinkCount;
+            //            qDebug() << "Setting PulseFreq2 = " << m_blinkFreq << ", PulseCnt2 = " << m_blinkCount;
             restartBlinkTimer();
         }
         else
         {
             m_blinkFreq = m_currentIndication.PulseFreq1;
             m_blinkCount = m_currentIndication.PulseCnt1;
-            qDebug() << "Setting PulseFreq1 = " << m_blinkFreq << ", PulseCnt1 = " << m_blinkCount;
+            //            qDebug() << "Setting PulseFreq1 = " << m_blinkFreq << ", PulseCnt1 = " << m_blinkCount;
             restartBlinkTimer();
         }
     }

@@ -36,7 +36,7 @@ public slots:
     void setFailedIndication();
 
 private:
-    QTimer checkPowerTimer, m_clientTimeoutTimer;
+    QTimer checkPowerTimer;
     uint8_t m_worstProcessNumber;
     Alise::ProcessErrors m_worstProcessError;
 
