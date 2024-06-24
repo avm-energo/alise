@@ -20,6 +20,7 @@ protected:
 public:
     explicit Broker(QObject *parent = nullptr);
     virtual bool connect() = 0;
+    void clearOldCode();
     uint32_t m_oldCode;
 
 public slots:

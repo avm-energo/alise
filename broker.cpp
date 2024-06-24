@@ -13,9 +13,14 @@ Broker::Broker(QObject *parent) : QObject(parent)
         qDebug() << "Health Query Timeout";
         setIndication(AliseConstants::FailureIndication);
     });
-    m_oldCode = 0;
+    clearOldCode();
 
     m_clientTimeoutTimer.start();
+}
+
+void Broker::clearOldCode()
+{
+    m_oldCode = 0;
 }
 
 void Broker::updateBlock(const DataTypes::BlockStruct &blk)
@@ -138,6 +143,7 @@ void Broker::healthReceived(uint32_t code)
 
 void Broker::setFailedIndication()
 {
+    clearOldCode(); // to let alise set new indication on new health code
     setIndication(AliseConstants::FailureIndication);
 }
 
