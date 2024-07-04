@@ -48,6 +48,13 @@ bool CommandLineParser::parseCommandLine(AliseSettings &settings)
         }
         if (!m_broker->BSIReady())
             waitForBSIOrTimeout();
+#else
+        bool showPins = parser.isSet(showGpio);
+        if (showPins)
+        {
+            listPins();
+        }
+#endif
         if (parser.isSet(listversion))
         {
             std::cout << "Module serial number: " << settings.serialNum << "\n";
@@ -56,14 +63,6 @@ bool CommandLineParser::parseCommandLine(AliseSettings &settings)
             std::cout << "Software version: " << settings.versionStr(settings.swVersion).toStdString() << "\n";
             return false;
         }
-#else
-        bool showPins = parser.isSet(showGpio);
-        if (showPins)
-        {
-            listPins();
-        }
-#endif
-
         if (parser.isSet(serialNumber))
             setSerialNumber(parser.value("serial"));
         if (parser.isSet(serialNumberB))
