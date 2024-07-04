@@ -47,6 +47,7 @@
 
 TimeSyncronizer::TimeSyncronizer(QObject *parent) : QObject(parent)
 {
+    oldNtpStatus = NtpStatusEnum::NO_SYNC;
     executor = new ExecuteCommandAsync;
     connect(executor, &ExecuteCommandAsync::resultAcquired, this, &TimeSyncronizer::commandResultAcquired);
     connect(executor, &ExecuteCommandAsync::finished, this, &TimeSyncronizer::commandExitCodeAcuired);
@@ -64,6 +65,7 @@ void TimeSyncronizer::init()
     timer->setInterval(Alise::AliseConstants::UpdateTimePeriod());
     connect(timer, &QTimer::timeout, this, &TimeSyncronizer::checkNtpAndSetTime);
     timer->start();
+    connect(this, &TimeSyncronizer::ntpStatusChanged, this, &TimeSyncronizer::synchrHwClockWithNtp);
 }
 
 void printts(const timespec &st)
@@ -91,18 +93,22 @@ timespec TimeSyncronizer::systemTime() const
 void TimeSyncronizer::setSystemTime(const timespec &systemTime)
 {
 #if defined(Q_OS_LINUX)
-    QString program = "/usr/sbin/hwclock -w";
-
     struct timeval timeToSet;
     timeToSet.tv_sec = systemTime.tv_sec;
     timeToSet.tv_usec = 0;
     settimeofday(&timeToSet, NULL);
-    qInfo() << "Setting hwclock time: " << systemTime.tv_sec;
-    curCommand = CurrentCommandEnum::HWCLOCK;
-    executor->execute(program);
+    setHWClock();
 #else
     // to be written...
 #endif
+}
+
+void TimeSyncronizer::setHWClock()
+{
+    QString program = "/usr/sbin/hwclock -w";
+    qInfo() << "Setting hwclock time: " << systemTime().tv_sec;
+    curCommand = CurrentCommandEnum::HWCLOCK;
+    executor->execute(program);
 }
 
 void TimeSyncronizer::checkNtpAndSetTime()
@@ -163,8 +169,18 @@ void TimeSyncronizer::commandExitCodeAcuired(int exitCode)
         qWarning() << "Error executing command, status: " << exitCode;
 }
 
-void TimeSyncronizer::ntpStatusReceived(int status)
+/// \brief Synchronize HW RTC Clock upon Ntp is synchronized with external source and send setTime signal once per
+/// minute
+/// \param status - status of NTP. If it was changed from anything to SYNC_EXT emit hwclock -w command
+
+void TimeSyncronizer::synchrHwClockWithNtp(int status)
 {
+    if (status != oldNtpStatus)
+    {
+        oldNtpStatus = status;
+        if (status == NtpStatusEnum::SYNC_EXT)
+            setHWClock();
+    }
     if (m_timeCounter >= 20) // one time per minute
     {
         if (status != NO_SYNC) // ntp is working

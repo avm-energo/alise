@@ -10,7 +10,7 @@ option(ALISE_STM "Build with STM32 support" OFF)
 option(ALISE_LOCALDEBUG "Local debug on PC" OFF)
 
 find_package(QT NAMES Qt6)
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Xml HttpServer REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core HttpServer REQUIRED)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
@@ -82,7 +82,7 @@ if (ALISE_STM)
 else()
     target_link_libraries(${PROJECT_NAME} PUBLIC gen ${GPIODCXX_LIBRARY})
 endif()
-target_link_libraries(${PROJECT_NAME} PUBLIC Qt6::Xml Qt6::HttpServer pthread gitversion)
+target_link_libraries(${PROJECT_NAME} PUBLIC Qt6::HttpServer pthread gitversion)
 
 install(TARGETS ${PROJECT_NAME})
 

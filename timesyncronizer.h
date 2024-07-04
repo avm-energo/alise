@@ -33,15 +33,17 @@ public slots:
 
 private:
     void setSystemTime(const timespec &systemTime);
+    void setHWClock();
     int m_timeCounter;
     CurrentCommandEnum curCommand;
     ExecuteCommandAsync *executor;
+    int oldNtpStatus;
 
 private slots:
     void checkNtpAndSetTime();
     void commandResultAcquired(const QString &output);
     void commandExitCodeAcuired(int exitCode);
-    void ntpStatusReceived(int status);
+    void synchrHwClockWithNtp(int status);
 
 signals:
     void ntpStatusChanged(int);
