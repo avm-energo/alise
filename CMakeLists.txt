@@ -51,8 +51,6 @@ set(SOURCES
     httpapiserver.cpp
     httpmiddleware.h
     httpmiddleware.cpp
-    logger.cpp
-    logger.h
     recovery.cpp
     recovery.h
     timesyncronizer.cpp

@@ -1,0 +1,386 @@
+{
+	"BUILD_DIR" : "/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-build/gen_autogen",
+	"CMAKE_BINARY_DIR" : "/home/anton/repos/alise/build/Desktop-Debug",
+	"CMAKE_CURRENT_BINARY_DIR" : "/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-build",
+	"CMAKE_CURRENT_SOURCE_DIR" : "/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src",
+	"CMAKE_EXECUTABLE" : "/usr/bin/cmake",
+	"CMAKE_LIST_FILES" : 
+	[
+		"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src/CMakeLists.txt",
+		"/home/anton/repos/alise/build/Desktop-Debug/.qtc/package-manager/auto-setup.cmake",
+		"/usr/share/cmake-3.29/Modules/GNUInstallDirs.cmake",
+		"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src/cmake/DetermineTargetArchitecture.cmake",
+		"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src/cmake/SetProjectTargetName.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6ConfigVersion.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6ConfigVersionImpl.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6Config.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6ConfigExtras.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicCMakeVersionHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6Targets.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6VersionlessTargets.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtFeature.cmake",
+		"/usr/share/cmake-3.29/Modules/CheckCXXCompilerFlag.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtFeatureCommon.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicAppleHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicCMakeHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicCMakeVersionHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicDependencyHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicExternalProjectHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicFinalizerHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicFindPackageHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicPluginHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicTargetHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicTestHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicToolHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicWalkLibsHelpers.cmake",
+		"/usr/share/cmake-3.29/Modules/CMakeFindDependencyMacro.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6Dependencies.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6ConfigVersion.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6ConfigVersionImpl.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6Config.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6ConfigExtras.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicCMakeVersionHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6Targets.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6VersionlessTargets.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtFeature.cmake",
+		"/usr/share/cmake-3.29/Modules/CheckCXXCompilerFlag.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtFeatureCommon.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicAppleHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicCMakeHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicCMakeVersionHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicDependencyHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicExternalProjectHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicFinalizerHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicFindPackageHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicPluginHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicTargetHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicTestHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicToolHelpers.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/QtPublicWalkLibsHelpers.cmake",
+		"/usr/share/cmake-3.29/Modules/CMakeFindDependencyMacro.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6/Qt6Dependencies.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6Xml/Qt6XmlConfigVersion.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6Xml/Qt6XmlConfigVersionImpl.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6Xml/Qt6XmlConfig.cmake",
+		"/usr/share/cmake-3.29/Modules/CMakeFindDependencyMacro.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6Xml/Qt6XmlDependencies.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6Xml/Qt6XmlTargets.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6Xml/Qt6XmlTargets-none.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6Xml/Qt6XmlAdditionalTargetInfo.cmake",
+		"/usr/lib/x86_64-linux-gnu/cmake/Qt6Xml/Qt6XmlVersionlessTargets.cmake",
+		"/home/anton/repos/alise/build/Desktop-Debug/arch.c"
+	],
+	"CMAKE_SOURCE_DIR" : "/home/anton/repos/alise",
+	"CROSS_CONFIG" : false,
+	"DEP_FILE" : "/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-build/gen_autogen/deps",
+	"DEP_FILE_RULE_NAME" : "gen_autogen/timestamp",
+	"HEADERS" : 
+	[
+		[
+			"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src/include/gen/binary_file.h",
+			"MU",
+			"N7QP3IHER2/moc_binary_file.cpp",
+			null
+		],
+		[
+			"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src/include/gen/colors.h",
+			"MU",
+			"N7QP3IHER2/moc_colors.cpp",
+			null
+		],
+		[
+			"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src/include/gen/comaexception.h",
+			"MU",
+			"N7QP3IHER2/moc_comaexception.cpp",
+			null
+		],
+		[
+			"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src/include/gen/datatypes.h",
+			"MU",
+			"N7QP3IHER2/moc_datatypes.cpp",
+			null
+		],
+		[
+			"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src/include/gen/error.h",
+			"MU",
+			"N7QP3IHER2/moc_error.cpp",
+			null
+		],
+		[
+			"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src/include/gen/errorqueue.h",
+			"MU",
+			"N7QP3IHER2/moc_errorqueue.cpp",
+			null
+		],
+		[
+			"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src/include/gen/executecommand.h",
+			"MU",
+			"N7QP3IHER2/moc_executecommand.cpp",
+			null
+		],
+		[
+			"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src/include/gen/files.h",
+			"MU",
+			"N7QP3IHER2/moc_files.cpp",
+			null
+		],
+		[
+			"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src/include/gen/files/lzma_stream.h",
+			"MU",
+			"EZL7AM4IMM/moc_lzma_stream.cpp",
+			null
+		],
+		[
+			"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src/include/gen/files/lzma_util.h",
+			"MU",
+			"EZL7AM4IMM/moc_lzma_util.cpp",
+			null
+		],
+		[
+			"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src/include/gen/gen_export.h",
+			"MU",
+			"N7QP3IHER2/moc_gen_export.cpp",
+			null
+		],
+		[
+			"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src/include/gen/helper.h",
+			"MU",
+			"N7QP3IHER2/moc_helper.cpp",
+			null
+		],
+		[
+			"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src/include/gen/integers.h",
+			"MU",
+			"N7QP3IHER2/moc_integers.cpp",
+			null
+		],
+		[
+			"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src/include/gen/logclass.h",
+			"MU",
+			"N7QP3IHER2/moc_logclass.cpp",
+			null
+		],
+		[
+			"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src/include/gen/logger.h",
+			"MU",
+			"N7QP3IHER2/moc_logger.cpp",
+			null
+		],
+		[
+			"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src/include/gen/pch.h",
+			"MU",
+			"N7QP3IHER2/moc_pch.cpp",
+			null
+		],
+		[
+			"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src/include/gen/settings.h",
+			"MU",
+			"N7QP3IHER2/moc_settings.cpp",
+			null
+		],
+		[
+			"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src/include/gen/singleton.h",
+			"MU",
+			"N7QP3IHER2/moc_singleton.cpp",
+			null
+		],
+		[
+			"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src/include/gen/std_ext.h",
+			"MU",
+			"N7QP3IHER2/moc_std_ext.cpp",
+			null
+		],
+		[
+			"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src/include/gen/stdfunc.h",
+			"MU",
+			"N7QP3IHER2/moc_stdfunc.cpp",
+			null
+		],
+		[
+			"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src/include/gen/timefunc.h",
+			"MU",
+			"N7QP3IHER2/moc_timefunc.cpp",
+			null
+		],
+		[
+			"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src/include/gen/uint24.h",
+			"MU",
+			"N7QP3IHER2/moc_uint24.cpp",
+			null
+		],
+		[
+			"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src/include/gen/utils/convertable.h",
+			"MU",
+			"6RCUMHBN33/moc_convertable.cpp",
+			null
+		],
+		[
+			"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src/include/gen/utils/crc16.h",
+			"MU",
+			"6RCUMHBN33/moc_crc16.cpp",
+			null
+		],
+		[
+			"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src/include/gen/utils/crc32.h",
+			"MU",
+			"6RCUMHBN33/moc_crc32.cpp",
+			null
+		]
+	],
+	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
+	"INCLUDE_DIR" : "/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-build/gen_autogen/include",
+	"MOC_COMPILATION_FILE" : "/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-build/gen_autogen/mocs_compilation.cpp",
+	"MOC_DEFINITIONS" : 
+	[
+		"AVTUK_STM",
+		"CMAKE_CONFIG",
+		"HAVE_STATIC_BUILD",
+		"QT_CORE_LIB",
+		"QT_NETWORK_LIB",
+		"QT_XML_LIB"
+	],
+	"MOC_DEPEND_FILTERS" : 
+	[
+		[
+			"Q_PLUGIN_METADATA",
+			"[\n][ \t]*Q_PLUGIN_METADATA[ \t]*\\([^\\)]*FILE[ \t]*\"([^\"]+)\""
+		]
+	],
+	"MOC_INCLUDES" : 
+	[
+		"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-build",
+		"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src",
+		"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src/include",
+		"/usr/include/x86_64-linux-gnu/qt6/QtCore",
+		"/usr/include/x86_64-linux-gnu/qt6",
+		"/usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++",
+		"/usr/include/x86_64-linux-gnu/qt6/QtXml",
+		"/usr/include/x86_64-linux-gnu/qt6/QtNetwork",
+		"/usr/include/c++/13",
+		"/usr/include/x86_64-linux-gnu/c++/13",
+		"/usr/include/c++/13/backward",
+		"/usr/lib/llvm-16/lib/clang/16/include",
+		"/usr/local/include",
+		"/usr/include/x86_64-linux-gnu",
+		"/usr/include"
+	],
+	"MOC_MACRO_NAMES" : 
+	[
+		"Q_OBJECT",
+		"Q_GADGET",
+		"Q_NAMESPACE",
+		"Q_NAMESPACE_EXPORT",
+		"Q_GADGET_EXPORT"
+	],
+	"MOC_OPTIONS" : [],
+	"MOC_PATH_PREFIX" : false,
+	"MOC_PREDEFS_CMD" : 
+	[
+		"/usr/bin/clang++-16",
+		"-std=gnu++17",
+		"-dM",
+		"-E",
+		"-c",
+		"/usr/share/cmake-3.29/Modules/CMakeCXXCompilerABI.cpp"
+	],
+	"MOC_PREDEFS_FILE" : "/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-build/gen_autogen/moc_predefs.h",
+	"MOC_RELAXED_MODE" : false,
+	"MOC_SKIP" : [],
+	"MULTI_CONFIG" : false,
+	"PARALLEL" : 8,
+	"PARSE_CACHE_FILE" : "/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-build/CMakeFiles/gen_autogen.dir/ParseCache.txt",
+	"QT_MOC_EXECUTABLE" : "/usr/lib/qt6/libexec/moc",
+	"QT_UIC_EXECUTABLE" : "",
+	"QT_VERSION_MAJOR" : 6,
+	"QT_VERSION_MINOR" : 6,
+	"SETTINGS_FILE" : "/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-build/CMakeFiles/gen_autogen.dir/AutogenUsed.txt",
+	"SOURCES" : 
+	[
+		[
+			"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src/src/comaexception.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src/src/error.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src/src/errorqueue.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src/src/executecommand.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src/src/files/files.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src/src/files/lzma_stream.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src/src/files/lzma_util.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src/src/helper.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src/src/logclass.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src/src/logger.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src/src/stdfunc.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src/src/timefunc.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src/src/uint24.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src/src/utils/convertable.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src/src/utils/crc16.cpp",
+			"MU",
+			null
+		],
+		[
+			"/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-src/src/utils/crc32.cpp",
+			"MU",
+			null
+		]
+	],
+	"UIC_OPTIONS" : [],
+	"UIC_SEARCH_PATHS" : [],
+	"UIC_SKIP" : [],
+	"UIC_UI_FILES" : [],
+	"USE_BETTER_GRAPH" : false,
+	"VERBOSITY" : 0
+}

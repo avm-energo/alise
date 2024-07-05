@@ -2,10 +2,10 @@
 #include "commandlineparser.h"
 #include "engine.h"
 #include "gitversion/gitversion.h"
-#include "logger.h"
 
 #include <QCoreApplication>
 #include <config.h>
+#include <gen/logger.h>
 #include <gen/stdfunc.h>
 #include <iostream>
 #include <memory>

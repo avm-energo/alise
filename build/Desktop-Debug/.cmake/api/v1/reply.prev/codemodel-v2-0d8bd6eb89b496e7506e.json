@@ -1,0 +1,248 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"childIndexes" : 
+					[
+						1,
+						2,
+						3
+					],
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Debug-945263ef2fa5b3dad5c1.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				},
+				{
+					"build" : "_deps/gen-build",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-_deps.gen-build-Debug-0b505b8a29f5a2277186.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 1,
+					"source" : "build/Desktop-Debug/_deps/gen-src",
+					"targetIndexes" : 
+					[
+						3,
+						4,
+						5
+					]
+				},
+				{
+					"build" : "gitversion",
+					"jsonFile" : "directory-gitversion-Debug-909e1fce44f507bdd98b.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 2,
+					"source" : "gitversion",
+					"targetIndexes" : 
+					[
+						6,
+						7,
+						8
+					]
+				},
+				{
+					"build" : "interfaces",
+					"jsonFile" : "directory-interfaces-Debug-e847e2b7f463abe3cfcb.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.14"
+					},
+					"parentIndex" : 0,
+					"projectIndex" : 3,
+					"source" : "interfaces",
+					"targetIndexes" : 
+					[
+						9,
+						10,
+						11
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"childIndexes" : 
+					[
+						1,
+						2,
+						3
+					],
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "alise",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						1
+					],
+					"name" : "gen",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						3,
+						4,
+						5
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						2
+					],
+					"name" : "gitversion",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						6,
+						7,
+						8
+					]
+				},
+				{
+					"directoryIndexes" : 
+					[
+						3
+					],
+					"name" : "interfaces",
+					"parentIndex" : 0,
+					"targetIndexes" : 
+					[
+						9,
+						10,
+						11
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "alise::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-alise-Debug-998eda1512fc24e30789.json",
+					"name" : "alise",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "alise_autogen::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-alise_autogen-Debug-1020ec1ab4e620e0f873.json",
+					"name" : "alise_autogen",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "alise_autogen_timestamp_deps::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-alise_autogen_timestamp_deps-Debug-c3b09de71e4b72cd058e.json",
+					"name" : "alise_autogen_timestamp_deps",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "gen::@e3df51ea6cd5a933987b",
+					"jsonFile" : "target-gen-Debug-ed2c314f168763dfc719.json",
+					"name" : "gen",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "gen_autogen::@e3df51ea6cd5a933987b",
+					"jsonFile" : "target-gen_autogen-Debug-f18b052d5479aebef09e.json",
+					"name" : "gen_autogen",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 1,
+					"id" : "gen_autogen_timestamp_deps::@e3df51ea6cd5a933987b",
+					"jsonFile" : "target-gen_autogen_timestamp_deps-Debug-5dc8c17226dca8c03c28.json",
+					"name" : "gen_autogen_timestamp_deps",
+					"projectIndex" : 1
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "gitversion::@fd94b3b69839f75e4731",
+					"jsonFile" : "target-gitversion-Debug-4953f74a8fbde2ad51db.json",
+					"name" : "gitversion",
+					"projectIndex" : 2
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "gitversion_autogen::@fd94b3b69839f75e4731",
+					"jsonFile" : "target-gitversion_autogen-Debug-54442402d40ca472fc4e.json",
+					"name" : "gitversion_autogen",
+					"projectIndex" : 2
+				},
+				{
+					"directoryIndex" : 2,
+					"id" : "gitversion_autogen_timestamp_deps::@fd94b3b69839f75e4731",
+					"jsonFile" : "target-gitversion_autogen_timestamp_deps-Debug-22d926fea4de3922be7b.json",
+					"name" : "gitversion_autogen_timestamp_deps",
+					"projectIndex" : 2
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "interfaces::@6ff2676d08d3dbc7a613",
+					"jsonFile" : "target-interfaces-Debug-b8fa2c3cf8ef171e9af4.json",
+					"name" : "interfaces",
+					"projectIndex" : 3
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "interfaces_autogen::@6ff2676d08d3dbc7a613",
+					"jsonFile" : "target-interfaces_autogen-Debug-f47a061545de4004f7ec.json",
+					"name" : "interfaces_autogen",
+					"projectIndex" : 3
+				},
+				{
+					"directoryIndex" : 3,
+					"id" : "interfaces_autogen_timestamp_deps::@6ff2676d08d3dbc7a613",
+					"jsonFile" : "target-interfaces_autogen_timestamp_deps-Debug-ecafaf2d01a8de52f1ce.json",
+					"name" : "interfaces_autogen_timestamp_deps",
+					"projectIndex" : 3
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/home/anton/repos/alise/build/Desktop-Debug",
+		"source" : "/home/anton/repos/alise"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 7
+	}
+}
