@@ -12,7 +12,7 @@ Engine::Engine(QObject *parent)
     Q_UNUSED(parent)
 }
 
-bool Engine::init(int httpPort)
+bool Engine::init(const AliseSettings &settings)
 {
     m_timeSynchronizer = new TimeSyncronizer;
     m_timeSynchronizer->init();
@@ -25,9 +25,9 @@ bool Engine::init(int httpPort)
     if (!ok)
         return false;
 
-    m_mw = new HttpMiddleware;
+    m_mw = new HttpMiddleware(settings);
     m_server = new HttpApiServer(m_mw);
-    m_server->initServer(httpPort, Alise::AliseConstants::ReplyTimeoutPeriod());
+    m_server->initServer(settings.httpPort, Alise::AliseConstants::ReplyTimeoutPeriod());
 
     createLocalConnections();
     createHttpConnections();

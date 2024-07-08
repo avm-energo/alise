@@ -52,14 +52,6 @@ public:
         uint16_t ProcessStatusSemiWorkingBlink;
     };
 
-    struct ModuleInfo
-    {
-        std::uint32_t ModuleType = 0x14;
-        uint32_t SerialNumber;
-        uint32_t HWVersion;
-        uint32_t ModuleSerialNumber;
-    };
-
     AliseConstants();
     static void setResetCheckPeriod(int period);
     static void setPowerCheckPeriod(int period);
@@ -86,8 +78,6 @@ public:
     static Timers _timersConstants;
     static Blinks _blinksConstants;
     static uint16_t freqByPeriod(int period);
-
-    static ModuleInfo s_moduleInfo;
 
 private:
     static int s_SecondsToHardReset; // really it's ResetCheckPeriod times (seconds = ResetCheckPeriod / 1000 *

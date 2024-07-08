@@ -7,24 +7,25 @@
 #include <QDateTime>
 #include <QString>
 #include <config.h>
+#include <gen/stdfunc.h>
 
-HttpMiddleware::HttpMiddleware(QObject *parent)
-    : QObject{parent}
+HttpMiddleware::HttpMiddleware(const AliseSettings &settings, QObject *parent) : QObject { parent }
 {
+    GitVersion gitVersion;
+    m_aliseVersion = QString(ALISEVERSION) + "-" + gitVersion.getGitHash();
+    m_serialNum = QString::number(settings.serialNum);
+    m_hwVersion = StdFunc::VerToStr(settings.hwVersion);
+    m_swVersion = StdFunc::VerToStr(settings.swVersion);
     setNtpState(0);
 }
 
 QJsonObject HttpMiddleware::helloReply()
 {
     QJsonObject json;
-    AliseSettings settings;
-    GitVersion gitVersion;
-    settings.init();
-    settings.readSettings();
-    json["AliseVersion"] = QString(ALISEVERSION) + "-" + gitVersion.getGitHash();
-    json["SerialNum"] = QString::number(settings.serialNum);
-    json["HwVersion"] = settings.versionStr(settings.hwVersion);
-    json["SwVersion"] = settings.versionStr(settings.swVersion);
+    json["AliseVersion"] = m_aliseVersion;
+    json["SerialNum"] = m_serialNum;
+    json["HwVersion"] = m_hwVersion;
+    json["SwVersion"] = m_swVersion;
     return json;
 }
 

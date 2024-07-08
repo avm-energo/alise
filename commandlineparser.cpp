@@ -5,6 +5,7 @@
 #include <QCommandLineParser>
 #include <QEventLoop>
 #include <QTimer>
+#include <gen/stdfunc.h>
 #include <gpiod.h>
 #include <iostream>
 
@@ -59,75 +60,28 @@ bool CommandLineParser::parseCommandLine(AliseSettings &settings)
         {
             std::cout << "Module serial number: " << settings.serialNum << "\n";
             std::cout << "Board serial number: " << settings.serialNumB << "\n";
-            std::cout << "Hardware version: " << settings.versionStr(settings.hwVersion).toStdString() << "\n";
-            std::cout << "Software version: " << settings.versionStr(settings.swVersion).toStdString() << "\n";
+            std::cout << "Hardware version: " << StdFunc::VerToStr(settings.hwVersion).toStdString() << "\n";
+            std::cout << "Software version: " << StdFunc::VerToStr(settings.swVersion).toStdString() << "\n";
             return false;
         }
         if (parser.isSet(serialNumber))
-            setSerialNumber(parser.value("serial"));
+            settings.serialNum = parser.value("serial").toUInt();
         if (parser.isSet(serialNumberB))
-            setSerialNumberB(parser.value("serialb"));
+            settings.serialNumB = parser.value("serialb").toUInt();
         if (parser.isSet(hardware))
-            setHWVersion(parser.value("hardware"));
+            settings.hwVersion = parser.value("hardware").toUInt();
         if (parser.isSet(software))
-            settings.swVersion = versionNum(parser.value("software"));
-        settings.writeSetting();
+            settings.swVersion = StdFunc::StrToVer(parser.value("software"));
+        settings.writeSettings();
+#ifdef AVTUK_STM
+        writeHiddenBlock();
+#endif
         return false;
     }
     return true;
 }
 
-std::uint32_t CommandLineParser::versionNum(const QString &str)
-{
-    std::uint8_t mv, lv;
-    std::uint16_t sv;
-    QStringList sl;
-    sl = str.split(".");
-    if (sl.size() > 1)
-    {
-        mv = sl.at(0).toUInt();
-        sl = sl.at(1).split("-");
-        lv = sl.at(0).toUInt();
-        if (sl.size() > 1)
-            sv = sl.at(1).toUInt();
-        else
-            sv = 0;
-    }
-    else
-    {
-        mv = 0;
-        lv = 0;
-        sv = sl.at(0).toUInt();
-    }
-    std::uint32_t version = (static_cast<std::uint32_t>(mv) << 24) | (static_cast<std::uint32_t>(lv) << 16) | sv;
-    return version;
-}
-
 #ifdef AVTUK_STM
-
-void CommandLineParser::setSerialNumber(const QString &serialNum)
-{
-    waitForBSIOrTimeout();
-    Alise::AliseConstants::s_moduleInfo.ModuleSerialNumber = serialNum.toUInt();
-    std::cout << "Set module serial number: " << serialNum.toStdString() << "\n";
-    writeHiddenBlock();
-}
-
-void CommandLineParser::setSerialNumberB(const QString &serialNum)
-{
-    waitForBSIOrTimeout();
-    Alise::AliseConstants::s_moduleInfo.SerialNumber = serialNum.toUInt();
-    std::cout << "Set board serial number: " << serialNum.toStdString() << "\n";
-    writeHiddenBlock();
-}
-
-void CommandLineParser::setHWVersion(const QString &hwversion)
-{
-    waitForBSIOrTimeout();
-    Alise::AliseConstants::s_moduleInfo.HWVersion = versionNum(hwversion);
-    std::cout << "Set HW version: " << hwversion.toStdString() << "\n";
-    writeHiddenBlock();
-}
 
 void CommandLineParser::waitForBSIOrTimeout()
 {
@@ -154,21 +108,6 @@ void CommandLineParser::writeHiddenBlock()
 
 #else
 
-void CommandLineParser::setSerialNumber(const QString &serialNum)
-{
-    Alise::AliseConstants::s_moduleInfo.ModuleSerialNumber = serialNum.toUInt();
-}
-
-void CommandLineParser::setSerialNumberB(const QString &serialNum)
-{
-    Alise::AliseConstants::s_moduleInfo.SerialNumber = serialNum.toUInt();
-}
-
-void CommandLineParser::setHWVersion(const QString &hwversion)
-{
-    Alise::AliseConstants::s_moduleInfo.HWVersion = hwversion.toUInt();
-}
-
 void CommandLineParser::listPins()
 {
     struct gpiod_chip *chip;
@@ -176,43 +115,50 @@ void CommandLineParser::listPins()
     struct gpiod_line_bulk *lineBulk;
     struct gpiod_line *line;
 
-    while ((chip = gpiod_chip_iter_next(iter)) != NULL)
+    try
     {
-        std::cout << gpiod_chip_name(chip) << " - " << gpiod_chip_num_lines(chip) << " lines:" << ::std::endl;
-        if (!gpiod_chip_get_all_lines(chip, lineBulk))
+        while ((chip = gpiod_chip_iter_next(iter)) != NULL)
         {
-            std::cout << "Error while get all lines from chip";
-            return;
-        }
-        for (int i = 0; i < lineBulk->num_lines; ++i)
-        {
-            line = lineBulk->lines[i];
-            if (line == NULL)
+            std::cout << gpiod_chip_name(chip) << " - " << gpiod_chip_num_lines(chip) << " lines:" << ::std::endl;
+            if (!gpiod_chip_get_all_lines(chip, lineBulk))
             {
-                std::cout << "Error while get line " << i << " from chip";
+                std::cout << "Error while get all lines from chip";
                 return;
             }
-            std::cout << "\tline ";
-            std::cout.width(3);
-            std::cout << gpiod_line_offset(line) << ": ";
+            for (int i = 0; i < lineBulk->num_lines; ++i)
+            {
+                line = lineBulk->lines[i];
+                if (line == NULL)
+                {
+                    std::cout << "Error while get line " << i << " from chip";
+                    return;
+                }
+                std::cout << "\tline ";
+                std::cout.width(3);
+                std::cout << gpiod_line_offset(line) << ": ";
 
-            std::cout.width(12);
-            std::cout << gpiod_line_name(line);
-            std::cout << " ";
+                std::cout.width(12);
+                std::cout << gpiod_line_name(line);
+                std::cout << " ";
 
-            std::cout.width(12);
-            std::cout << gpiod_line_consumer(line);
-            std::cout << " ";
+                std::cout.width(12);
+                std::cout << gpiod_line_consumer(line);
+                std::cout << " ";
 
-            std::cout.width(8);
-            std::cout << (gpiod_line_direction(line) == GPIOD_LINE_DIRECTION_INPUT ? "input" : "output");
-            std::cout << " ";
+                std::cout.width(8);
+                std::cout << (gpiod_line_direction(line) == GPIOD_LINE_DIRECTION_INPUT ? "input" : "output");
+                std::cout << " ";
 
-            std::cout.width(10);
-            std::cout << (gpiod_line_active_state(line) == GPIOD_LINE_ACTIVE_STATE_LOW ? "active-low" : "active-high");
+                std::cout.width(10);
+                std::cout << (gpiod_line_active_state(line) == GPIOD_LINE_ACTIVE_STATE_LOW ? "active-low"
+                                                                                           : "active-high");
 
-            std::cout << ::std::endl;
+                std::cout << ::std::endl;
+            }
         }
+    } catch (std::exception e)
+    {
+        std::cout << "Exception was raised: " << e.what() << std::endl;
     }
 }
 #endif

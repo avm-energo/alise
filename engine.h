@@ -1,5 +1,6 @@
 #pragma once
 
+#include "alisesettings.h"
 #include "broker.h"
 #include "httpapiserver.h"
 #include "httpmiddleware.h"
@@ -14,7 +15,7 @@ public:
     Engine(QObject *parent = nullptr);
 
     /// \brief Инициализация движка
-    bool init(int httpPort);
+    bool init(const AliseSettings &settings);
 
     /// \brief Старт работы по http
     void start();

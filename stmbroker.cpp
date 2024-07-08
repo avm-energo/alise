@@ -71,10 +71,15 @@ void StmBroker::writeHiddenBlock()
 #ifndef ALISE_LOCALDEBUG
     QMutexLocker locker(&_mutex);
     Q_CHECK_PTR(m_conn);
+    AliseSettings settings;
+    settings.readSettings();
+    QByteArray ba = StdFunc::toByteArray(settings.serialNum) + StdFunc::toByteArray(settings.serialNumB)
+        + StdFunc::toByteArray(settings.hwVersion) + StdFunc::toByteArray(settings.swVersion);
+
     DataTypes::BlockStruct block;
     block.ID = 0x01; // base block
-    block.data.resize(sizeof(Alise::AliseConstants::ModuleInfo));
-    memcpy(block.data.data(), &Alise::AliseConstants::s_moduleInfo, sizeof(Alise::AliseConstants::ModuleInfo));
+    block.data.resize(ba.size());
+    memcpy(block.data.data(), &ba.data()[0], ba.size());
     m_conn->writeCommand(Interface::Commands::C_WriteHiddenBlock, QVariant::fromValue(block));
 #endif
 }
@@ -204,10 +209,7 @@ void StmBroker::updateBsi(AliseSettings &m_settings, const DataTypes::BitStringS
         qDebug() << "BSI receiving complete: serialNum = " << m_settings.serialNum
                  << ", serialNumB = " << m_settings.serialNumB << ", HWVersion = " << m_settings.hwVersion
                  << ", SWVersion = " << m_settings.swVersion;
-        Alise::AliseConstants::s_moduleInfo.ModuleSerialNumber = m_settings.serialNum;
-        Alise::AliseConstants::s_moduleInfo.SerialNumber = m_settings.serialNumB;
-        Alise::AliseConstants::s_moduleInfo.HWVersion = m_settings.hwVersion;
-        m_settings.writeSetting();
+        m_settings.writeSettings();
         emit ModuleInfoFilled();
     }
 }

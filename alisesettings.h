@@ -12,8 +12,8 @@ public:
     void init();
     void readSettings();
     void logSettings();
-    void writeSetting(); // write module properties: serialnum, hwversion, etc
-    QString versionStr(const uint32_t &version);
+    void writeSettings();      // write all settings
+    void flush();
 
     QString logLevel;
     QString logFilename;

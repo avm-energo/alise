@@ -1,0 +1,39 @@
+=====================================
+Log file started at 2024-07-08 15:23:13.520
+alise v.3.0.1-a609b7de2024-07-08 15:23:13.520 [INFO]Reading settings from:  "/home/anton/repos/alise/build/Desktop-Debug/~/sonica/alise/settings/settings.ini"
+2024-07-08 15:23:13.520 [INFO]Startup information:
+2024-07-08 15:23:13.520 [INFO]=========================
+2024-07-08 15:23:13.520 [INFO]LogLevel:  "Info"
+2024-07-08 15:23:13.520 [INFO]HttpPort:  5555
+2024-07-08 15:23:13.520 [INFO]NormalBlink period: 500  ms
+2024-07-08 15:23:13.520 [INFO]StartingBlink period: 250  ms
+2024-07-08 15:23:13.520 [INFO]StoppedBlink period: 2000  ms
+2024-07-08 15:23:13.520 [INFO]SemiWorkingBlink period: 1000  ms
+2024-07-08 15:23:13.520 [INFO]ProcessFailedBlink period: 125  ms
+2024-07-08 15:23:13.520 [INFO]FailureBlink period: 50  ms
+2024-07-08 15:23:13.520 [INFO]Power check period: 1000  ms
+2024-07-08 15:23:13.520 [INFO]Reset check period: 1000  ms
+2024-07-08 15:23:13.520 [INFO]Time update period: 3000  ms
+2024-07-08 15:23:13.520 [INFO]Health query period: 1500  ms
+2024-07-08 15:23:13.520 [INFO]Reply timeout period: 8000  ms
+2024-07-08 15:23:13.520 [INFO]Module serial:  0
+2024-07-08 15:23:13.520 [INFO]Board serial:  0
+2024-07-08 15:23:13.520 [INFO]Board hardware:  0
+2024-07-08 15:23:13.520 [INFO]MCU software version:  0
+2024-07-08 15:23:13.520 [INFO]Recovery eth "0" : found
+2024-07-08 15:23:13.520 [INFO]Recovery eth "1" : found
+2024-07-08 15:23:13.520 [INFO]Recovery eth "2" : not found
+2024-07-08 15:23:13.520 [INFO]=========================
+
+2024-07-08 15:23:13.546 [WARNING]Error executing command, status:  32512
+2024-07-08 15:23:13.546 [WARNING]ntpq output is empty!
+2024-07-08 15:23:16.672 [WARNING]Error executing command, status:  32512
+2024-07-08 15:23:16.672 [WARNING]ntpq output is empty!
+2024-07-08 15:23:19.713 [WARNING]Error executing command, status:  32512
+2024-07-08 15:23:19.713 [WARNING]ntpq output is empty!
+2024-07-08 15:23:22.713 [WARNING]Error executing command, status:  32512
+2024-07-08 15:23:22.713 [WARNING]ntpq output is empty!
+2024-07-08 15:23:25.713 [WARNING]Error executing command, status:  32512
+2024-07-08 15:23:25.713 [WARNING]ntpq output is empty!
+2024-07-08 15:23:28.713 [WARNING]Error executing command, status:  32512
+2024-07-08 15:23:28.713 [WARNING]ntpq output is empty!

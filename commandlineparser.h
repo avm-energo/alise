@@ -18,11 +18,6 @@ public:
     bool parseCommandLine(AliseSettings &settings);
 
 private:
-    void setSerialNumber(const QString &serialNum);
-    void setSerialNumberB(const QString &serialNumB);
-    void setHWVersion(const QString &hwversion);
-    std::uint32_t versionNum(const QString &str);
-
 #ifndef AVTUK_STM
     void listPins();
 #else

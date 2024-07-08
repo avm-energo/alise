@@ -1,5 +1,7 @@
 #pragma once
 
+#include "alisesettings.h"
+
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QObject>
@@ -9,7 +11,7 @@ class HttpMiddleware : public QObject
 {
     Q_OBJECT
 public:
-    explicit HttpMiddleware(QObject *parent = nullptr);
+    explicit HttpMiddleware(const AliseSettings &settings, QObject *parent = nullptr);
 
     QJsonObject helloReply();  ///< подготовка ответа на запрос Hello
     QJsonObject timeStamp();   ///< подготовка json с текущим временем
@@ -36,6 +38,7 @@ private:
     timespec m_time;
     int m_ntpState;
     int m_pwrIn, m_resetReq;
+    QString m_aliseVersion, m_serialNum, m_hwVersion, m_swVersion;
 
     /// \brief Конвертация POST-запроса в JSON объект
     QJsonObject byteArrayToJsonObject(const QByteArray &arr);

@@ -10,17 +10,14 @@ AliseSettings::AliseSettings()
 
 void AliseSettings::init()
 {
-#ifdef ALISE_LOCALDEBUG
-    m_settings = new QSettings("~/sonica/alise/settings/settings.ini", QSettings::IniFormat);
-    logFilename = m_settings->value("Logs/logfile", "~/sonica/alise/logs/alise.log").toString();
-#else
     m_settings = new QSettings("/avtuk/settings/alise/settings/settings.ini", QSettings::IniFormat);
     logFilename = m_settings->value("Logs/logfile", "/avtuk/settings/alise/logs/alise.log").toString();
-#endif
 }
 
 void AliseSettings::readSettings()
 {
+    Q_ASSERT(m_settings != nullptr);
+
     int logcounter = m_settings->value("Test/counter", "1").toInt();
     m_settings->setValue("Test/counter", ++logcounter);
     logLevel = m_settings->value("Logs/Loglevel", "Info").toString();
@@ -37,10 +34,11 @@ void AliseSettings::readSettings()
     Alise::AliseConstants::setHealthQueryPeriod(m_settings->value("Timers/HealthQueryPeriod", "1500").toInt());
     Alise::AliseConstants::setReplyTimeoutPeriod(m_settings->value("Timers/ReplyTimeoutPeriod", "8000").toInt());
     Alise::AliseConstants::setSecondsToHardReset(m_settings->value("Reset/TimeToWaitForHardReset", "4").toInt());
-    serialNum = m_settings->value("Module/SerialNumber", "FFFFFFFF").toString().toUInt();
-    serialNumB = m_settings->value("Module/BoardSerialNumber", "FFFFFFFF").toString().toUInt();
-    hwVersion = m_settings->value("Module/HardwareVersion", "FFFFFFFF").toString().toUInt();
-    swVersion = m_settings->value("Module/SoftwareVersion", "FFFFFFFF").toString().toUInt();
+    serialNum = m_settings->value("Module/SerialNumber", "4294967295").toString().toUInt(); // 0xffffffff
+    serialNumB = m_settings->value("Module/BoardSerialNumber", "4294967295").toString().toUInt();
+    hwVersion = m_settings->value("Module/HardwareVersion", "4294967295").toString().toUInt();
+    swVersion = m_settings->value("Module/SoftwareVersion", "4294967295").toString().toUInt();
+    flush();
 }
 
 void AliseSettings::logSettings()
@@ -69,22 +67,32 @@ void AliseSettings::logSettings()
     qInfo() << "MCU software version: " << swVersion;
 }
 
-void AliseSettings::writeSetting()
+void AliseSettings::writeSettings()
 {
     Q_ASSERT(m_settings != nullptr);
-    serialNum = Alise::AliseConstants::s_moduleInfo.ModuleSerialNumber;
-    serialNumB = Alise::AliseConstants::s_moduleInfo.SerialNumber;
-    hwVersion = Alise::AliseConstants::s_moduleInfo.HWVersion;
+    m_settings->setValue("Logs/Loglevel", logLevel);
+    m_settings->setValue("Main/HttpPort", httpPort);
+    m_settings->setValue("Timers/FailureBlink", Alise::AliseConstants::FailureBlink());
+    m_settings->setValue("Timers/StartingBlink", Alise::AliseConstants::_blinksConstants.ProcessStatusStartingBlink);
+    m_settings->setValue(
+        "Timers/SemiWorkingBlink", Alise::AliseConstants::_blinksConstants.ProcessStatusSemiWorkingBlink);
+    m_settings->setValue("Timers/NormalBlink", Alise::AliseConstants::_blinksConstants.ProcessStatusNormalBlink);
+    m_settings->setValue("Timers/StoppedBlink", Alise::AliseConstants::_blinksConstants.ProcessStatusStoppedBlink);
+    m_settings->setValue("Timers/FailedBlink", Alise::AliseConstants::_blinksConstants.ProcessStatusFailedBlink);
+    m_settings->setValue("Timers/PowerCheckPeriod", Alise::AliseConstants::PowerCheckPeriod());
+    m_settings->setValue("Timers/ResetCheckPeriod", Alise::AliseConstants::ResetCheckPeriod());
+    m_settings->setValue("Timers/UpdateTimePeriod", Alise::AliseConstants::UpdateTimePeriod());
+    m_settings->setValue("Timers/HealthQueryPeriod", Alise::AliseConstants::HealthQueryPeriod());
+    m_settings->setValue("Timers/ReplyTimeoutPeriod", Alise::AliseConstants::ReplyTimeoutPeriod());
+    m_settings->setValue("Reset/TimeToWaitForHardReset", Alise::AliseConstants::SecondsToHardReset());
     m_settings->setValue("Module/SerialNumber", serialNum);
     m_settings->setValue("Module/BoardSerialNumber", serialNumB);
     m_settings->setValue("Module/HardwareVersion", hwVersion);
     m_settings->setValue("Module/SoftwareVersion", swVersion);
+    flush();
 }
 
-QString AliseSettings::versionStr(const std::uint32_t &version)
+void AliseSettings::flush()
 {
-    std::uint8_t mv = version >> 24;
-    std::uint8_t lv = (version & 0x00FF0000) >> 16;
-    std::uint16_t sv = version & 0x0000FFFF;
-    return QString::number(mv) + "." + QString::number(lv) + "-" + QString::number(sv);
+    m_settings->sync();
 }

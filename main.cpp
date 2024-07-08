@@ -20,8 +20,6 @@ int main(int argc, char *argv[])
     AliseSettings settings;
     CommandLineParser parser;
 
-    std::cout << "Started " << std::endl;
-
     qRegisterMetaType<uint32_t>("uint32_t");
 
     GitVersion gitVersion;
@@ -52,7 +50,7 @@ int main(int argc, char *argv[])
 
     qInfo() << "=========================\n";
 
-    if (!engine->init(settings.httpPort))
+    if (!engine->init(settings))
     {
         qCritical() << "Can't create engine, exiting";
         return 11;
