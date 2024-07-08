@@ -1,3 +1,0 @@
-/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-subbuild/CMakeFiles/gen-populate.dir
-/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-subbuild/CMakeFiles/edit_cache.dir
-/home/anton/repos/alise/build/Desktop-Debug/_deps/gen-subbuild/CMakeFiles/rebuild_cache.dir
