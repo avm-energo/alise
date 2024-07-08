@@ -29,6 +29,7 @@ int main(int argc, char *argv[])
 
     settings.init();
     settings.readSettings();
+    settings.writeSettings(); // to set those settings which was not set (settings.ini is absent or is old enough)
 
     if (!parser.parseCommandLine(settings))
         return 0;

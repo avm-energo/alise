@@ -1,7 +1,5 @@
 #include "commandlineparser.h"
 
-#include "aliseconstants.h"
-
 #include <QCommandLineParser>
 #include <QEventLoop>
 #include <QTimer>
@@ -69,7 +67,7 @@ bool CommandLineParser::parseCommandLine(AliseSettings &settings)
         if (parser.isSet(serialNumberB))
             settings.serialNumB = parser.value("serialb").toUInt();
         if (parser.isSet(hardware))
-            settings.hwVersion = parser.value("hardware").toUInt();
+            settings.hwVersion = StdFunc::StrToVer(parser.value("hardware"));
         if (parser.isSet(software))
             settings.swVersion = StdFunc::StrToVer(parser.value("software"));
         settings.writeSettings();
