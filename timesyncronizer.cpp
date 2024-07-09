@@ -76,7 +76,8 @@ void TimeSyncronizer::setHWClock()
 
 void TimeSyncronizer::checkNtpAndSetTime()
 {
-    emit ntpStatusChanged(m_ntpStatus->getNtpStatus());
+    int res = m_ntpStatus->getNtpStatus();
+    emit ntpStatusChanged(res);
     ++m_timeCounter;
 }
 
