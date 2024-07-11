@@ -21,10 +21,6 @@ NtpStatus::NtpStatus()
     m_sock.sin_family = AF_INET;
     m_sock.sin_addr = address;
     m_sock.sin_port = htons(NTP_PORT);
-
-    /* initialise timeout value */
-    m_tv.tv_sec = 3;
-    m_tv.tv_usec = 0;
 }
 
 int NtpStatus::getNtpStatus()
@@ -34,6 +30,7 @@ int NtpStatus::getNtpStatus()
     uint8_t byte1ok;
     uint8_t byte2ok;
     int sd; /* file descriptor for socket */
+    struct timeval tv;
 
     /* initialise file descriptor set */
     FD_ZERO(&fds);
@@ -62,9 +59,14 @@ int NtpStatus::getNtpStatus()
         return ERROR;
     }
     qDebug() << "Ntp: query has been sent";
+
+    /* initialise timeout value */
+    tv.tv_sec = 1;
+    tv.tv_usec = 0;
+
     /*----------------------------------------------------------------------*/
     /* Receive the reply message */
-    n = select(sd + 1, &fds, (fd_set *)0, (fd_set *)0, &m_tv);
+    n = select(sd + 1, &fds, (fd_set *)0, (fd_set *)0, &tv);
 
     if (n == 0)
     {

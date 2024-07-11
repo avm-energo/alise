@@ -39,7 +39,6 @@ public:
 
 private:
     struct sockaddr_in m_sock;
-    struct timeval m_tv;
 
     struct NtpMsgStruct
     {                  /* RFC-1305 NTP control message format */
