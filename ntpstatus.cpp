@@ -8,32 +8,42 @@
 
 NtpStatus::NtpStatus()
 {
-    struct in_addr address;
-    /*----------------------------------------------------------------*/
-    /* Compose the command message */
-
-    memset(&m_ntpmsg, 0, sizeof(NtpMsgStruct));
-    m_ntpmsg.byte1 = B1VAL;
-    m_ntpmsg.byte2 = B2VAL;
-    m_ntpmsg.sequence = htons(1);
-
-    inet_aton("127.0.0.1", &address);
-    m_sock.sin_family = AF_INET;
-    m_sock.sin_addr = address;
-    m_sock.sin_port = htons(NTP_PORT);
 }
 
 int NtpStatus::getNtpStatus()
 {
-    int n; /* number returned from select call */
-    fd_set fds;
-    uint8_t byte1ok;
-    uint8_t byte2ok;
+    struct sockaddr_in sock;
+    struct in_addr address;
     int sd; /* file descriptor for socket */
+    fd_set fds;
     struct timeval tv;
+    int n; /* number returned from select call */
+    unsigned char byte1ok;
+    unsigned char byte2ok;
+    NtpMsgStruct ntpmsg;
+    int8_t buff[PAYLOADSIZE]; /* temporary buffer holding payload string */
+
+    uint8_t clksrc;
+
+    /* initialise timeout value */
+    tv.tv_sec = 1;
+    tv.tv_usec = 0;
 
     /* initialise file descriptor set */
     FD_ZERO(&fds);
+
+    inet_aton("127.0.0.1", &address);
+    sock.sin_family = AF_INET;
+    sock.sin_addr = address;
+    sock.sin_port = htons(NTP_PORT);
+
+    /*----------------------------------------------------------------*/
+    /* Compose the command message */
+
+    memset(&ntpmsg, 0, sizeof(ntpmsg));
+    ntpmsg.byte1 = B1VAL;
+    ntpmsg.byte2 = B2VAL;
+    ntpmsg.sequence = htons(1);
 
     /*---------------------------------------------------------------------*/
     /* Send the command message */
@@ -45,24 +55,20 @@ int NtpStatus::getNtpStatus()
 
     qDebug() << "Ntp: Socket has been opened";
 
-    if (connect(sd, (struct sockaddr *)&m_sock, sizeof(m_sock)) < 0)
+    if (connect(sd, (struct sockaddr *)&sock, sizeof(sock)) < 0)
     {
-        qDebug() << "Ntp: unable to connect to socket: " << m_sock.sin_addr.s_addr << ":" << m_sock.sin_port;
+        qDebug() << "Ntp: unable to connect to socket: " << sock.sin_addr.s_addr << ":" << sock.sin_port;
         return ERROR;
     }
-    qDebug() << "Ntp: Socket connected: " << m_sock.sin_addr.s_addr << ":" << m_sock.sin_port;
+    qDebug() << "Ntp: Socket connected: " << sock.sin_addr.s_addr << ":" << sock.sin_port;
     FD_SET(sd, &fds);
 
-    if (send(sd, &m_ntpmsg, sizeof(m_ntpmsg), 0) < 0)
+    if (send(sd, &ntpmsg, sizeof(ntpmsg), 0) < 0)
     {
         qDebug() << "Ntp: unable to send command to NTP port";
         return ERROR;
     }
     qDebug() << "Ntp: query has been sent";
-
-    /* initialise timeout value */
-    tv.tv_sec = 1;
-    tv.tv_usec = 0;
 
     /*----------------------------------------------------------------------*/
     /* Receive the reply message */
@@ -78,7 +84,7 @@ int NtpStatus::getNtpStatus()
         qDebug() << "Ntp: error on select";
         return ERROR;
     }
-    if (recv(sd, &m_ntpmsg, sizeof(NtpMsgStruct), 0) < 0)
+    if (recv(sd, &ntpmsg, sizeof(NtpMsgStruct), 0) < 0)
     {
         qDebug() << "Ntp: Unable to talk to NTP daemon. Is it running?";
         return ERROR;
@@ -98,21 +104,21 @@ int NtpStatus::getNtpStatus()
     // printf("%s\n\n",ntpmsg.payload);
     /* For the reply message to be valid, the first byte should be as sent,
        and the second byte should be the same, with the response bit set */
-    byte1ok = ((m_ntpmsg.byte1 & 0x3F) == B1VAL);
-    byte2ok = ((m_ntpmsg.byte2 & ~MMASK) == (B2VAL | RMASK));
+    byte1ok = ((ntpmsg.byte1 & 0x3F) == B1VAL);
+    byte2ok = ((ntpmsg.byte2 & ~MMASK) == (B2VAL | RMASK));
     if (!(byte1ok && byte2ok))
     {
         qDebug() << "Ntp: return data appears to be invalid based on status word";
         return ERROR;
     }
 
-    if (!(m_ntpmsg.byte2 | EMASK))
+    if (!(ntpmsg.byte2 | EMASK))
     {
         qDebug() << "Ntp: error bit is set in reply";
         return ERROR;
     }
 
-    if (!(m_ntpmsg.byte2 | MMASK))
+    if (!(ntpmsg.byte2 | MMASK))
     {
         qDebug() << "Ntp: More bit unexpected in reply";
         return ERROR;
@@ -120,14 +126,14 @@ int NtpStatus::getNtpStatus()
 
     /* if the leap indicator (LI), which is the two most significant bits
        in status byte1, are both one, then the clock is not synchronised. */
-    if ((m_ntpmsg.status1 >> 6) == 3)
+    if ((ntpmsg.status1 >> 6) == 3)
     {
         qDebug() << "NTP is unsynchronised";
         return NO_SYNC;
     }
     else
     {
-        clksrc = (m_ntpmsg.status1 & 0x3F);
+        clksrc = (ntpmsg.status1 & 0x3F);
         if (clksrc == LOCALNETSRC)
         {
             qDebug() << "NTP is synchronised to local source";

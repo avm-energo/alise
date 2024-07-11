@@ -38,7 +38,6 @@ public:
     int getNtpStatus();
 
 private:
-    struct sockaddr_in m_sock;
 
     struct NtpMsgStruct
     {                  /* RFC-1305 NTP control message format */
@@ -56,10 +55,4 @@ private:
         int8_t payload[PAYLOADSIZE];
         int8_t authenticator[96];
     };
-
-    NtpMsgStruct m_ntpmsg;
-
-    int8_t buff[PAYLOADSIZE]; /* temporary buffer holding payload string */
-
-    uint8_t clksrc;
 };
