@@ -1,79 +1,13 @@
+/* This piece of code is stolen from ntpstate project (https://github.com/darkhelmet/ntpstat.git) */
+
 #include "ntpstatus.h"
 
 #include <QtDebug>
-#include <arpa/inet.h>
-#include <sys/socket.h>
 #include <sys/time.h>
-
-#define NTP_PORT 123
-
-/* This piece of code is stolen from ntpstate project (https://github.com/darkhelmet/ntpstat.git) */
-/* ------------------------------------------------------------------------*/
-/* value of Byte1 and Byte2 in the ntpmsg       */
-#define B1VAL 0x16 /* VN = 2, Mode = 6 */
-#define B2VAL 2
-// Response = 0; ( this makes the packet a command )
-// Error    = 0;
-// More     = 0;
-// Op Code  = 2 (read variables command)
-#define RMASK 0x80      /* bit mask for the response bit in Status Byte2 */
-#define EMASK 0x40      /* bit mask for the error bit in Status Byte2 */
-#define MMASK 0x20      /* bit mask for the more bit in Status Byte2 */
-#define PAYLOADSIZE 468 /* size in bytes of the message payload string */
-#define LOCALNETSRC 5
-#define NTPSRC 6
-#define LOCALNTPSRC 0
-/*-------------------------------------------------------------------------*/
+#include <unistd.h>
 
 NtpStatus::NtpStatus()
 {
-}
-
-int NtpStatus::getNtpStatus()
-{
-    int rc; //  return code
-    struct sockaddr_in sock;
-    struct in_addr address;
-    int sd; /* file descriptor for socket */
-    fd_set fds;
-    struct timeval tv;
-    int n; /* number returned from select call */
-    unsigned char byte1ok;
-    unsigned char byte2ok;
-
-    struct
-    {                        /* RFC-1305 NTP control message format */
-        unsigned char byte1; /* Version Number: bits 3 - 5; Mode: bits 0 - 2; */
-        unsigned char byte2; /* Response: bit 7;
-                               Error: bit 6;
-                               More: bit 5;
-                               Op code: bits 0 - 4 */
-        unsigned short sequence;
-        unsigned char status1; /* LI and clock source */
-        unsigned char status2; /* count and code */
-        unsigned short AssocID;
-        unsigned short Offset;
-        unsigned short Count;
-        char payload[PAYLOADSIZE];
-        char authenticator[96];
-    } ntpmsg;
-
-    char buff[PAYLOADSIZE]; /* temporary buffer holding payload string */
-
-    unsigned int clksrc;
-
-    /* initialise timeout value */
-    tv.tv_sec = 1;
-    tv.tv_usec = 0;
-
-    /* initialise file descriptor set */
-    FD_ZERO(&fds);
-
-    inet_aton("127.0.0.1", &address);
-    sock.sin_family = AF_INET;
-    sock.sin_addr = address;
-    sock.sin_port = htons(NTP_PORT);
-
     /*----------------------------------------------------------------*/
     /* Compose the command message */
 
@@ -81,6 +15,22 @@ int NtpStatus::getNtpStatus()
     ntpmsg.byte1 = B1VAL;
     ntpmsg.byte2 = B2VAL;
     ntpmsg.sequence = htons(1);
+
+    inet_aton("127.0.0.1", &address);
+    sock.sin_family = AF_INET;
+    sock.sin_addr = address;
+    sock.sin_port = htons(NTP_PORT);
+
+    /* initialise timeout value */
+    tv.tv_sec = 1;
+    tv.tv_usec = 0;
+}
+
+int NtpStatus::getNtpStatus()
+{
+    /* initialise file descriptor set */
+    FD_ZERO(&fds);
+
     /*---------------------------------------------------------------------*/
     /* Send the command message */
     if ((sd = socket(PF_INET, SOCK_DGRAM, 0)) < 0)
@@ -120,6 +70,9 @@ int NtpStatus::getNtpStatus()
         qDebug() << "Unable to talk to NTP daemon. Is it running?";
         return ERROR;
     }
+
+    close(sd);
+
     /*----------------------------------------------------------------------*/
     /* Interpret the received NTP control message */
     // printf("NTP mode 6 message\n");
