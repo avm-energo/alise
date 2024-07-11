@@ -3,6 +3,7 @@
 
 #include <QMap>
 #include <QSettings>
+#include <gen/logger.h>
 
 class AliseSettings
 {

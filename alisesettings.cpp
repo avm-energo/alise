@@ -3,7 +3,7 @@
 #include "aliseconstants.h"
 
 #include <QtDebug>
-
+#include <gen/stdfunc.h>
 AliseSettings::AliseSettings()
 {
 }
@@ -45,26 +45,37 @@ void AliseSettings::logSettings()
 {
     Q_ASSERT(m_settings != nullptr);
 
-    qInfo() << "Reading settings from: " << m_settings->fileName();
-    qInfo() << "Startup information:";
-    qInfo() << "=========================";
-    qInfo() << "LogLevel: " << logLevel;
-    qInfo() << "HttpPort: " << httpPort;
-    qInfo() << "NormalBlink period:" << Alise::AliseConstants::ProcessBlink(Alise::NORMAL) << " ms";
-    qInfo() << "StartingBlink period:" << Alise::AliseConstants::ProcessBlink(Alise::YELLOW) << " ms";
-    qInfo() << "StoppedBlink period:" << Alise::AliseConstants::ProcessBlink(Alise::ORANGE) << " ms";
-    qInfo() << "SemiWorkingBlink period:" << Alise::AliseConstants::ProcessBlink(Alise::VIOLET) << " ms";
-    qInfo() << "ProcessFailedBlink period:" << Alise::AliseConstants::ProcessBlink(Alise::RED) << " ms";
-    qInfo() << "FailureBlink period:" << Alise::AliseConstants::FailureBlink() << " ms";
-    qInfo() << "Power check period:" << Alise::AliseConstants::PowerCheckPeriod() << " ms";
-    qInfo() << "Reset check period:" << Alise::AliseConstants::ResetCheckPeriod() << " ms";
-    qInfo() << "Time update period:" << Alise::AliseConstants::UpdateTimePeriod() << " ms";
-    qInfo() << "Health query period:" << Alise::AliseConstants::HealthQueryPeriod() << " ms";
-    qInfo() << "Reply timeout period:" << Alise::AliseConstants::ReplyTimeoutPeriod() << " ms";
-    qInfo() << "Module serial: " << serialNum;
-    qInfo() << "Board serial: " << serialNumB;
-    qInfo() << "Board hardware: " << hwVersion;
-    qInfo() << "MCU software version: " << swVersion;
+    Logger::writeLog(Logger::All, "Reading settings from: " + m_settings->fileName());
+    Logger::writeLog(Logger::All, "Startup information:");
+    Logger::writeLog(Logger::All, "=========================");
+    Logger::writeLog(Logger::All, "LogLevel: " + logLevel);
+    Logger::writeLog(Logger::All, "HttpPort: " + QString::number(httpPort));
+    Logger::writeLog(Logger::All,
+        "NormalBlink period:" + QString::number(Alise::AliseConstants::ProcessBlink(Alise::NORMAL)) + " ms");
+    Logger::writeLog(Logger::All,
+        "StartingBlink period:" + QString::number(Alise::AliseConstants::ProcessBlink(Alise::YELLOW)) + " ms");
+    Logger::writeLog(Logger::All,
+        "StoppedBlink period:" + QString::number(Alise::AliseConstants::ProcessBlink(Alise::ORANGE)) + " ms");
+    Logger::writeLog(Logger::All,
+        "SemiWorkingBlink period:" + QString::number(Alise::AliseConstants::ProcessBlink(Alise::VIOLET)) + " ms");
+    Logger::writeLog(Logger::All,
+        "ProcessFailedBlink period:" + QString::number(Alise::AliseConstants::ProcessBlink(Alise::RED)) + " ms");
+    Logger::writeLog(
+        Logger::All, "FailureBlink period:" + QString::number(Alise::AliseConstants::FailureBlink()) + " ms");
+    Logger::writeLog(
+        Logger::All, "Power check period:" + QString::number(Alise::AliseConstants::PowerCheckPeriod()) + " ms");
+    Logger::writeLog(
+        Logger::All, "Reset check period:" + QString::number(Alise::AliseConstants::ResetCheckPeriod()) + " ms");
+    Logger::writeLog(
+        Logger::All, "Time update period:" + QString::number(Alise::AliseConstants::UpdateTimePeriod()) + " ms");
+    Logger::writeLog(
+        Logger::All, "Health query period:" + QString::number(Alise::AliseConstants::HealthQueryPeriod()) + " ms");
+    Logger::writeLog(
+        Logger::All, "Reply timeout period:" + QString::number(Alise::AliseConstants::ReplyTimeoutPeriod()) + " ms");
+    Logger::writeLog(Logger::All, "Module serial: " + QString::number(serialNum));
+    Logger::writeLog(Logger::All, "Board serial: " + QString::number(serialNumB));
+    Logger::writeLog(Logger::All, "Board hardware: " + StdFunc::VerToStr(hwVersion));
+    Logger::writeLog(Logger::All, "MCU software version: " + StdFunc::VerToStr(swVersion));
 }
 
 void AliseSettings::writeSettings()

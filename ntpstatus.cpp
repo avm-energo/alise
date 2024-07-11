@@ -39,11 +39,14 @@ int NtpStatus::getNtpStatus()
         return ERROR;
     }
 
+    qDebug() << "Socket has been opened";
+
     if (connect(sd, (struct sockaddr *)&sock, sizeof(sock)) < 0)
     {
         qDebug() << "unable to connect to socket";
         return ERROR;
     }
+    qDebug() << "Socket connected";
     FD_SET(sd, &fds);
 
     if (send(sd, &ntpmsg, sizeof(ntpmsg), 0) < 0)
@@ -51,6 +54,7 @@ int NtpStatus::getNtpStatus()
         qDebug() << "unable to send command to NTP port";
         return ERROR;
     }
+    qDebug() << "Ntp query has been sent";
     /*----------------------------------------------------------------------*/
     /* Receive the reply message */
     n = select(sd + 1, &fds, (fd_set *)0, (fd_set *)0, &tv);
@@ -70,9 +74,11 @@ int NtpStatus::getNtpStatus()
         qDebug() << "Unable to talk to NTP daemon. Is it running?";
         return ERROR;
     }
+    qDebug() << "Data has been received";
 
     close(sd);
 
+    qDebug() << "Socket has been closed";
     /*----------------------------------------------------------------------*/
     /* Interpret the received NTP control message */
     // printf("NTP mode 6 message\n");
