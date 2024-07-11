@@ -38,16 +38,10 @@ public:
     int getNtpStatus();
 
 private:
-    struct sockaddr_in sock;
-    struct in_addr address;
-    int sd; /* file descriptor for socket */
-    fd_set fds;
-    struct timeval tv;
-    int n; /* number returned from select call */
-    uint8_t byte1ok;
-    uint8_t byte2ok;
+    struct sockaddr_in m_sock;
+    struct timeval m_tv;
 
-    struct
+    struct NtpMsgStruct
     {                  /* RFC-1305 NTP control message format */
         uint8_t byte1; /* Version Number: bits 3 - 5; Mode: bits 0 - 2; */
         uint8_t byte2; /* Response: bit 7;
@@ -62,7 +56,9 @@ private:
         uint16_t Count;
         int8_t payload[PAYLOADSIZE];
         int8_t authenticator[96];
-    } ntpmsg;
+    };
+
+    NtpMsgStruct m_ntpmsg;
 
     int8_t buff[PAYLOADSIZE]; /* temporary buffer holding payload string */
 

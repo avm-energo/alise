@@ -8,26 +8,33 @@
 
 NtpStatus::NtpStatus()
 {
+    struct in_addr address;
     /*----------------------------------------------------------------*/
     /* Compose the command message */
 
-    memset(&ntpmsg, 0, sizeof(ntpmsg));
-    ntpmsg.byte1 = B1VAL;
-    ntpmsg.byte2 = B2VAL;
-    ntpmsg.sequence = htons(1);
+    memset(&m_ntpmsg, 0, sizeof(NtpMsgStruct));
+    m_ntpmsg.byte1 = B1VAL;
+    m_ntpmsg.byte2 = B2VAL;
+    m_ntpmsg.sequence = htons(1);
 
     inet_aton("127.0.0.1", &address);
-    sock.sin_family = AF_INET;
-    sock.sin_addr = address;
-    sock.sin_port = htons(NTP_PORT);
+    m_sock.sin_family = AF_INET;
+    m_sock.sin_addr = address;
+    m_sock.sin_port = htons(NTP_PORT);
 
     /* initialise timeout value */
-    tv.tv_sec = 1;
-    tv.tv_usec = 0;
+    m_tv.tv_sec = 3;
+    m_tv.tv_usec = 0;
 }
 
 int NtpStatus::getNtpStatus()
 {
+    int n; /* number returned from select call */
+    fd_set fds;
+    uint8_t byte1ok;
+    uint8_t byte2ok;
+    int sd; /* file descriptor for socket */
+
     /* initialise file descriptor set */
     FD_ZERO(&fds);
 
@@ -35,50 +42,50 @@ int NtpStatus::getNtpStatus()
     /* Send the command message */
     if ((sd = socket(PF_INET, SOCK_DGRAM, 0)) < 0)
     {
-        qDebug() << "unable to open socket";
+        qDebug() << "Ntp: unable to open socket";
         return ERROR;
     }
 
-    qDebug() << "Socket has been opened";
+    qDebug() << "Ntp: Socket has been opened";
 
-    if (connect(sd, (struct sockaddr *)&sock, sizeof(sock)) < 0)
+    if (connect(sd, (struct sockaddr *)&m_sock, sizeof(m_sock)) < 0)
     {
-        qDebug() << "unable to connect to socket";
+        qDebug() << "Ntp: unable to connect to socket: " << m_sock.sin_addr.s_addr << ":" << m_sock.sin_port;
         return ERROR;
     }
-    qDebug() << "Socket connected";
+    qDebug() << "Ntp: Socket connected: " << m_sock.sin_addr.s_addr << ":" << m_sock.sin_port;
     FD_SET(sd, &fds);
 
-    if (send(sd, &ntpmsg, sizeof(ntpmsg), 0) < 0)
+    if (send(sd, &m_ntpmsg, sizeof(m_ntpmsg), 0) < 0)
     {
-        qDebug() << "unable to send command to NTP port";
+        qDebug() << "Ntp: unable to send command to NTP port";
         return ERROR;
     }
-    qDebug() << "Ntp query has been sent";
+    qDebug() << "Ntp: query has been sent";
     /*----------------------------------------------------------------------*/
     /* Receive the reply message */
-    n = select(sd + 1, &fds, (fd_set *)0, (fd_set *)0, &tv);
+    n = select(sd + 1, &fds, (fd_set *)0, (fd_set *)0, &m_tv);
 
     if (n == 0)
     {
-        qDebug() << "timeout";
+        qDebug() << "Ntp: select timeout";
         return ERROR;
     }
     if (n == -1)
     {
-        qDebug() << "error on select";
+        qDebug() << "Ntp: error on select";
         return ERROR;
     }
-    if (recv(sd, &ntpmsg, sizeof(ntpmsg), 0) < 0)
+    if (recv(sd, &m_ntpmsg, sizeof(NtpMsgStruct), 0) < 0)
     {
-        qDebug() << "Unable to talk to NTP daemon. Is it running?";
+        qDebug() << "Ntp: Unable to talk to NTP daemon. Is it running?";
         return ERROR;
     }
-    qDebug() << "Data has been received";
+    qDebug() << "Ntp: Data has been received";
 
     close(sd);
 
-    qDebug() << "Socket has been closed";
+    qDebug() << "Ntp: Socket has been closed";
     /*----------------------------------------------------------------------*/
     /* Interpret the received NTP control message */
     // printf("NTP mode 6 message\n");
@@ -89,36 +96,36 @@ int NtpStatus::getNtpStatus()
     // printf("%s\n\n",ntpmsg.payload);
     /* For the reply message to be valid, the first byte should be as sent,
        and the second byte should be the same, with the response bit set */
-    byte1ok = ((ntpmsg.byte1 & 0x3F) == B1VAL);
-    byte2ok = ((ntpmsg.byte2 & ~MMASK) == (B2VAL | RMASK));
+    byte1ok = ((m_ntpmsg.byte1 & 0x3F) == B1VAL);
+    byte2ok = ((m_ntpmsg.byte2 & ~MMASK) == (B2VAL | RMASK));
     if (!(byte1ok && byte2ok))
     {
-        qDebug() << "return data appears to be invalid based on status word";
+        qDebug() << "Ntp: return data appears to be invalid based on status word";
         return ERROR;
     }
 
-    if (!(ntpmsg.byte2 | EMASK))
+    if (!(m_ntpmsg.byte2 | EMASK))
     {
-        qDebug() << "error bit is set in reply";
+        qDebug() << "Ntp: error bit is set in reply";
         return ERROR;
     }
 
-    if (!(ntpmsg.byte2 | MMASK))
+    if (!(m_ntpmsg.byte2 | MMASK))
     {
-        qDebug() << "More bit unexpected in reply";
+        qDebug() << "Ntp: More bit unexpected in reply";
         return ERROR;
     }
 
     /* if the leap indicator (LI), which is the two most significant bits
        in status byte1, are both one, then the clock is not synchronised. */
-    if ((ntpmsg.status1 >> 6) == 3)
+    if ((m_ntpmsg.status1 >> 6) == 3)
     {
         qDebug() << "NTP is unsynchronised";
         return NO_SYNC;
     }
     else
     {
-        clksrc = (ntpmsg.status1 & 0x3F);
+        clksrc = (m_ntpmsg.status1 & 0x3F);
         if (clksrc == LOCALNETSRC)
         {
             qDebug() << "NTP is synchronised to local source";
