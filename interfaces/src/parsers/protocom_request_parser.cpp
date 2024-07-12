@@ -143,6 +143,7 @@ QByteArray ProtocomRequestParser::parse(const CommandStruct &cmd)
     {
         if (cmd.arg1.canConvert<QVariantList>())
         {
+            qDebug() << "WriteUserValues: " << cmd.arg1;
             auto vList = cmd.arg1.value<QVariantList>();
             const quint16 start_addr = vList.first().value<DataTypes::FloatStruct>().sigAdr;
             const auto group = getGroupByAddress(start_addr);
@@ -157,6 +158,10 @@ QByteArray ProtocomRequestParser::parse(const CommandStruct &cmd)
                 }
                 m_request = writeLongData(s_protoCmdMap.at(cmd.command), tmpba);
             }
+        }
+        else
+        {
+            qDebug() << "Wrong QVariantList";
         }
         break;
     }

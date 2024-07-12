@@ -129,6 +129,7 @@ void StmBroker::setIndication(const AVTUK_CCU::Indication &indication)
     block.data = m_currentIndication.toByteArray();
     //    block.data.resize(sizeof(m_currentIndication));
     //    memcpy(block.data.data(), &m_currentIndication, sizeof(m_currentIndication));
+    qDebug() << "Block send: ID = " << block.ID << ", data = " << block.data;
     m_conn->writeCommand(Interface::Commands::C_WriteUserValues, QVariant::fromValue(block));
 #endif
 }

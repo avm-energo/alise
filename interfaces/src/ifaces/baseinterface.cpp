@@ -41,7 +41,7 @@ void BaseInterface::writeLog(const QByteArray &ba, Interface::Direction dir)
             msg += ": ";
             break;
         }
-        msg += ba.toHex();
+        msg += ba;
         m_log.debug(msg);
     }
 }
