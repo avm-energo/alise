@@ -80,9 +80,7 @@ void StmBroker::writeHiddenBlock()
     block.ID = 0x01; // base block
     block.data.resize(ba.size());
     memcpy(block.data.data(), &ba.data()[0], ba.size());
-    QList<QVariant> list;
-    list.append(QVariant::fromValue(block));
-    m_conn->writeCommand(Interface::Commands::C_WriteHiddenBlock, list);
+    m_conn->writeCommand(Interface::Commands::C_WriteHiddenBlock, QVariant::fromValue(block));
 #endif
 }
 
@@ -132,7 +130,7 @@ void StmBroker::setIndication(const AVTUK_CCU::Indication &indication)
     //    block.data.resize(sizeof(m_currentIndication));
     //    memcpy(block.data.data(), &m_currentIndication, sizeof(m_currentIndication));
     qDebug() << "Block send: ID = " << block.ID << ", data = " << block.data;
-    m_conn->writeCommand(Interface::Commands::C_WriteUserValues, QVariant::fromValue(block));
+    m_conn->writeCommand(Interface::Commands::C_WriteBlock, QVariant::fromValue(block));
 #endif
 }
 

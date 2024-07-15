@@ -29,6 +29,7 @@ const std::map<Interface::Commands, Proto::Commands> ProtocomRequestParser::s_pr
     { Commands::C_GetMode, Proto::ReadMode },                      //
     { Commands::C_SetMode, Proto::WriteMode },                     //
     { Commands::C_WriteHiddenBlock, Proto::WriteHardware },        //
+    { Commands::C_WriteBlock, Proto::WriteBlkData },               //
     { Commands::C_WriteTypeOsc, Proto::WriteBlkData }              //
 };
 
@@ -128,6 +129,7 @@ QByteArray ProtocomRequestParser::parse(const CommandStruct &cmd)
     case Commands::C_SetNewConfiguration:
     case Commands::C_WriteTuningCoef:
     case Commands::C_WriteTypeOsc:
+    case Commands::C_WriteBlock:
     {
         if (cmd.arg1.canConvert<DataTypes::BlockStruct>())
         {

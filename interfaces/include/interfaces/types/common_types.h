@@ -66,6 +66,7 @@ enum class Commands
     C_Test,
     C_EraseTechBlock,
     C_EnableHiddenBlockWriting,
+    C_WriteBlock,
     C_WriteHiddenBlock,
     C_WriteUserValues,
     C_WriteSingleCommand,
