@@ -11,7 +11,7 @@ option(ALISE_LOCALDEBUG "Local debug on PC" OFF)
 #set(ALISE_BUILDFORDEB "bullseye" CACHE STRING "debian version to build for")
 set(ALISE_POSTFIX)
 
-find_package(QT NAMES Qt6 Qt5)
+find_package(QT NAMES Qt5)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core Xml REQUIRED)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
