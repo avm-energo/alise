@@ -54,7 +54,6 @@ Controller *Controller::ofType(Controller::ContrTypes type) {
     break;
   case IS_CORE:
     adminjaSetup();
-    booterSetup();
     coreSetup();
     break;
   default:
