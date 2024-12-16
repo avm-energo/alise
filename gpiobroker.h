@@ -7,7 +7,7 @@
 #include <QMutex>
 #include <QObject>
 #include <QTimer>
-#include <gpiod.h>
+#include <gpiod.hpp>
 
 constexpr uint16_t c_maxBlinks = 0xFFFF;
 
@@ -45,11 +45,11 @@ public:
     bool connect() override;
 
 public slots:
-    void checkIndication() override {};
+    void checkIndication() override { };
     void checkPowerUnit() override;
     void setIndication(const AVTUK_CCU::Indication &indication) override;
-    void setTime(const timespec &time) override {};
-    void getTime() override {};
+    void setTime(const timespec &time) override { };
+    void getTime() override { };
     void rebootMyself() override;
 
 private:
@@ -59,13 +59,17 @@ private:
     int resetCounter = 0;
     QMutex _mutex;
 
+    GpioPin PowerStatusPin0 { "PWR1", 3, 5, PinDirections::INPUT };
+    GpioPin PowerStatusPin1 { "PWR2", 2, 17, PinDirections::INPUT };
+    GpioPin LedPin { "MODELED", 0, 31, PinDirections::OUTPUT };
+    GpioPin ResetPin { "RESET", 1, 6, PinDirections::INPUT };
+    const QList<GpioPin> c_pinList = { LedPin, ResetPin, PowerStatusPin0, PowerStatusPin1 };
+
     QTimer m_gpioTimer, m_resetTimer;
     void reset();
     void restartBlinkTimer();
-
-    QMap<int, struct gpiod_chip *> chipMap;                        // pairs: <chipNum, chip> for each gpiochipx
-    QMap<std::string, struct gpiod_line *> lineMap;                // pairs: <lineName, line> for each pin
-    struct gpiod_line *modeLine, *resetLine, *pwr1Line, *pwr2Line; // for each pin: led, reset, pwr1, pwr2
+    bool gpioGetLineValue(GpioPin pin);
+    void gpioSetLineValue(GpioPin pin, bool value);
 
 private slots:
     void blink();
