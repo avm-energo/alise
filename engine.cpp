@@ -19,7 +19,7 @@ bool Engine::init(const AliseSettings &settings)
 #if defined(AVTUK_STM)
     m_broker = new StmBroker(this);
 #else
-    m_broker = new GpioBroker(this);
+    m_broker = new GpioBroker(settings, this);
 #endif
     bool ok = m_broker->connect();
     if (!ok)

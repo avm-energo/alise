@@ -1,6 +1,7 @@
 #ifndef GPIOBROKER_H
 #define GPIOBROKER_H
 
+#include "alisesettings.h"
 #include "broker.h"
 
 #include <QMap>
@@ -40,7 +41,7 @@ public:
         TWOBLINKS
     };
 
-    GpioBroker(QObject *parent = nullptr);
+    GpioBroker(AliseSettings settings, QObject *parent = nullptr);
     ~GpioBroker();
     bool connect() override;
 
@@ -58,6 +59,7 @@ private:
     BlinkMode m_blinkMode;
     int resetCounter = 0;
     QMutex _mutex;
+    AliseSettings m_settings;
 
     GpioPin PowerStatusPin0 { "PWR1", 3, 5, PinDirections::INPUT };
     GpioPin PowerStatusPin1 { "PWR2", 2, 17, PinDirections::INPUT };

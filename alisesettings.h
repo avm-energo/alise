@@ -13,7 +13,7 @@ public:
     void init();
     void readSettings();
     void logSettings();
-    void writeSettings();      // write all settings
+    void writeSettings(); // write all settings
     void flush();
 
     QString logLevel;
@@ -23,6 +23,7 @@ public:
     std::uint32_t hwVersion;
     std::uint32_t swVersion;
     int httpPort;
+    bool gpioExceptionsAreOn;
 
 private:
     QSettings *m_settings;

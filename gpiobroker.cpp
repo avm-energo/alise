@@ -11,7 +11,7 @@
 
 using namespace Alise;
 
-GpioBroker::GpioBroker(QObject *parent) : Broker(parent)
+GpioBroker::GpioBroker(AliseSettings settings, QObject *parent) : Broker(parent), m_settings(settings)
 {
     qDebug() << "[GPIO] GPIO Broker created";
     m_blinkMode = BlinkMode::ONEBLINK;
@@ -156,28 +156,43 @@ void GpioBroker::restartBlinkTimer()
 
 bool GpioBroker::gpioGetLineValue(GpioPin pin)
 {
-    const std::string chipstr = "/dev/gpiochip" + std::to_string(pin.chip);
-    ::gpiod::chip chip = ::gpiod::chip(chipstr.c_str());
-    auto request
-        = chip.prepare_request()
-              .set_consumer("get-line-value")
-              .add_line_settings(pin.offset, ::gpiod::line_settings().set_direction(::gpiod::line::direction::INPUT))
-              .do_request();
-    return (request.get_value(pin.offset) == ::gpiod::line::value::ACTIVE);
-}
-
-void GpioBroker::gpioSetLineValue(GpioPin pin, bool value)
-{
-    bool pinValue = gpioGetLineValue(pin);
-    if (pinValue ^ value)
+    try
     {
         const std::string chipstr = "/dev/gpiochip" + std::to_string(pin.chip);
         ::gpiod::chip chip = ::gpiod::chip(chipstr.c_str());
         auto request = chip.prepare_request()
-                           .set_consumer("toggle-line-value")
+                           .set_consumer("get-line-value")
                            .add_line_settings(
-                               pin.offset, ::gpiod::line_settings().set_direction(::gpiod::line::direction::OUTPUT))
+                               pin.offset, ::gpiod::line_settings().set_direction(::gpiod::line::direction::INPUT))
                            .do_request();
+        return (request.get_value(pin.offset) == ::gpiod::line::value::ACTIVE);
+    } catch (std::exception e)
+    {
+        if (m_settings.gpioExceptionsAreOn)
+            qDebug() << "gpioGetLineValue exception: " << e.what();
+    }
+    return false;
+}
+
+void GpioBroker::gpioSetLineValue(GpioPin pin, bool value)
+{
+    try
+    {
+        bool pinValue = gpioGetLineValue(pin);
+        if (pinValue ^ value)
+        {
+            const std::string chipstr = "/dev/gpiochip" + std::to_string(pin.chip);
+            ::gpiod::chip chip = ::gpiod::chip(chipstr.c_str());
+            auto request = chip.prepare_request()
+                               .set_consumer("toggle-line-value")
+                               .add_line_settings(
+                                   pin.offset, ::gpiod::line_settings().set_direction(::gpiod::line::direction::OUTPUT))
+                               .do_request();
+        }
+    } catch (std::exception e)
+    {
+        if (m_settings.gpioExceptionsAreOn)
+            qDebug() << "gpioSetLineValue exception: " << e.what();
     }
 }
 
