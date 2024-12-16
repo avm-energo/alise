@@ -1,6 +1,5 @@
 #include "httpmiddleware.h"
 
-#include "alisesettings.h"
 #include "avtukccu.h"
 #include "gitversion/gitversion.h"
 
@@ -8,6 +7,7 @@
 #include <QString>
 #include <config.h>
 #include <gen/stdfunc.h>
+#include <gen/timefunc.h>
 
 HttpMiddleware::HttpMiddleware(const AliseSettings &settings, QObject *parent) : QObject { parent }
 {
@@ -59,6 +59,13 @@ QJsonObject HttpMiddleware::ntpStatus()
     return json;
 }
 
+QJsonObject HttpMiddleware::timeZone()
+{
+    QJsonObject json;
+    json["Timezone"] = QString::number(TimeFunc::curTimeZone());
+    return json;
+}
+
 void HttpMiddleware::timePost(const QByteArray &arr)
 {
     const QJsonObject json = byteArrayToJsonObject(arr);
@@ -78,6 +85,16 @@ void HttpMiddleware::healthPost(const QByteArray &arr)
     bool ok;
     uint32_t code = healthString.toUInt(&ok, 16);
     emit healthReceived(code);
+}
+
+void HttpMiddleware::timeZonePost(const QByteArray &arr)
+{
+    const QJsonObject json = byteArrayToJsonObject(arr);
+    QString timeZoneString = json["Timezone"].toString();
+    qDebug() << "Timezone received: " << timeZoneString;
+    bool ok;
+    uint8_t timeZone = timeZoneString.toUInt(&ok);
+    emit timeZoneReceived(timeZone);
 }
 
 void HttpMiddleware::setBooterConnectionLost()

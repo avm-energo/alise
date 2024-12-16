@@ -95,6 +95,7 @@ void Engine::createHttpConnections()
 {
     // time received: set Linux system time
     connect(m_mw, &HttpMiddleware::timeReceived, m_timeSynchronizer, &TimeSyncronizer::printAndSetSystemTime);
+    connect(m_mw, &HttpMiddleware::timeZoneReceived, m_timeSynchronizer, &TimeSyncronizer::setTimeZone);
 
 #if defined(AVTUK_STM)
     // time received: write new time into STM32

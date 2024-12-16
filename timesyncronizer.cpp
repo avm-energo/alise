@@ -42,6 +42,20 @@ void TimeSyncronizer::printAndSetSystemTime(const timespec time)
     setSystemTime(time);
 }
 
+void TimeSyncronizer::setTimeZone(const int8_t tz)
+{
+    if ((tz < -12) || (tz > 14))
+    {
+        qDebug() << "Wrong timezone has been received from HTTP: " + QString::number(tz);
+        return;
+    }
+    QString program = "/usr/bin/timedatectl set-timezone Etc/GMT" + QString::number(tz);
+    qInfo() << "Setting timezone: " << program;
+    curCommand = CurrentCommandEnum::TIMEZONE;
+    ExecuteCommandAsync *executor = new ExecuteCommandAsync;
+    executor->execute(program);
+}
+
 timespec TimeSyncronizer::systemTime() const
 {
     timespec time;
