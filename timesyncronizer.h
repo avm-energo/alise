@@ -12,7 +12,8 @@ public:
     enum CurrentCommandEnum
     {
         NTP,
-        HWCLOCK
+        HWCLOCK,
+        TIMEZONE
     };
 
     explicit TimeSyncronizer(QObject *parent = nullptr);
@@ -23,6 +24,7 @@ public:
 
 public slots:
     void printAndSetSystemTime(const timespec time);
+    void setTimeZone(const int8_t tz);
 
 private:
     void setSystemTime(const timespec &systemTime);

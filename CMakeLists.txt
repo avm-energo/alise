@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.18)
-project(alise VERSION 3.0.2)
+project(alise VERSION 3.1.0)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -75,12 +75,14 @@ add_subdirectory(gitversion)
 
 configure_file(${CMAKE_SOURCE_DIR}/cconfig.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h @ONLY)
 
+target_include_directories(${PROJECT_NAME} PRIVATE ${avm-gen_SOURCE_DIR}/include)
+
 if (ALISE_STM)
     add_subdirectory(interfaces)
     ##WARNING Link interfaces before gen (!)
     target_link_libraries(${PROJECT_NAME} PUBLIC interfaces)
 else()
-    target_link_libraries(${PROJECT_NAME} PUBLIC gen ${GPIODCXX_LIBRARY})
+    target_link_libraries(${PROJECT_NAME} PUBLIC avm-gen ${GPIODCXX_LIBRARY})
 endif()
 target_link_libraries(${PROJECT_NAME} PUBLIC Qt6::HttpServer pthread gitversion)
 
