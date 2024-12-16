@@ -49,7 +49,9 @@ void TimeSyncronizer::setTimeZone(const int8_t tz)
         qDebug() << "Wrong timezone has been received from HTTP: " + QString::number(tz);
         return;
     }
-    QString program = "/usr/bin/timedatectl set-timezone Etc/GMT" + QString::number(tz);
+    QString tzstr = (tz > 0) ? "-" + QString::number(tz)
+                             : "+" + QString::number(-tz); // inverting because of Debian's ugly timezone setting
+    QString program = "/usr/bin/timedatectl set-timezone Etc/GMT" + tzstr;
     qInfo() << "Setting timezone: " << program;
     curCommand = CurrentCommandEnum::TIMEZONE;
     ExecuteCommandAsync *executor = new ExecuteCommandAsync;

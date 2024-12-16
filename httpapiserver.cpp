@@ -51,6 +51,11 @@ void HttpApiServer::setRoutes()
         return QHttpServerResponse(m_mw->ntpStatus());
     });
 
+    m_server.route("/gettimezone/<arg>", QHttpServerRequest::Method::Get, [&](QString identity) {
+        qDebug() << identity << " [GET] NtpState";
+        return QHttpServerResponse(m_mw->timeZone());
+    });
+
     // POST requests
     m_server.route(
         "/sethealth/<arg>", QHttpServerRequest::Method::Post, [&](QString identity, const QHttpServerRequest &request) {
@@ -63,6 +68,13 @@ void HttpApiServer::setRoutes()
         [&](QString identity, const QHttpServerRequest &request) {
             qDebug() << identity << " [POST] SetTime";
             m_mw->timePost(request.body());
+            return QHttpServerResponse(m_mw->pingReply());
+        });
+
+    m_server.route("/settimezone/<arg>", QHttpServerRequest::Method::Post,
+        [&](QString identity, const QHttpServerRequest &request) {
+            qDebug() << identity << " [POST] SetTimeZone";
+            m_mw->timeZonePost(request.body());
             return QHttpServerResponse(m_mw->pingReply());
         });
 }

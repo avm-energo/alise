@@ -62,7 +62,8 @@ QJsonObject HttpMiddleware::ntpStatus()
 QJsonObject HttpMiddleware::timeZone()
 {
     QJsonObject json;
-    json["Timezone"] = QString::number(TimeFunc::curTimeZone());
+    int tz = TimeFunc::curTimeZone();
+    json["Timezone"] = QString::number(tz); // inverting because of ugly timezone setting in Debian
     return json;
 }
 
@@ -93,7 +94,7 @@ void HttpMiddleware::timeZonePost(const QByteArray &arr)
     QString timeZoneString = json["Timezone"].toString();
     qDebug() << "Timezone received: " << timeZoneString;
     bool ok;
-    uint8_t timeZone = timeZoneString.toUInt(&ok);
+    int8_t timeZone = timeZoneString.toInt(&ok);
     emit timeZoneReceived(timeZone);
 }
 

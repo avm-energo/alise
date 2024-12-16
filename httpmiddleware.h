@@ -30,7 +30,7 @@ signals:
     void timeReceived(
         const timespec &systemTime); ///< сигнал при получении текущего времени для задания в Алису из Соники
     void timeZoneReceived(
-        const uint8_t tz); ///< сигнал при получении текущего часового пояса для установки в контроллер из Соники
+        const int8_t tz); ///< сигнал при получении текущего часового пояса для установки в контроллер из Соники
 
 public slots:
     void setTimeStamp(const timespec &systemTime); ///< установка текущего времени по сигналу из брокера

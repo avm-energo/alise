@@ -75,6 +75,8 @@ add_subdirectory(gitversion)
 
 configure_file(${CMAKE_SOURCE_DIR}/cconfig.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h @ONLY)
 
+target_include_directories(${PROJECT_NAME} PRIVATE ${avm-gen_SOURCE_DIR}/include)
+
 if (ALISE_STM)
     add_subdirectory(interfaces)
     ##WARNING Link interfaces before gen (!)
@@ -82,7 +84,7 @@ if (ALISE_STM)
 else()
     message("GPIODCXX_LIBRARY is ${GPIODCXX_LIBRARY}")
     target_link_libraries(${PROJECT_NAME} PUBLIC ${GPIODCXX_LIBRARY})
-    target_link_libraries(${PROJECT_NAME} PUBLIC gen)
+    target_link_libraries(${PROJECT_NAME} PUBLIC avm-gen)
 endif()
 target_link_libraries(${PROJECT_NAME} PUBLIC Qt6::HttpServer pthread gitversion)
 
