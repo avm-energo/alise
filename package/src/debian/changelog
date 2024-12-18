@@ -1,3 +1,10 @@
+alise (3.1.0) unstable; urgency=low
+
+  * Timezone processing
+
+ -- AVM-Energo <support@avmenergo.ru>  Wed, 18 Dec 2024 09:14:41 +0300
+
+
 alise (3.0.1) unstable; urgency=low
 
   * Http restAPI implemented
