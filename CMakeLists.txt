@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.18)
-project(alise VERSION 3.0.2)
+project(alise VERSION 3.1.0)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -8,20 +8,11 @@ set(CMAKE_AUTORCC ON)
 
 option(ALISE_STM "Build with STM32 support" OFF)
 option(ALISE_LOCALDEBUG "Local debug on PC" OFF)
-option(BUILD_SHARED_LIBS "Build with shared libs" ON)
-
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_BINARY_DIR}")
 
 find_package(QT NAMES Qt6)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core HttpServer REQUIRED)
-find_package(avm-gen QUIET)
-if(${avm-gen_FOUND})
-    message(STATUS "Using installed avm-gen")
-else()
-    message(STATUS "Using external avm-gen")
-    include(avm-gen)
-endif()
+
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 if (ALISE_LOCALDEBUG)
     add_compile_definitions(ALISE_LOCALDEBUG)
@@ -37,6 +28,10 @@ else()
       message(FATAL_ERROR "gpiod library not found. Install apt install libgpiod-dev")
     endif()
 endif()
+
+include(gen)
+
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_BINARY_DIR}")
 
 set(SOURCES
     main.cpp
@@ -62,11 +57,11 @@ set(SOURCES
     recovery.h
     timesyncronizer.cpp
     timesyncronizer.h
+    ${AVTUK_MODULE_PATH}/interfaces.qrc
     )
 
 if (ALISE_STM)
     list(APPEND SOURCES
-        ${AVTUK_MODULE_PATH}/interfaces.qrc
          stmbroker.cpp
          stmbroker.h)
 else()
@@ -80,11 +75,14 @@ add_subdirectory(gitversion)
 
 configure_file(${CMAKE_SOURCE_DIR}/cconfig.h.in ${CMAKE_CURRENT_BINARY_DIR}/config.h @ONLY)
 
+target_include_directories(${PROJECT_NAME} PRIVATE ${avm-gen_SOURCE_DIR}/include)
+
 if (ALISE_STM)
     add_subdirectory(interfaces)
-    target_link_libraries(${PROJECT_NAME} PRIVATE interfaces)
+    ##WARNING Link interfaces before gen (!)
+    target_link_libraries(${PROJECT_NAME} PUBLIC interfaces)
 else()
-    target_link_libraries(${PROJECT_NAME} PRIVATE avm-gen ${GPIODCXX_LIBRARY})
+    target_link_libraries(${PROJECT_NAME} PUBLIC avm-gen ${GPIODCXX_LIBRARY})
 endif()
 target_link_libraries(${PROJECT_NAME} PUBLIC Qt6::HttpServer pthread gitversion)
 

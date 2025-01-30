@@ -13,20 +13,24 @@ class HttpMiddleware : public QObject
 public:
     explicit HttpMiddleware(const AliseSettings &settings, QObject *parent = nullptr);
 
-    QJsonObject helloReply();  ///< подготовка ответа на запрос Hello
-    QJsonObject timeStamp();   ///< подготовка json с текущим временем
-    QJsonObject pingReply();   ///< подготовка ответа на ping запрос
-    QJsonObject powerStatus(); ///< подготовка json с текущим значеним состояния GPIO
-    QJsonObject ntpStatus();   ///< подготовка json с текущим значеним NTP статуса
-    void timePost(const QByteArray &arr);   ///< получили POST сообщение с временем
-    void healthPost(const QByteArray &arr); ///< получили POST сообщение со статусами
-    void setBooterConnectionLost(); ///< выдача сигнала о потере связи с Бутером
+    QJsonObject helloReply();                 ///< подготовка ответа на запрос Hello
+    QJsonObject timeStamp();                  ///< подготовка json с текущим временем
+    QJsonObject pingReply();                  ///< подготовка ответа на ping запрос
+    QJsonObject powerStatus();                ///< подготовка json с текущим значеним состояния GPIO
+    QJsonObject ntpStatus();                  ///< подготовка json с текущим значеним NTP статуса
+    QJsonObject timeZone();                   ///< подготовка json с текущим значением часового пояса
+    void timePost(const QByteArray &arr);     ///< получили POST сообщение с временем
+    void healthPost(const QByteArray &arr);   ///< получили POST сообщение со статусами
+    void timeZonePost(const QByteArray &arr); ///< установка часового пояса из Админзи
+    void setBooterConnectionLost();           ///< выдача сигнала о потере связи с Бутером
 
 signals:
-    void booterConnectionIsLost(); ///< сигнал при потере пингов от Бутера на время более двух запросов подряд
+    void booterConnectionIsLost();      ///< сигнал при потере пингов от Бутера на время более двух запросов подряд
     void healthReceived(uint32_t code); ///< сигнал при получении состояния Соники от Бутера
     void timeReceived(
         const timespec &systemTime); ///< сигнал при получении текущего времени для задания в Алису из Соники
+    void timeZoneReceived(
+        const int8_t tz); ///< сигнал при получении текущего часового пояса для установки в контроллер из Соники
 
 public slots:
     void setTimeStamp(const timespec &systemTime); ///< установка текущего времени по сигналу из брокера
@@ -38,6 +42,7 @@ private:
     timespec m_time;
     int m_ntpState;
     int m_pwrIn, m_resetReq;
+    uint8_t m_timeZone;
     QString m_aliseVersion, m_serialNum, m_hwVersion, m_swVersion;
 
     /// \brief Конвертация POST-запроса в JSON объект
