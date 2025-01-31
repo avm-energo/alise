@@ -1,0 +1,7 @@
+Source: avm-alise-stm
+Maintainer: AVM-Energo <support@avmenergo.ru>
+
+Package: avm-alise-stm
+Description: Avtuk LInux SErver
+Architecture: amd64
+Depends: ${shlibs:Depends}

@@ -1,0 +1,2 @@
+systemctl disable alise.service 2>/dev/null
+systemctl stop alise.service 2>/dev/null
