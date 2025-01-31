@@ -5,6 +5,9 @@ project(interfaces LANGUAGES CXX)
 set(INCLUDE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/include/interfaces")
 set(SRC_PATH     "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
+find_package(QT NAMES Qt6)
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core REQUIRED)
+
 set(files_h
     "${INCLUDE_PATH}/connectioncontext.h"
     "${INCLUDE_PATH}/connectionmanager.h"
@@ -67,7 +70,7 @@ elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Cl
 endif()
 
 # Linking dependencies
-target_link_libraries(${PROJECT_NAME} PUBLIC gen)
+target_link_libraries(${PROJECT_NAME} PUBLIC Qt6::Core avm-gen)
 
 if(UNIX)
   target_link_libraries(${PROJECT_NAME} PRIVATE hidapi-hidraw)

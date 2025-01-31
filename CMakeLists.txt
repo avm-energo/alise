@@ -79,7 +79,6 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${avm-gen_SOURCE_DIR}/include
 
 if (ALISE_STM)
     add_subdirectory(interfaces)
-    ##WARNING Link interfaces before gen (!)
     target_link_libraries(${PROJECT_NAME} PUBLIC interfaces)
 else()
     target_link_libraries(${PROJECT_NAME} PUBLIC avm-gen ${GPIODCXX_LIBRARY})
