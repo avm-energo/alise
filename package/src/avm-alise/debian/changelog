@@ -1,3 +1,9 @@
+avm-alise (3.2.0) unstable; urgency=low
+
+  * GPIO settings now parsed from conf file
+
+ -- AVM-Energo <support@avmenergo.ru>  Tue, 18 Mar 2025 10:11:36 +0300
+
 avm-alise (3.1.0) unstable; urgency=low
 
   * Timezone processing

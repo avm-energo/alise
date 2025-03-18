@@ -1,6 +1,7 @@
 #ifndef GPIOBROKER_H
 #define GPIOBROKER_H
 
+#include "alisesettings.h"
 #include "broker.h"
 
 #include <QMap>
@@ -40,16 +41,16 @@ public:
         TWOBLINKS
     };
 
-    GpioBroker(QObject *parent = nullptr);
+    GpioBroker(QMap<QString, AliseSettings::GPIOInfo> &gpioMap, QObject *parent = nullptr);
     ~GpioBroker();
     bool connect() override;
 
 public slots:
-    void checkIndication() override {};
+    void checkIndication() override { };
     void checkPowerUnit() override;
     void setIndication(const AVTUK_CCU::Indication &indication) override;
-    void setTime(const timespec &time) override {};
-    void getTime() override {};
+    void setTime(const timespec &time) override { };
+    void getTime() override { };
     void rebootMyself() override;
 
 private:
@@ -59,12 +60,12 @@ private:
     int resetCounter = 0;
     QMutex _mutex;
 
+    QList<GpioPin> m_pinList;
     QTimer m_gpioTimer, m_resetTimer;
     void reset();
     void restartBlinkTimer();
 
     QMap<int, struct gpiod_chip *> chipMap;                        // pairs: <chipNum, chip> for each gpiochipx
-    QMap<std::string, struct gpiod_line *> lineMap;                // pairs: <lineName, line> for each pin
     struct gpiod_line *modeLine, *resetLine, *pwr1Line, *pwr2Line; // for each pin: led, reset, pwr1, pwr2
 
 private slots:

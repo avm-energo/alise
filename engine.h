@@ -15,7 +15,7 @@ public:
     Engine(QObject *parent = nullptr);
 
     /// \brief Инициализация движка
-    bool init(const AliseSettings &settings);
+    bool init(AliseSettings &settings);
 
     /// \brief Старт работы по http
     void start();

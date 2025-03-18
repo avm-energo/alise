@@ -8,7 +8,6 @@
 #include <gen/logger.h>
 #include <gen/stdfunc.h>
 #include <iostream>
-#include <memory>
 
 constexpr char ethPathString[] = "/etc/network/interfaces.d/eth";
 constexpr char ethResourcePathString[] = ":/network/eth";

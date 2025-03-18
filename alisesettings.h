@@ -8,13 +8,22 @@
 class AliseSettings
 {
 public:
+    struct GPIOInfo
+    {
+        int pin;
+        int offset;
+    };
+
     AliseSettings();
 
     void init();
     void readSettings();
     void logSettings();
-    void writeSettings();      // write all settings
+    void writeSettings(); // write all settings
     void flush();
+    bool isValid();
+    GPIOInfo parseGPIOSettings(const QString &pinName);
+    void setGPIOValues();
 
     QString logLevel;
     QString logFilename;
@@ -23,9 +32,11 @@ public:
     std::uint32_t hwVersion;
     std::uint32_t swVersion;
     int httpPort;
+    QMap<QString, GPIOInfo> m_gpioMap;
 
 private:
     QSettings *m_settings;
+    bool m_isValid;
 };
 
 #endif // ALISESETTINGS_H

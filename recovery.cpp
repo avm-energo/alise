@@ -12,6 +12,7 @@ constexpr char ethResourcePathString[] = ":/network/eth";
 
 RecoveryEngine::RecoveryEngine(QObject *parent) : QObject(parent)
 {
+    m_resetInit = false;
 }
 
 void RecoveryEngine::setDefEth(int ethNum)
@@ -72,7 +73,7 @@ void RecoveryEngine::receiveBlock(const DataTypes::BlockStruct &blk)
         AVTUK_CCU::Main mainBlock;
         memcpy(&mainBlock, blk.data.data(), sizeof(mainBlock));
         //        qDebug() << "[Recovery] Main block has been received from MCU, reset is: " << mainBlock.resetReq;
-        if (mainBlock.resetReq && (!resetInit))
+        if (mainBlock.resetReq && (!m_resetInit))
         {
             setDefEth(0);
 #if defined(AVTUK_STM)
@@ -83,7 +84,7 @@ void RecoveryEngine::receiveBlock(const DataTypes::BlockStruct &blk)
             sync();
             restartNetwork();
             emit rebootReq();
-            resetInit = true;
+            m_resetInit = true;
         }
     }
     }

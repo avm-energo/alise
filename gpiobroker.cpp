@@ -10,17 +10,23 @@
 #include <sys/reboot.h>
 #include <unistd.h>
 
-GpioBroker::GpioPin PowerStatusPin0 { "PWR1", 3, 5, GpioBroker::PinDirections::INPUT };
-GpioBroker::GpioPin PowerStatusPin1 { "PWR2", 2, 17, GpioBroker::PinDirections::INPUT };
-GpioBroker::GpioPin LedPin { "MODELED", 0, 31, GpioBroker::PinDirections::OUTPUT };
-GpioBroker::GpioPin ResetPin { "RESET", 1, 6, GpioBroker::PinDirections::INPUT };
+// GpioBroker::GpioPin PowerStatusPin0 { "PWR1", 3, 5, GpioBroker::PinDirections::INPUT };
+// GpioBroker::GpioPin PowerStatusPin1 { "PWR2", 2, 17, GpioBroker::PinDirections::INPUT };
+// GpioBroker::GpioPin LedPin { "MODELED", 0, 31, GpioBroker::PinDirections::OUTPUT };
+// GpioBroker::GpioPin ResetPin { "RESET", 1, 6, GpioBroker::PinDirections::INPUT };
 
 using namespace Alise;
 
-GpioBroker::GpioBroker(QObject *parent) : Broker(parent)
+GpioBroker::GpioBroker(QMap<QString, AliseSettings::GPIOInfo> &gpioMap, QObject *parent) : Broker(parent)
 {
     qDebug() << "[GPIO] GPIO Broker created";
     m_blinkMode = BlinkMode::ONEBLINK;
+    m_pinList = {
+        { "Power1", gpioMap["Power1"].pin, gpioMap["Power1"].offset, PinDirections::INPUT },
+        { "Power2", gpioMap["Power2"].pin, gpioMap["Power2"].offset, PinDirections::INPUT },
+        { "ModeLed", gpioMap["ModeLed"].pin, gpioMap["ModeLed"].offset, PinDirections::OUTPUT },
+        { "Reset", gpioMap["Reset"].pin, gpioMap["Reset"].offset, PinDirections::INPUT },
+    };
 }
 
 GpioBroker::~GpioBroker()
@@ -29,7 +35,7 @@ GpioBroker::~GpioBroker()
 
 bool GpioBroker::connect()
 {
-    const QList<GpioPin> pinList = { LedPin, ResetPin, PowerStatusPin0, PowerStatusPin1 };
+    QMap<std::string, struct gpiod_line *> lineMap; // pairs: <lineName, line> for each pin
     m_resetTimer.setInterval(AliseConstants::ResetCheckPeriod());
     setIndication(AliseConstants::FailureIndication);
     QObject::connect(&m_resetTimer, &QTimer::timeout, this, &GpioBroker::reset);
@@ -38,7 +44,7 @@ bool GpioBroker::connect()
     m_gpioTimer.start();
 
 #ifndef ALISE_LOCALDEBUG
-    for (auto pin : pinList)
+    for (auto pin : m_pinList)
     {
         if (!chipMap.contains(pin.chip)) // if chip is not already opened
         {
@@ -55,6 +61,11 @@ bool GpioBroker::connect()
             if (line == NULL)
             {
                 qCritical() << "cannot get line " << chipstr.c_str() << ":" << pin.offset << "!";
+                return false;
+            }
+            if (line == NULL)
+            {
+                qCritical() << "Line " + pin.name + " is NULL!";
                 return false;
             }
             lineMap[pin.name] = line;
@@ -79,15 +90,10 @@ bool GpioBroker::connect()
             qDebug() << "line " << chipstr.c_str() << ":" << pin.offset << " has been opened";
         }
     }
-    modeLine = lineMap["MODELED"];
-    pwr1Line = lineMap["PWR1"];
-    pwr2Line = lineMap["PWR2"];
-    resetLine = lineMap["RESET"];
-    if ((modeLine == NULL) || (pwr1Line == NULL) || (pwr2Line == NULL) || (resetLine == NULL))
-    {
-        qCritical() << "One of the line is NULL!";
-        return false;
-    }
+    modeLine = lineMap["ModeLed"];
+    pwr1Line = lineMap["Power1"];
+    pwr2Line = lineMap["Power2"];
+    resetLine = lineMap["Reset"];
     gpiod_line_set_value(modeLine, 1);
 #endif
     return true;

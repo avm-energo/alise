@@ -20,7 +20,7 @@ private:
     void setDefEth(int ethNum);
     void sync();
     void restartNetwork();
-    bool resetInit = false;
+    bool m_resetInit;
 };
 
 #endif // RECOVERY_H

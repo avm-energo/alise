@@ -4,12 +4,14 @@
 
 #include <QtDebug>
 #include <gen/stdfunc.h>
+
 AliseSettings::AliseSettings()
 {
 }
 
 void AliseSettings::init()
 {
+    m_isValid = true;
     m_settings = new QSettings("/avtuk/settings/alise/settings/settings.ini", QSettings::IniFormat);
     logFilename = m_settings->value("Logs/logfile", "/avtuk/settings/alise/logs/alise.log").toString();
 }
@@ -38,6 +40,11 @@ void AliseSettings::readSettings()
     serialNumB = m_settings->value("Module/BoardSerialNumber", "4294967295").toString().toUInt();
     hwVersion = m_settings->value("Module/HardwareVersion", "4294967295").toString().toUInt();
     swVersion = m_settings->value("Module/SoftwareVersion", "4294967295").toString().toUInt();
+
+    m_gpioMap["Power1"] = parseGPIOSettings("Power1");
+    m_gpioMap["Power2"] = parseGPIOSettings("Power2");
+    m_gpioMap["ModeLed"] = parseGPIOSettings("ModeLed");
+    m_gpioMap["Reset"] = parseGPIOSettings("Reset");
     flush();
 }
 
@@ -50,6 +57,16 @@ void AliseSettings::logSettings()
     Logger::writeLog(Logger::All, "=========================");
     Logger::writeLog(Logger::All, "LogLevel: " + logLevel);
     Logger::writeLog(Logger::All, "HttpPort: " + QString::number(httpPort));
+    Logger::writeLog(Logger::All, "--------- GPIOs ---------");
+    Logger::writeLog(Logger::All,
+        "Power1: " + QString::number(m_gpioMap["Power1"].pin) + ":" + QString::number(m_gpioMap["Power1"].offset));
+    Logger::writeLog(Logger::All,
+        "Power2: " + QString::number(m_gpioMap["Power2"].pin) + ":" + QString::number(m_gpioMap["Power2"].offset));
+    Logger::writeLog(Logger::All,
+        "ModeLed: " + QString::number(m_gpioMap["ModeLed"].pin) + ":" + QString::number(m_gpioMap["ModeLed"].offset));
+    Logger::writeLog(Logger::All,
+        "Reset: " + QString::number(m_gpioMap["Reset"].pin) + ":" + QString::number(m_gpioMap["Reset"].offset));
+    Logger::writeLog(Logger::All, "-------- Blinks ---------");
     Logger::writeLog(Logger::All,
         "NormalBlink period:" + QString::number(Alise::AliseConstants::ProcessBlink(Alise::NORMAL)) + " ms");
     Logger::writeLog(Logger::All,
@@ -72,6 +89,7 @@ void AliseSettings::logSettings()
         Logger::All, "Health query period:" + QString::number(Alise::AliseConstants::HealthQueryPeriod()) + " ms");
     Logger::writeLog(
         Logger::All, "Reply timeout period:" + QString::number(Alise::AliseConstants::ReplyTimeoutPeriod()) + " ms");
+    Logger::writeLog(Logger::All, "-------- Module ---------");
     Logger::writeLog(Logger::All, "Module serial: " + QString::number(serialNum));
     Logger::writeLog(Logger::All, "Board serial: " + QString::number(serialNumB));
     Logger::writeLog(Logger::All, "Board hardware: " + StdFunc::VerToStr(hwVersion));
@@ -100,10 +118,44 @@ void AliseSettings::writeSettings()
     m_settings->setValue("Module/BoardSerialNumber", serialNumB);
     m_settings->setValue("Module/HardwareVersion", hwVersion);
     m_settings->setValue("Module/SoftwareVersion", swVersion);
+    setGPIOValues();
     flush();
 }
 
 void AliseSettings::flush()
 {
     m_settings->sync();
+}
+
+bool AliseSettings::isValid()
+{
+    return m_isValid;
+}
+
+AliseSettings::GPIOInfo AliseSettings::parseGPIOSettings(const QString &pinName)
+{
+    if (!m_isValid)
+        return { -1, -1 };
+    GPIOInfo pinInfo;
+    bool ok;
+    QString str = m_settings->value("GPIO/" + pinName, "3 5").toString();
+    QStringList sl = str.split(" ");
+    if (sl.size() > 1)
+    {
+        pinInfo.pin = sl.at(0).toInt(&ok);
+        if (ok)
+        {
+            pinInfo.offset = sl.at(1).toInt(&ok);
+            if (ok)
+                return pinInfo;
+        }
+    }
+    m_isValid = false;
+    return { -1, -1 };
+}
+
+void AliseSettings::setGPIOValues()
+{
+    for (auto [key, value] : m_gpioMap.asKeyValueRange())
+        m_settings->setValue("GPIO/" + key, QString::number(value.pin) + " " + QString::number(value.offset));
 }

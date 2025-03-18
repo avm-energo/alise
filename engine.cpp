@@ -12,14 +12,14 @@ Engine::Engine(QObject *parent)
     Q_UNUSED(parent)
 }
 
-bool Engine::init(const AliseSettings &settings)
+bool Engine::init(AliseSettings &settings)
 {
     m_timeSynchronizer = new TimeSyncronizer;
     m_timeSynchronizer->init();
 #if defined(AVTUK_STM)
     m_broker = new StmBroker(this);
 #else
-    m_broker = new GpioBroker(this);
+    m_broker = new GpioBroker(settings.m_gpioMap, this);
 #endif
     bool ok = m_broker->connect();
     if (!ok)
