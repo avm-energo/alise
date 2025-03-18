@@ -65,7 +65,7 @@ bool GpioBroker::connect()
             }
             if (line == NULL)
             {
-                qCritical() << "Line " + pin.name + " is NULL!";
+                qCritical() << "Line " << pin.name << " is NULL!";
                 return false;
             }
             lineMap[pin.name] = line;
