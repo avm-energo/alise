@@ -102,21 +102,15 @@ bool GpioBroker::connect()
 
 void GpioBroker::checkPowerUnit()
 {
-    std::cout << "Entering checkPowerUnit";
     QMutexLocker locker(&m_mutex);
 #ifndef ALISE_LOCALDEBUG
-    if ((m_pwr1Line == NULL) || (m_pwr2Line == NULL))
-    {
-        std::cout << "pwrLine is NULL";
-        return;
-    }
     auto status1 = gpiod_line_get_value(m_pwr1Line);
+    usleep(10000);
     auto status2 = gpiod_line_get_value(m_pwr2Line);
 #else
     int status1 = 0;
     int status2 = 0;
 #endif
-    std::cout << "got powers: " << status1 << " " << status2;
     DataTypes::BlockStruct blk;
     blk.data.resize(sizeof(AVTUK_CCU::Main));
     AVTUK_CCU::Main str;
