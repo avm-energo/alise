@@ -7,14 +7,8 @@
 #include <config.h>
 #include <cstdlib>
 #include <gen/error.h>
-#include <iostream>
 #include <sys/reboot.h>
 #include <unistd.h>
-
-// GpioBroker::GpioPin PowerStatusPin0 { "PWR1", 3, 5, GpioBroker::PinDirections::INPUT };
-// GpioBroker::GpioPin PowerStatusPin1 { "PWR2", 2, 17, GpioBroker::PinDirections::INPUT };
-// GpioBroker::GpioPin LedPin { "MODELED", 0, 31, GpioBroker::PinDirections::OUTPUT };
-// GpioBroker::GpioPin ResetPin { "RESET", 1, 6, GpioBroker::PinDirections::INPUT };
 
 using namespace Alise;
 
@@ -47,10 +41,11 @@ bool GpioBroker::connect()
 #ifndef ALISE_LOCALDEBUG
     for (auto pin : m_pinList)
     {
+        gpiod_chip *chip;
+        const std::string chipstr = "/dev/gpiochip" + std::to_string(pin.chip);
         if (!m_chipMap.contains(pin.chip)) // if chip is not already opened
         {
-            const std::string chipstr = "/dev/gpiochip" + std::to_string(pin.chip);
-            gpiod_chip *chip = gpiod_chip_open(chipstr.c_str());
+            chip = gpiod_chip_open(chipstr.c_str());
             if (chip == NULL)
             {
                 qCritical() << "cannot open chip " << chipstr.c_str() << "!";
@@ -58,38 +53,40 @@ bool GpioBroker::connect()
             }
             m_chipMap[pin.chip] = chip;
             qDebug() << "chip " << chipstr.c_str() << " has been opened";
-            gpiod_line *line = gpiod_chip_get_line(chip, pin.offset);
-            if (line == NULL)
-            {
-                qCritical() << "cannot get line " << chipstr.c_str() << ":" << pin.offset << "!";
-                return false;
-            }
-            if (line == NULL)
-            {
-                qCritical() << "Line " << pin.name.c_str() << " is NULL!";
-                return false;
-            }
-            lineMap[pin.name] = line;
-            if (pin.direction == GpioBroker::PinDirections::OUTPUT)
-            {
-                int ret = gpiod_line_request_output(line, "gpio", 0);
-                if (ret != 0)
-                {
-                    qCritical() << "cannot request line " << chipstr.c_str() << ":" << pin.offset << " for output!";
-                    return false;
-                }
-            }
-            else
-            {
-                int ret = gpiod_line_request_input(line, "gpio");
-                if (ret != 0)
-                {
-                    qCritical() << "cannot request line " << chipstr.c_str() << ":" << pin.offset << " for input!";
-                    return false;
-                }
-            }
-            qDebug() << "line " << chipstr.c_str() << ":" << pin.offset << " has been opened";
         }
+        else
+            chip = m_chipMap[pin.chip];
+        gpiod_line *line = gpiod_chip_get_line(chip, pin.offset);
+        if (line == NULL)
+        {
+            qCritical() << "cannot get line " << chipstr.c_str() << ":" << pin.offset << "!";
+            return false;
+        }
+        if (line == NULL)
+        {
+            qCritical() << "Line " << pin.name.c_str() << " is NULL!";
+            return false;
+        }
+        lineMap[pin.name] = line;
+        if (pin.direction == GpioBroker::PinDirections::OUTPUT)
+        {
+            int ret = gpiod_line_request_output(line, "gpio", 0);
+            if (ret != 0)
+            {
+                qCritical() << "cannot request line " << chipstr.c_str() << ":" << pin.offset << " for output!";
+                return false;
+            }
+        }
+        else
+        {
+            int ret = gpiod_line_request_input(line, "gpio");
+            if (ret != 0)
+            {
+                qCritical() << "cannot request line " << chipstr.c_str() << ":" << pin.offset << " for input!";
+                return false;
+            }
+        }
+        qDebug() << "line " << chipstr.c_str() << ":" << pin.offset << " has been opened";
     }
     m_modeLine = lineMap["ModeLed"];
     m_pwr1Line = lineMap["Power1"];
@@ -144,8 +141,6 @@ void GpioBroker::setIndication(const AVTUK_CCU::Indication &indication)
         m_blinkCount = c_maxBlinks;
         m_blinkFreq = indic.PulseFreq2;
         m_blinkMode = BlinkMode::ONEBLINK;
-        //        qDebug() << "1. restartBlinkTimer: blinkCount = " << m_blinkCount << ", blinkMode = " << m_blinkMode
-        //                 << ", blinkFreq = " << m_blinkFreq;
         restartBlinkTimer();
         return;
     }
@@ -153,14 +148,11 @@ void GpioBroker::setIndication(const AVTUK_CCU::Indication &indication)
     {
         m_blinkCount = c_maxBlinks;
         m_blinkMode = BlinkMode::ONEBLINK;
-        //        qDebug() << "2. restartBlinkTimer: blinkCount = " << m_blinkCount << ", blinkMode = " << m_blinkMode
-        //                 << ", blinkFreq = " << m_blinkFreq;
         restartBlinkTimer();
         return;
     }
     else
         m_blinkMode = BlinkMode::TWOBLINKS;
-    //    qDebug() << "Two blinks mode";
     restartBlinkTimer();
 }
 
@@ -232,21 +224,18 @@ void GpioBroker::blink()
     {
         if (m_blinkMode != BlinkMode::TWOBLINKS)
         {
-            //            qDebug() << "Setting maxBlinks";
             m_blinkCount = c_maxBlinks;
         }
         else if (m_blinkFreq == m_currentIndication.PulseFreq1)
         {
             m_blinkFreq = m_currentIndication.PulseFreq2;
             m_blinkCount = m_currentIndication.PulseCnt2;
-            //            qDebug() << "Setting PulseFreq2 = " << m_blinkFreq << ", PulseCnt2 = " << m_blinkCount;
             restartBlinkTimer();
         }
         else
         {
             m_blinkFreq = m_currentIndication.PulseFreq1;
             m_blinkCount = m_currentIndication.PulseCnt1;
-            //            qDebug() << "Setting PulseFreq1 = " << m_blinkFreq << ", PulseCnt1 = " << m_blinkCount;
             restartBlinkTimer();
         }
     }
