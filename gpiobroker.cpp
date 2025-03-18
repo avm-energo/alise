@@ -7,6 +7,7 @@
 #include <config.h>
 #include <cstdlib>
 #include <gen/error.h>
+#include <iostream>
 #include <sys/reboot.h>
 #include <unistd.h>
 
@@ -46,7 +47,7 @@ bool GpioBroker::connect()
 #ifndef ALISE_LOCALDEBUG
     for (auto pin : m_pinList)
     {
-        if (!chipMap.contains(pin.chip)) // if chip is not already opened
+        if (!m_chipMap.contains(pin.chip)) // if chip is not already opened
         {
             const std::string chipstr = "/dev/gpiochip" + std::to_string(pin.chip);
             gpiod_chip *chip = gpiod_chip_open(chipstr.c_str());
@@ -55,7 +56,7 @@ bool GpioBroker::connect()
                 qCritical() << "cannot open chip " << chipstr.c_str() << "!";
                 return false;
             }
-            chipMap[pin.chip] = chip;
+            m_chipMap[pin.chip] = chip;
             qDebug() << "chip " << chipstr.c_str() << " has been opened";
             gpiod_line *line = gpiod_chip_get_line(chip, pin.offset);
             if (line == NULL)
@@ -90,25 +91,32 @@ bool GpioBroker::connect()
             qDebug() << "line " << chipstr.c_str() << ":" << pin.offset << " has been opened";
         }
     }
-    modeLine = lineMap["ModeLed"];
-    pwr1Line = lineMap["Power1"];
-    pwr2Line = lineMap["Power2"];
-    resetLine = lineMap["Reset"];
-    gpiod_line_set_value(modeLine, 1);
+    m_modeLine = lineMap["ModeLed"];
+    m_pwr1Line = lineMap["Power1"];
+    m_pwr2Line = lineMap["Power2"];
+    m_resetLine = lineMap["Reset"];
+    gpiod_line_set_value(m_modeLine, 1);
 #endif
     return true;
 }
 
 void GpioBroker::checkPowerUnit()
 {
-    QMutexLocker locker(&_mutex);
+    std::cout << "Entering checkPowerUnit";
+    QMutexLocker locker(&m_mutex);
 #ifndef ALISE_LOCALDEBUG
-    auto status1 = gpiod_line_get_value(pwr1Line);
-    auto status2 = gpiod_line_get_value(pwr2Line);
+    if ((m_pwr1Line == NULL) || (m_pwr2Line == NULL))
+    {
+        std::cout << "pwrLine is NULL";
+        return;
+    }
+    auto status1 = gpiod_line_get_value(m_pwr1Line);
+    auto status2 = gpiod_line_get_value(m_pwr2Line);
 #else
     int status1 = 0;
     int status2 = 0;
 #endif
+    std::cout << "got powers: " << status1 << " " << status2;
     DataTypes::BlockStruct blk;
     blk.data.resize(sizeof(AVTUK_CCU::Main));
     AVTUK_CCU::Main str;
@@ -123,7 +131,7 @@ void GpioBroker::checkPowerUnit()
 
 void GpioBroker::setIndication(const AVTUK_CCU::Indication &indication)
 {
-    QMutexLocker locker(&_mutex);
+    QMutexLocker locker(&m_mutex);
     AVTUK_CCU::Indication indic = indication;
     indic.PulseCnt1 *= 2; // one is on & one is off
     indic.PulseCnt2 *= 2; // the same
@@ -168,35 +176,35 @@ void GpioBroker::rebootMyself()
     m_gpioTimer.stop();
     m_resetTimer.stop();
 #ifndef ALISE_LOCALDEBUG
-    gpiod_line_set_value(modeLine, PinOutputs::OFF);
+    gpiod_line_set_value(m_modeLine, PinOutputs::OFF);
 #endif
     reboot(RB_AUTOBOOT);
 }
 
 void GpioBroker::reset()
 {
-    QMutexLocker locker(&_mutex);
+    QMutexLocker locker(&m_mutex);
 #ifndef ALISE_LOCALDEBUG
-    bool value = !gpiod_line_get_value(resetLine);
+    bool value = !gpiod_line_get_value(m_resetLine);
 
     if (value) // button pushed, counting seconds...
     {
-        resetCounter += value;
+        m_resetCounter += value;
         return;
     }
-    else if (resetCounter == 0) // normal mode, there's no any button push
+    else if (m_resetCounter == 0) // normal mode, there's no any button push
         return;
 
     // soft reset (only reboot)
-    if ((resetCounter > (AliseConstants::SecondsToHardReset() / 2))
-        && (resetCounter <= AliseConstants::SecondsToHardReset()))
+    if ((m_resetCounter > (AliseConstants::SecondsToHardReset() / 2))
+        && (m_resetCounter <= AliseConstants::SecondsToHardReset()))
     {
         qDebug() << "[GPIO] Reboot only";
         rebootMyself();
         return;
     }
     // hard reset
-    if (resetCounter > AliseConstants::SecondsToHardReset())
+    if (m_resetCounter > AliseConstants::SecondsToHardReset())
     {
         qDebug() << "[GPIO] Reset interface settings...";
 
@@ -212,7 +220,7 @@ void GpioBroker::reset()
         emit receivedBlock(blk);
     }
 #endif
-    resetCounter = 0;
+    m_resetCounter = 0;
 }
 
 void GpioBroker::restartBlinkTimer()
@@ -224,7 +232,7 @@ void GpioBroker::blink()
 {
 #ifndef ALISE_LOCALDEBUG
     --m_blinkCount;
-    gpiod_line_set_value(modeLine, (m_blinkStatus) ? PinOutputs::ON : PinOutputs::OFF);
+    gpiod_line_set_value(m_modeLine, (m_blinkStatus) ? PinOutputs::ON : PinOutputs::OFF);
     m_blinkStatus = !m_blinkStatus;
     if (m_blinkCount <= 0)
     {

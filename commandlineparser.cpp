@@ -115,6 +115,11 @@ void CommandLineParser::listPins()
 
     try
     {
+        if (iter == NULL)
+        {
+            std::cout << "Can't iter through GPIO";
+            return;
+        }
         while ((chip = gpiod_chip_iter_next(iter)) != NULL)
         {
             std::cout << gpiod_chip_name(chip) << " - " << gpiod_chip_num_lines(chip) << " lines:" << ::std::endl;

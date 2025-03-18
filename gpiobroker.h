@@ -57,16 +57,15 @@ private:
     bool m_blinkStatus = true;
     int m_blinkCount, m_blinkFreq;
     BlinkMode m_blinkMode;
-    int resetCounter = 0;
-    QMutex _mutex;
-
+    int m_resetCounter = 0;
+    QMutex m_mutex;
     QList<GpioPin> m_pinList;
     QTimer m_gpioTimer, m_resetTimer;
+    QMap<int, struct gpiod_chip *> m_chipMap;                              // pairs: <chipNum, chip> for each gpiochipx
+    struct gpiod_line *m_modeLine, *m_resetLine, *m_pwr1Line, *m_pwr2Line; // for each pin: led, reset, pwr1, pwr2
+
     void reset();
     void restartBlinkTimer();
-
-    QMap<int, struct gpiod_chip *> chipMap;                        // pairs: <chipNum, chip> for each gpiochipx
-    struct gpiod_line *modeLine, *resetLine, *pwr1Line, *pwr2Line; // for each pin: led, reset, pwr1, pwr2
 
 private slots:
     void blink();
