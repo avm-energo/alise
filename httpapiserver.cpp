@@ -16,7 +16,7 @@ bool HttpApiServer::initServer(int port, int pingTimeout)
     setRoutes();
     auto tcpserver = new QTcpServer();
 #if QT_VERSION < QT_VERSION_CHECK(6, 8, 0)
-    if (!tcpserver->listen(QHostAddress::Any, port)
+    if (!tcpserver->listen(QHostAddress::Any, port))
     {
         delete tcpserver;
         return false;
