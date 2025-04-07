@@ -15,11 +15,20 @@ bool HttpApiServer::initServer(int port, int pingTimeout)
     m_pingTimeout = pingTimeout;
     setRoutes();
     auto tcpserver = new QTcpServer();
+#if QT_VERSION < QT_VERSION_CHECK(6, 8, 0)
+    if (!tcpserver->listen(QHostAddress::Any, port)
+    {
+        delete tcpserver;
+        return false;
+    }
+    m_server.bind(tcpserver);
+#else
     if (!tcpserver->listen(QHostAddress::Any, port) || !m_server.bind(tcpserver))
     {
         delete tcpserver;
         return false;
     }
+#endif
     m_pingTimeoutTimer->start(m_pingTimeout);
     return true;
 }
