@@ -9,13 +9,14 @@
 #include <gen/stdfunc.h>
 #include <gen/timefunc.h>
 
-HttpMiddleware::HttpMiddleware(const AliseSettings &settings, QObject *parent) : QObject { parent }
+HttpMiddleware::HttpMiddleware(const AliseSettings &settings, QDateTime startDT, QObject *parent) : QObject { parent }
 {
     GitVersion gitVersion;
     m_aliseVersion = QString(ALISEVERSION) + "-" + gitVersion.getGitHash();
     m_serialNum = QString::number(settings.serialNum);
     m_hwVersion = StdFunc::VerToStr(settings.hwVersion);
     m_swVersion = StdFunc::VerToStr(settings.swVersion);
+    m_startDT = startDT;
     setNtpState(0);
 }
 
@@ -41,6 +42,7 @@ QJsonObject HttpMiddleware::pingReply()
 {
     QJsonObject json;
     json["Result"] = "true";
+    json["StartDT"] = m_startDT.toString("yyyy-MM-dd hh:mm:ss");
     return json;
 }
 

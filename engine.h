@@ -17,9 +17,6 @@ public:
     /// \brief Инициализация движка
     bool init(AliseSettings &settings);
 
-    /// \brief Старт работы по http
-    void start();
-
 private:
     HttpMiddleware *m_mw;
     HttpApiServer *m_server;
@@ -28,5 +25,5 @@ private:
     Broker *m_broker;
 
     void createLocalConnections(); ///< создание локальных соединений между RecoveryEngine, Broker и TimeSynchronizer
-    void createHttpConnections(); ///< создание соединений между Http слоем и остальными сущностями
+    void createHttpConnections();  ///< создание соединений между Http слоем и остальными сущностями
 };

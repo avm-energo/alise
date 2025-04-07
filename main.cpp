@@ -31,7 +31,10 @@ int main(int argc, char *argv[])
     settings.writeSettings(); // to set those settings which was not set (settings.ini is absent or is old enough)
 
     if (!parser.parseCommandLine(settings))
+    {
+        delete engine;
         return 0;
+    }
 
     Logger::writeStart(settings.logFilename);
     Logger::setLogLevel(settings.logLevel);
@@ -53,10 +56,9 @@ int main(int argc, char *argv[])
     if (!engine->init(settings))
     {
         qCritical() << "Can't create engine, exiting";
+        delete engine;
         return 11;
     }
-
-    engine->start();
 
     std::cout << "Enter the event loop" << std::endl;
     return a.exec();

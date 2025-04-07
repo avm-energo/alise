@@ -11,7 +11,7 @@ class HttpMiddleware : public QObject
 {
     Q_OBJECT
 public:
-    explicit HttpMiddleware(const AliseSettings &settings, QObject *parent = nullptr);
+    explicit HttpMiddleware(const AliseSettings &settings, QDateTime startDT, QObject *parent = nullptr);
 
     QJsonObject helloReply();                 ///< подготовка ответа на запрос Hello
     QJsonObject timeStamp();                  ///< подготовка json с текущим временем
@@ -44,6 +44,7 @@ private:
     int m_pwrIn, m_resetReq;
     uint8_t m_timeZone;
     QString m_aliseVersion, m_serialNum, m_hwVersion, m_swVersion;
+    QDateTime m_startDT;
 
     /// \brief Конвертация POST-запроса в JSON объект
     QJsonObject byteArrayToJsonObject(const QByteArray &arr);

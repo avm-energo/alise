@@ -25,7 +25,7 @@ bool Engine::init(AliseSettings &settings)
     if (!ok)
         return false;
 
-    m_mw = new HttpMiddleware(settings);
+    m_mw = new HttpMiddleware(settings, QDateTime::currentDateTime(), this);
     m_server = new HttpApiServer(m_mw);
     m_server->initServer(settings.httpPort, Alise::AliseConstants::ReplyTimeoutPeriod());
 
@@ -39,10 +39,6 @@ bool Engine::init(AliseSettings &settings)
 #endif
 
     return true;
-}
-
-void Engine::start()
-{
 }
 
 void Engine::createLocalConnections()

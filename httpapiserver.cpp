@@ -1,6 +1,7 @@
 #include "httpapiserver.h"
 
 #include <QJsonObject>
+#include <QTcpServer>
 
 HttpApiServer::HttpApiServer(HttpMiddleware *mw, QObject *parent) : QObject { parent }
 {
@@ -13,9 +14,12 @@ bool HttpApiServer::initServer(int port, int pingTimeout)
 {
     m_pingTimeout = pingTimeout;
     setRoutes();
-    const auto rport = m_server.listen(QHostAddress::Any, port);
-    if (!rport)
+    auto tcpserver = new QTcpServer();
+    if (!tcpserver->listen(QHostAddress::Any, port) || !m_server.bind(tcpserver))
+    {
+        delete tcpserver;
         return false;
+    }
     m_pingTimeoutTimer->start(m_pingTimeout);
     return true;
 }

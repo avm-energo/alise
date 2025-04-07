@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.18)
-project(alise VERSION 3.2.0)
+project(alise VERSION 3.3.0)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -89,5 +89,9 @@ target_link_libraries(${PROJECT_NAME} PUBLIC Qt6::HttpServer pthread gitversion)
 install(TARGETS ${PROJECT_NAME})
 
 set(VERSION_IN ${CMAKE_CURRENT_SOURCE_DIR}/VERSION.in)
-set(VERSION_OUT ${CMAKE_CURRENT_SOURCE_DIR}/package/src/VERSION)
+set(VERSION_OUT ${CMAKE_CURRENT_SOURCE_DIR}/package/src/avm-alise/VERSION)
+configure_file(${VERSION_IN} ${VERSION_OUT} @ONLY)
+
+set(VERSION_IN ${CMAKE_CURRENT_SOURCE_DIR}/VERSION.in)
+set(VERSION_OUT ${CMAKE_CURRENT_SOURCE_DIR}/package/src/avm-alise-stm/VERSION)
 configure_file(${VERSION_IN} ${VERSION_OUT} @ONLY)
