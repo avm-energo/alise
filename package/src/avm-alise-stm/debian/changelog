@@ -1,10 +1,10 @@
-avm-alise (3.3.0) unstable; urgency=low
+avm-alise-stm (3.3.0) unstable; urgency=low
 
   * start datetime in ping replies
 
  -- AVM-Energo <support@avmenergo.ru>  Mon, 07 Apr 2025 11:36:50 +0300
 
-avm-alise (3.2.0) unstable; urgency=low
+avm-alise-stm (3.2.0) unstable; urgency=low
 
   * GPIO settings now parsed from conf file
 
