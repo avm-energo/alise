@@ -57,6 +57,7 @@ int NtpStatus::getNtpStatus()
 
     if (connect(sd, (struct sockaddr *)&sock, sizeof(sock)) < 0)
     {
+        close(sd);
         qDebug() << "Ntp: unable to connect to socket: " << sock.sin_addr.s_addr << ":" << sock.sin_port;
         return ERROR;
     }
@@ -65,6 +66,7 @@ int NtpStatus::getNtpStatus()
 
     if (send(sd, &ntpmsg, sizeof(ntpmsg), 0) < 0)
     {
+        close(sd);
         qDebug() << "Ntp: unable to send command to NTP port";
         return ERROR;
     }
@@ -77,16 +79,19 @@ int NtpStatus::getNtpStatus()
     if (n == 0)
     {
         qDebug() << "Ntp: select timeout";
+        close(sd);
         return ERROR;
     }
     if (n == -1)
     {
         qDebug() << "Ntp: error on select";
+        close(sd);
         return ERROR;
     }
     if (recv(sd, &ntpmsg, sizeof(NtpMsgStruct), 0) < 0)
     {
         qDebug() << "Ntp: Unable to talk to NTP daemon. Is it running?";
+        close(sd);
         return ERROR;
     }
     qDebug() << "Ntp: Data has been received";
