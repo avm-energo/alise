@@ -1,0 +1,12 @@
+avm-alise-stm (3.1.0) unstable; urgency=low
+
+  * Timezone processing
+
+ -- AVM-Energo <support@avmenergo.ru>  Wed, 18 Dec 2024 09:14:41 +0300
+
+
+avm-alise-stm (3.0.1) unstable; urgency=low
+
+  * Http restAPI implemented
+
+ -- AVM-Energo <support@avmenergo.ru>  Fri, 21 Jun 2024 16:26:44 +0300
