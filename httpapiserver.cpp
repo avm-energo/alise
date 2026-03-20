@@ -13,9 +13,14 @@ bool HttpApiServer::initServer(int port, int pingTimeout)
 {
     m_pingTimeout = pingTimeout;
     setRoutes();
-    const auto rport = m_server.listen(QHostAddress::Any, port);
+    m_tcpServer = new QTcpServer;
+    const auto rport = m_tcpServer->listen(QHostAddress::Any, port);
     if (!rport)
+    {
+        delete m_tcpServer;
         return false;
+    }
+    m_server.bind(m_tcpServer);
     m_pingTimeoutTimer->start(m_pingTimeout);
     return true;
 }

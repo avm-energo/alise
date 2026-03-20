@@ -1,3 +1,10 @@
+avm-alise (4.0.0) unstable; urgency=low
+
+  * gpiod2 implemented
+
+ -- AVM-Energo <support@avmenergo.ru>  Fri, 20 Mar 2026 16:58:52 +0300
+
+
 avm-alise (3.1.0) unstable; urgency=low
 
   * Timezone processing

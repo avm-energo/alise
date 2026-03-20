@@ -5,7 +5,9 @@
 #include <QDebug>
 #include <QRandomGenerator>
 #include <config.h>
+#include <filesystem>
 #include <gen/error.h>
+#include <gpiod.hpp>
 #include <sys/reboot.h>
 #include <unistd.h>
 
@@ -13,7 +15,7 @@ using namespace Alise;
 
 GpioBroker::GpioBroker(AliseSettings settings, QObject *parent) : Broker(parent), m_settings(settings)
 {
-    qDebug() << "[GPIO] GPIO Broker created";
+    qDebug() << "[GPIO] GPIO Broker has been created";
     m_blinkMode = BlinkMode::ONEBLINK;
 }
 
@@ -158,9 +160,9 @@ bool GpioBroker::gpioGetLineValue(GpioPin pin)
 {
     try
     {
-        const std::string chipstr = "/dev/gpiochip" + std::to_string(pin.chip);
-        ::gpiod::chip chip = ::gpiod::chip(chipstr.c_str());
-        auto request = chip.prepare_request()
+        const ::std::filesystem::path chip_path(getChipName(pin.chip).toStdString());
+        auto request = ::gpiod::chip(chip_path)
+                           .prepare_request()
                            .set_consumer("get-line-value")
                            .add_line_settings(
                                pin.offset, ::gpiod::line_settings().set_direction(::gpiod::line::direction::INPUT))
@@ -181,9 +183,9 @@ void GpioBroker::gpioSetLineValue(GpioPin pin, bool value)
         bool pinValue = gpioGetLineValue(pin);
         if (pinValue ^ value)
         {
-            const std::string chipstr = "/dev/gpiochip" + std::to_string(pin.chip);
-            ::gpiod::chip chip = ::gpiod::chip(chipstr.c_str());
-            auto request = chip.prepare_request()
+            const ::std::filesystem::path chip_path(getChipName(pin.chip).toStdString());
+            auto request = ::gpiod::chip(chip_path)
+                               .prepare_request()
                                .set_consumer("toggle-line-value")
                                .add_line_settings(
                                    pin.offset, ::gpiod::line_settings().set_direction(::gpiod::line::direction::OUTPUT))
@@ -194,6 +196,11 @@ void GpioBroker::gpioSetLineValue(GpioPin pin, bool value)
         if (m_settings.gpioExceptionsAreOn)
             qDebug() << "gpioSetLineValue exception: " << e.what();
     }
+}
+
+QString GpioBroker::getChipName(int chipNum) const
+{
+    return "/dev/gpiochip" + QString::number(chipNum);
 }
 
 void GpioBroker::blink()

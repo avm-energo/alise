@@ -1,5 +1,4 @@
-#ifndef GPIOBROKER_H
-#define GPIOBROKER_H
+#pragma once
 
 #include "alisesettings.h"
 #include "broker.h"
@@ -8,13 +7,11 @@
 #include <QMutex>
 #include <QObject>
 #include <QTimer>
-#include <gpiod.hpp>
-
-constexpr uint16_t c_maxBlinks = 0xFFFF;
 
 class GpioBroker : public Broker
 {
 public:
+    static constexpr uint16_t c_maxBlinks = 0xFFFF;
     enum PinDirections
     {
         INPUT,
@@ -72,9 +69,8 @@ private:
     void restartBlinkTimer();
     bool gpioGetLineValue(GpioPin pin);
     void gpioSetLineValue(GpioPin pin, bool value);
+    QString getChipName(int chipNum) const;
 
 private slots:
     void blink();
 };
-
-#endif // GPIOBROKER_H
