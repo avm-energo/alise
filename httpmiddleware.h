@@ -5,7 +5,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QObject>
-#include <gen/datatypes.h>
+#include <avm-gen/datatypes.h>
 
 class HttpMiddleware : public QObject
 {

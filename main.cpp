@@ -4,9 +4,10 @@
 #include "gitversion/gitversion.h"
 
 #include <QCoreApplication>
+#include <avm-gen/logger.h>
+#include <avm-gen/messagehandler.h>
+#include <avm-gen/stdfunc.h>
 #include <config.h>
-#include <gen/logger.h>
-#include <gen/stdfunc.h>
 #include <iostream>
 
 constexpr char ethPathString[] = "/etc/network/interfaces.d/eth";
@@ -36,9 +37,12 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    Logger::writeStart(settings.logFilename);
-    Logger::setLogLevel(settings.logLevel);
-    qInstallMessageHandler(Logger::messageHandler);
+    Logger logger;
+    logger.writeStart(settings.logFilename);
+    logger.setLogLevel(settings.m_logLevel);
+    MessageHandler::setMessageHandlerFilename(settings.logFilename);
+    MessageHandler::setLogLevel(Logger::s_logLevelsMap[settings.m_logLevel]);
+    qInstallMessageHandler(MessageHandler::messageHandler);
     settings.logSettings();
 
     for (const QString ethLetter : { "0", "1", "2" })

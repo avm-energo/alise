@@ -1,10 +1,10 @@
 [Unit]
-Description=alise
+Description=avm-alise
 StartLimitIntervalSec=0
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/alise
+ExecStart=/usr/local/bin/avm-alise
 Restart=always
 RestartSec=5s
 

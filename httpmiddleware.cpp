@@ -5,17 +5,17 @@
 
 #include <QDateTime>
 #include <QString>
+#include <avm-gen/stdfunc.h>
+#include <avm-gen/timefunc.h>
 #include <config.h>
-#include <gen/stdfunc.h>
-#include <gen/timefunc.h>
 
 HttpMiddleware::HttpMiddleware(const AliseSettings &settings, QDateTime startDT, QObject *parent) : QObject { parent }
 {
     GitVersion gitVersion;
     m_aliseVersion = QString(ALISEVERSION) + "-" + gitVersion.getGitHash();
-    m_serialNum = QString::number(settings.serialNum);
-    m_hwVersion = StdFunc::VerToStr(settings.hwVersion);
-    m_swVersion = StdFunc::VerToStr(settings.swVersion);
+    m_serialNum = QString::number(settings.m_serialNum);
+    m_hwVersion = StdFunc::VerToStr(settings.m_hwVersion);
+    m_swVersion = StdFunc::VerToStr(settings.m_swVersion);
     m_startDT = startDT;
     setNtpState(0);
 }

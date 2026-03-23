@@ -5,7 +5,6 @@
 #include <QDebug>
 #include <QDir>
 #include <QProcess>
-#include <gen/datatypes.h>
 
 constexpr char ethPathString[] = "/etc/network/interfaces.d/eth";
 constexpr char ethResourcePathString[] = ":/network/eth";

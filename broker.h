@@ -4,7 +4,7 @@
 
 #include <QObject>
 #include <QTimer>
-#include <gen/datatypes.h>
+#include <avm-gen/datatypes.h>
 
 constexpr int checkIndicationPeriod = 2000;
 constexpr int numberOfProcesses = 7; // booter, adminja, core, alise, ninja, vasya, petya

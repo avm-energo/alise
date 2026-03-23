@@ -2,7 +2,7 @@
 
 #include <QMap>
 #include <QSettings>
-#include <gen/logger.h>
+#include <avm-gen/logger.h>
 
 class AliseSettings
 {
@@ -24,15 +24,16 @@ public:
     GPIOInfo parseGPIOSettings(const QString &pinName);
     void setGPIOValues();
 
-    QString logLevel;
+    QString m_logLevel;
     QString logFilename;
-    std::uint32_t serialNum;
-    std::uint32_t serialNumB;
-    std::uint32_t hwVersion;
-    std::uint32_t swVersion;
-    int httpPort;
+    std::uint32_t m_serialNum;
+    std::uint32_t m_serialNumB;
+    std::uint32_t m_hwVersion;
+    std::uint32_t m_swVersion;
+    int m_httpPort;
     QMap<QString, GPIOInfo> m_gpioMap;
-    bool gpioExceptionsAreOn;
+    bool m_gpioExceptionsAreOn;
+    Logger m_log;
 
 private:
     QSettings *m_settings;

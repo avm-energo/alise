@@ -4,9 +4,9 @@
 
 #include <QDebug>
 #include <QRandomGenerator>
+#include <avm-gen/error.h>
 #include <config.h>
 #include <filesystem>
-#include <gen/error.h>
 #include <gpiod.hpp>
 #include <sys/reboot.h>
 #include <unistd.h>
@@ -174,7 +174,7 @@ bool GpioBroker::gpioGetLineValue(GpioPin pin)
         return (request.get_value(pin.offset) == ::gpiod::line::value::ACTIVE);
     } catch (std::exception e)
     {
-        if (m_settings.gpioExceptionsAreOn)
+        if (m_settings.m_gpioExceptionsAreOn)
             qDebug() << "gpioGetLineValue exception: " << e.what();
     }
     return false;
@@ -197,7 +197,7 @@ void GpioBroker::gpioSetLineValue(GpioPin pin, bool value)
         }
     } catch (std::exception e)
     {
-        if (m_settings.gpioExceptionsAreOn)
+        if (m_settings.m_gpioExceptionsAreOn)
             qDebug() << "gpioSetLineValue exception: " << e.what();
     }
 }

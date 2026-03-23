@@ -5,8 +5,8 @@
 #include <QDateTime>
 #include <QTimer>
 #include <QtDebug>
-#include <gen/executecommand.h>
-#include <gen/stdfunc.h>
+#include <avm-gen/executecommand.h>
+#include <avm-gen/stdfunc.h>
 #include <sys/time.h>
 
 TimeSyncronizer::TimeSyncronizer(QObject *parent) : QObject(parent)

@@ -1,8 +1,6 @@
-#ifndef RECOVERY_H
-#define RECOVERY_H
-
+#pragma once
 #include <QObject>
-#include <gen/datatypes.h>
+#include <avm-gen/datatypes.h>
 
 class RecoveryEngine : public QObject
 {
@@ -22,5 +20,3 @@ private:
     void restartNetwork();
     bool m_resetInit;
 };
-
-#endif // RECOVERY_H

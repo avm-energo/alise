@@ -3,7 +3,7 @@
 #include <QCommandLineParser>
 #include <QEventLoop>
 #include <QTimer>
-#include <gen/stdfunc.h>
+#include <avm-gen/stdfunc.h>
 #include <gpiod.hpp>
 #include <iostream>
 
@@ -56,20 +56,20 @@ bool CommandLineParser::parseCommandLine(AliseSettings &settings)
 #endif
         if (parser.isSet(listversion))
         {
-            std::cout << "Module serial number: " << settings.serialNum << "\n";
-            std::cout << "Board serial number: " << settings.serialNumB << "\n";
-            std::cout << "Hardware version: " << StdFunc::VerToStr(settings.hwVersion).toStdString() << "\n";
-            std::cout << "Software version: " << StdFunc::VerToStr(settings.swVersion).toStdString() << "\n";
+            std::cout << "Module serial number: " << settings.m_serialNum << "\n";
+            std::cout << "Board serial number: " << settings.m_serialNumB << "\n";
+            std::cout << "Hardware version: " << StdFunc::VerToStr(settings.m_hwVersion).toStdString() << "\n";
+            std::cout << "Software version: " << StdFunc::VerToStr(settings.m_swVersion).toStdString() << "\n";
             return false;
         }
         if (parser.isSet(serialNumber))
-            settings.serialNum = parser.value("serial").toUInt();
+            settings.m_serialNum = parser.value("serial").toUInt();
         if (parser.isSet(serialNumberB))
-            settings.serialNumB = parser.value("serialb").toUInt();
+            settings.m_serialNumB = parser.value("serialb").toUInt();
         if (parser.isSet(hardware))
-            settings.hwVersion = StdFunc::StrToVer(parser.value("hardware"));
+            settings.m_hwVersion = StdFunc::StrToVer(parser.value("hardware"));
         if (parser.isSet(software))
-            settings.swVersion = StdFunc::StrToVer(parser.value("software"));
+            settings.m_swVersion = StdFunc::StrToVer(parser.value("software"));
         settings.writeSettings();
 #ifdef AVTUK_STM
         writeHiddenBlock();
