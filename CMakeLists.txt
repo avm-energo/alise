@@ -24,7 +24,15 @@ if (ALISE_STM)
 else()
     set(AVTUK_MODULE_PATH avtuk-12)
     find_package(PkgConfig REQUIRED)
-    pkg_check_modules(GPIOD REQUIRED libgpiodcxx)
+    if(${QT_VERSION_MAJOR} GREATER_EQUAL 6 AND ${QT_VERSION_MINOR} GREATER_EQUAL 8)
+        pkg_check_modules(GPIOD REQUIRED libgpiodcxx)
+        set(GPIOD_VERS 2)
+        message(STATUS "Using gpiod library, C++ version")
+    else()
+        pkg_check_modules(GPIOD REQUIRED libgpiod)
+        set(GPIOD_VERS 1)
+        message(STATUS "Using gpiod library, C version")
+    endif()
 endif()
 
 include(gen)
@@ -63,9 +71,15 @@ if (ALISE_STM)
          stmbroker.cpp
          stmbroker.h)
 else()
+    if(${GPIOD_VERS} EQUAL 2)
     list(APPEND SOURCES
          gpiobroker.cpp
          gpiobroker.h)
+ else()
+     list(APPEND SOURCES
+          gpiobroker1.cpp
+          gpiobroker1.h)
+  endif()
 endif()
 
 add_executable(${PROJECT_NAME} ${SOURCES})

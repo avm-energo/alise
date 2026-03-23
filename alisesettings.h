@@ -1,5 +1,4 @@
-#ifndef ALISESETTINGS_H
-#define ALISESETTINGS_H
+#pragma once
 
 #include <QMap>
 #include <QSettings>
@@ -39,5 +38,3 @@ private:
     QSettings *m_settings;
     bool m_isValid;
 };
-
-#endif // ALISESETTINGS_H

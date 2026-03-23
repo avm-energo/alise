@@ -1,5 +1,4 @@
-#ifndef COMMANDLINEPARSER_H
-#define COMMANDLINEPARSER_H
+#pragma once
 
 #include "alisesettings.h"
 
@@ -27,5 +26,3 @@ private:
 
 #endif
 };
-
-#endif // COMMANDLINEPARSER_H
