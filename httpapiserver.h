@@ -38,7 +38,7 @@ signals:
 
 private:
     HttpMiddleware *m_mw; ///< экземпляр MiddleWare - прослойка между основной Алисой и HttpApiServer
-    QHttpServer m_server; ///< экземпляр http-сервера
+    QHttpServer m_server;       ///< экземпляр http-сервера
     QTimer *m_pingTimeoutTimer; ///< таймер для отслеживания неприходящих запросов Ping
     int m_pingTimeout;          ///< число в мс, отражающее таймаут команд Ping
 

@@ -12,20 +12,20 @@ Engine::Engine(QObject *parent)
     Q_UNUSED(parent)
 }
 
-bool Engine::init(AliseSettings &settings)
+bool Engine::init(const AliseSettings &settings)
 {
     m_timeSynchronizer = new TimeSyncronizer;
     m_timeSynchronizer->init();
 #if defined(AVTUK_STM)
     m_broker = new StmBroker(this);
 #else
-    m_broker = new GpioBroker(settings.m_gpioMap, this);
+    m_broker = new GpioBroker(settings, this);
 #endif
     bool ok = m_broker->connect();
     if (!ok)
         return false;
 
-    m_mw = new HttpMiddleware(settings, QDateTime::currentDateTime(), this);
+    m_mw = new HttpMiddleware(settings);
     m_server = new HttpApiServer(m_mw);
     m_server->initServer(settings.httpPort, Alise::AliseConstants::ReplyTimeoutPeriod());
 
@@ -39,6 +39,10 @@ bool Engine::init(AliseSettings &settings)
 #endif
 
     return true;
+}
+
+void Engine::start()
+{
 }
 
 void Engine::createLocalConnections()

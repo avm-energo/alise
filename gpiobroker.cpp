@@ -5,8 +5,9 @@
 #include <QDebug>
 #include <QRandomGenerator>
 #include <config.h>
-#include <cstdlib>
+#include <filesystem>
 #include <gen/error.h>
+#include <gpiod.hpp>
 #include <sys/reboot.h>
 #include <unistd.h>
 
@@ -14,14 +15,12 @@ using namespace Alise;
 
 GpioBroker::GpioBroker(QMap<QString, AliseSettings::GPIOInfo> &gpioMap, QObject *parent) : Broker(parent)
 {
-    qDebug() << "[GPIO] GPIO Broker created";
+    qDebug() << "[GPIO] GPIO Broker has been created";
     m_blinkMode = BlinkMode::ONEBLINK;
-    m_pinList = {
-        { "Power1", gpioMap["Power1"].pin, gpioMap["Power1"].offset, PinDirections::INPUT },
-        { "Power2", gpioMap["Power2"].pin, gpioMap["Power2"].offset, PinDirections::INPUT },
-        { "ModeLed", gpioMap["ModeLed"].pin, gpioMap["ModeLed"].offset, PinDirections::OUTPUT },
-        { "Reset", gpioMap["Reset"].pin, gpioMap["Reset"].offset, PinDirections::INPUT },
-    };
+    m_pinMap[pwr1] = { gpioMap[pwr1].pin, gpioMap[pwr1].offset, PinDirections::INPUT };
+    m_pinMap[pwr2] = { gpioMap[pwr2].pin, gpioMap[pwr2].offset, PinDirections::INPUT };
+    m_pinMap[mode] = { gpioMap[mode].pin, gpioMap[mode].offset, PinDirections::OUTPUT };
+    m_pinMap[rst] = { gpioMap[rst].pin, gpioMap[rst].offset, PinDirections::INPUT };
 }
 
 GpioBroker::~GpioBroker()
@@ -30,80 +29,22 @@ GpioBroker::~GpioBroker()
 
 bool GpioBroker::connect()
 {
-    QMap<std::string, struct gpiod_line *> lineMap; // pairs: <lineName, line> for each pin
     m_resetTimer.setInterval(AliseConstants::ResetCheckPeriod());
     setIndication(AliseConstants::FailureIndication);
     QObject::connect(&m_resetTimer, &QTimer::timeout, this, &GpioBroker::reset);
     QObject::connect(&m_gpioTimer, &QTimer::timeout, this, &GpioBroker::blink);
     m_resetTimer.start();
     m_gpioTimer.start();
-
-#ifndef ALISE_LOCALDEBUG
-    for (auto pin : m_pinList)
-    {
-        gpiod_chip *chip;
-        const std::string chipstr = "/dev/gpiochip" + std::to_string(pin.chip);
-        if (!m_chipMap.contains(pin.chip)) // if chip is not already opened
-        {
-            chip = gpiod_chip_open(chipstr.c_str());
-            if (chip == NULL)
-            {
-                qCritical() << "cannot open chip " << chipstr.c_str() << "!";
-                return false;
-            }
-            m_chipMap[pin.chip] = chip;
-            qDebug() << "chip " << chipstr.c_str() << " has been opened";
-        }
-        else
-            chip = m_chipMap[pin.chip];
-        gpiod_line *line = gpiod_chip_get_line(chip, pin.offset);
-        if (line == NULL)
-        {
-            qCritical() << "cannot get line " << chipstr.c_str() << ":" << pin.offset << "!";
-            return false;
-        }
-        if (line == NULL)
-        {
-            qCritical() << "Line " << pin.name.c_str() << " is NULL!";
-            return false;
-        }
-        lineMap[pin.name] = line;
-        if (pin.direction == GpioBroker::PinDirections::OUTPUT)
-        {
-            int ret = gpiod_line_request_output(line, "gpio", 0);
-            if (ret != 0)
-            {
-                qCritical() << "cannot request line " << chipstr.c_str() << ":" << pin.offset << " for output!";
-                return false;
-            }
-        }
-        else
-        {
-            int ret = gpiod_line_request_input(line, "gpio");
-            if (ret != 0)
-            {
-                qCritical() << "cannot request line " << chipstr.c_str() << ":" << pin.offset << " for input!";
-                return false;
-            }
-        }
-        qDebug() << "line " << chipstr.c_str() << ":" << pin.offset << " has been opened";
-    }
-    m_modeLine = lineMap["ModeLed"];
-    m_pwr1Line = lineMap["Power1"];
-    m_pwr2Line = lineMap["Power2"];
-    m_resetLine = lineMap["Reset"];
-    gpiod_line_set_value(m_modeLine, 1);
-#endif
+    gpioSetLineValue(m_pinMap[mode], PinOutputs::ON);
     return true;
 }
 
 void GpioBroker::checkPowerUnit()
 {
-    QMutexLocker locker(&m_mutex);
+    QMutexLocker locker(&_mutex);
 #ifndef ALISE_LOCALDEBUG
-    auto status1 = gpiod_line_get_value(m_pwr1Line);
-    usleep(10000);
-    auto status2 = gpiod_line_get_value(m_pwr2Line);
+    auto status1 = gpioGetLineValue(m_pinMap[pwr1]);
+    auto status2 = gpioGetLineValue(m_pinMap[pwr2]);
 #else
     int status1 = 0;
     int status2 = 0;
@@ -122,7 +63,7 @@ void GpioBroker::checkPowerUnit()
 
 void GpioBroker::setIndication(const AVTUK_CCU::Indication &indication)
 {
-    QMutexLocker locker(&m_mutex);
+    QMutexLocker locker(&_mutex);
     AVTUK_CCU::Indication indic = indication;
     indic.PulseCnt1 *= 2; // one is on & one is off
     indic.PulseCnt2 *= 2; // the same
@@ -141,6 +82,8 @@ void GpioBroker::setIndication(const AVTUK_CCU::Indication &indication)
         m_blinkCount = c_maxBlinks;
         m_blinkFreq = indic.PulseFreq2;
         m_blinkMode = BlinkMode::ONEBLINK;
+        //        qDebug() << "1. restartBlinkTimer: blinkCount = " << m_blinkCount << ", blinkMode = " << m_blinkMode
+        //                 << ", blinkFreq = " << m_blinkFreq;
         restartBlinkTimer();
         return;
     }
@@ -148,11 +91,14 @@ void GpioBroker::setIndication(const AVTUK_CCU::Indication &indication)
     {
         m_blinkCount = c_maxBlinks;
         m_blinkMode = BlinkMode::ONEBLINK;
+        //        qDebug() << "2. restartBlinkTimer: blinkCount = " << m_blinkCount << ", blinkMode = " << m_blinkMode
+        //                 << ", blinkFreq = " << m_blinkFreq;
         restartBlinkTimer();
         return;
     }
     else
         m_blinkMode = BlinkMode::TWOBLINKS;
+    //    qDebug() << "Two blinks mode";
     restartBlinkTimer();
 }
 
@@ -162,35 +108,35 @@ void GpioBroker::rebootMyself()
     m_gpioTimer.stop();
     m_resetTimer.stop();
 #ifndef ALISE_LOCALDEBUG
-    gpiod_line_set_value(m_modeLine, PinOutputs::OFF);
+    gpioSetLineValue(m_pinMap[mode], PinOutputs::OFF);
 #endif
     reboot(RB_AUTOBOOT);
 }
 
 void GpioBroker::reset()
 {
-    QMutexLocker locker(&m_mutex);
+    QMutexLocker locker(&_mutex);
 #ifndef ALISE_LOCALDEBUG
-    bool value = !gpiod_line_get_value(m_resetLine);
+    bool value = !gpioGetLineValue(m_pinMap[rst]);
 
     if (value) // button pushed, counting seconds...
     {
-        m_resetCounter += value;
+        resetCounter += value;
         return;
     }
-    else if (m_resetCounter == 0) // normal mode, there's no any button push
+    else if (resetCounter == 0) // normal mode, there's no any button push
         return;
 
     // soft reset (only reboot)
-    if ((m_resetCounter > (AliseConstants::SecondsToHardReset() / 2))
-        && (m_resetCounter <= AliseConstants::SecondsToHardReset()))
+    if ((resetCounter > (AliseConstants::SecondsToHardReset() / 2))
+        && (resetCounter <= AliseConstants::SecondsToHardReset()))
     {
         qDebug() << "[GPIO] Reboot only";
         rebootMyself();
         return;
     }
     // hard reset
-    if (m_resetCounter > AliseConstants::SecondsToHardReset())
+    if (resetCounter > AliseConstants::SecondsToHardReset())
     {
         qDebug() << "[GPIO] Reset interface settings...";
 
@@ -206,7 +152,7 @@ void GpioBroker::reset()
         emit receivedBlock(blk);
     }
 #endif
-    m_resetCounter = 0;
+    resetCounter = 0;
 }
 
 void GpioBroker::restartBlinkTimer()
@@ -214,28 +160,78 @@ void GpioBroker::restartBlinkTimer()
     m_gpioTimer.start(m_blinkFreq);
 }
 
+bool GpioBroker::gpioGetLineValue(GpioPin pin)
+{
+    try
+    {
+        const ::std::filesystem::path chip_path(getChipName(pin.chip).toStdString());
+        auto request = ::gpiod::chip(chip_path)
+                           .prepare_request()
+                           .set_consumer("get-line-value")
+                           .add_line_settings(
+                               pin.offset, ::gpiod::line_settings().set_direction(::gpiod::line::direction::INPUT))
+                           .do_request();
+        return (request.get_value(pin.offset) == ::gpiod::line::value::ACTIVE);
+    } catch (std::exception e)
+    {
+        if (m_settings.gpioExceptionsAreOn)
+            qDebug() << "gpioGetLineValue exception: " << e.what();
+    }
+    return false;
+}
+
+void GpioBroker::gpioSetLineValue(GpioPin pin, bool value)
+{
+    try
+    {
+        bool pinValue = gpioGetLineValue(pin);
+        if (pinValue ^ value)
+        {
+            const ::std::filesystem::path chip_path(getChipName(pin.chip).toStdString());
+            auto request = ::gpiod::chip(chip_path)
+                               .prepare_request()
+                               .set_consumer("toggle-line-value")
+                               .add_line_settings(
+                                   pin.offset, ::gpiod::line_settings().set_direction(::gpiod::line::direction::OUTPUT))
+                               .do_request();
+        }
+    } catch (std::exception e)
+    {
+        if (m_settings.gpioExceptionsAreOn)
+            qDebug() << "gpioSetLineValue exception: " << e.what();
+    }
+}
+
+QString GpioBroker::getChipName(int chipNum) const
+{
+    return "/dev/gpiochip" + QString::number(chipNum);
+}
+
 void GpioBroker::blink()
 {
 #ifndef ALISE_LOCALDEBUG
     --m_blinkCount;
-    gpiod_line_set_value(m_modeLine, (m_blinkStatus) ? PinOutputs::ON : PinOutputs::OFF);
+    gpioSetLineValue(m_pinMap[mode], (m_blinkStatus) ? PinOutputs::ON : PinOutputs::OFF);
     m_blinkStatus = !m_blinkStatus;
     if (m_blinkCount <= 0)
     {
         if (m_blinkMode != BlinkMode::TWOBLINKS)
         {
+            //            qDebug() << "Setting maxBlinks";
             m_blinkCount = c_maxBlinks;
         }
         else if (m_blinkFreq == m_currentIndication.PulseFreq1)
         {
             m_blinkFreq = m_currentIndication.PulseFreq2;
             m_blinkCount = m_currentIndication.PulseCnt2;
+            //            qDebug() << "Setting PulseFreq2 = " << m_blinkFreq << ", PulseCnt2 = " << m_blinkCount;
             restartBlinkTimer();
         }
         else
         {
             m_blinkFreq = m_currentIndication.PulseFreq1;
             m_blinkCount = m_currentIndication.PulseCnt1;
+            //            qDebug() << "Setting PulseFreq1 = " << m_blinkFreq << ", PulseCnt1 = " << m_blinkCount;
             restartBlinkTimer();
         }
     }

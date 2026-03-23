@@ -1,5 +1,4 @@
-#ifndef GPIOBROKER_H
-#define GPIOBROKER_H
+#pragma once
 
 #include "alisesettings.h"
 #include "broker.h"
@@ -8,13 +7,16 @@
 #include <QMutex>
 #include <QObject>
 #include <QTimer>
-#include <gpiod.h>
-
-constexpr uint16_t c_maxBlinks = 0xFFFF;
 
 class GpioBroker : public Broker
 {
 public:
+    static constexpr uint16_t c_maxBlinks = 0xFFFF;
+    static constexpr auto mode = "ModeLed";
+    static constexpr auto pwr1 = "Power1";
+    static constexpr auto pwr2 = "Power2";
+    static constexpr auto rst = "Reset";
+
     enum PinDirections
     {
         INPUT,
@@ -29,7 +31,6 @@ public:
 
     struct GpioPin
     {
-        std::string name;        // line name a-la "ModeLed"
         int chip;                // gpiochip number
         int offset;              // gpiochip pin number
         PinDirections direction; // 0 for input, 1 for output
@@ -57,18 +58,18 @@ private:
     bool m_blinkStatus = true;
     int m_blinkCount, m_blinkFreq;
     BlinkMode m_blinkMode;
-    int m_resetCounter = 0;
-    QMutex m_mutex;
-    QList<GpioPin> m_pinList;
+    QMap<QString, GpioPin> m_pinMap;
+    int resetCounter = 0;
+    QMutex _mutex;
+    AliseSettings m_settings;
     QTimer m_gpioTimer, m_resetTimer;
-    QMap<int, struct gpiod_chip *> m_chipMap;                              // pairs: <chipNum, chip> for each gpiochipx
-    struct gpiod_line *m_modeLine, *m_resetLine, *m_pwr1Line, *m_pwr2Line; // for each pin: led, reset, pwr1, pwr2
 
     void reset();
     void restartBlinkTimer();
+    bool gpioGetLineValue(GpioPin pin);
+    void gpioSetLineValue(GpioPin pin, bool value);
+    QString getChipName(int chipNum) const;
 
 private slots:
     void blink();
 };
-
-#endif // GPIOBROKER_H

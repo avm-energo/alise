@@ -4,7 +4,7 @@
 #include <QEventLoop>
 #include <QTimer>
 #include <gen/stdfunc.h>
-#include <gpiod.h>
+#include <gpiod.hpp>
 #include <iostream>
 
 CommandLineParser::CommandLineParser(QObject *parent) : QObject(parent)
@@ -108,55 +108,39 @@ void CommandLineParser::writeHiddenBlock()
 
 void CommandLineParser::listPins()
 {
-    struct gpiod_chip *chip;
-    struct gpiod_chip_iter *iter = gpiod_chip_iter_new();
-    struct gpiod_line_bulk *lineBulk;
-    struct gpiod_line *line;
 
     try
     {
-        if (iter == NULL)
+        for (const auto &entry : ::std::filesystem::directory_iterator("/dev/"))
         {
-            std::cout << "Can't iter through GPIO";
-            return;
-        }
-        while ((chip = gpiod_chip_iter_next(iter)) != NULL)
-        {
-            std::cout << gpiod_chip_name(chip) << " - " << gpiod_chip_num_lines(chip) << " lines:" << ::std::endl;
-            if (!gpiod_chip_get_all_lines(chip, lineBulk))
+            if (::gpiod::is_gpiochip_device(entry.path()))
             {
-                std::cout << "Error while get all lines from chip";
-                return;
-            }
-            for (int i = 0; i < lineBulk->num_lines; ++i)
-            {
-                line = lineBulk->lines[i];
-                if (line == NULL)
+                ::gpiod::chip chip(entry.path());
+                ::gpiod::chip_info info = chip.get_info();
+                for (int i = 0; i < info.num_lines(); ++i)
                 {
-                    std::cout << "Error while get line " << i << " from chip";
-                    return;
+                    ::gpiod::line_info line = chip.get_line_info(i);
+                    std::cout << "\tline ";
+                    std::cout.width(3);
+                    std::cout << line.offset() << ": ";
+
+                    std::cout.width(12);
+                    std::cout << line.name();
+                    std::cout << " ";
+
+                    std::cout.width(12);
+                    std::cout << line.consumer();
+                    std::cout << " ";
+
+                    std::cout.width(8);
+                    std::cout << (line.direction() == ::gpiod::line::direction::INPUT ? "input" : "output");
+                    std::cout << " ";
+
+                    std::cout.width(10);
+                    std::cout << (line.active_low() ? "active-low" : "active-high");
+
+                    std::cout << ::std::endl;
                 }
-                std::cout << "\tline ";
-                std::cout.width(3);
-                std::cout << gpiod_line_offset(line) << ": ";
-
-                std::cout.width(12);
-                std::cout << gpiod_line_name(line);
-                std::cout << " ";
-
-                std::cout.width(12);
-                std::cout << gpiod_line_consumer(line);
-                std::cout << " ";
-
-                std::cout.width(8);
-                std::cout << (gpiod_line_direction(line) == GPIOD_LINE_DIRECTION_INPUT ? "input" : "output");
-                std::cout << " ";
-
-                std::cout.width(10);
-                std::cout << (gpiod_line_active_state(line) == GPIOD_LINE_ACTIVE_STATE_LOW ? "active-low"
-                                                                                           : "active-high");
-
-                std::cout << ::std::endl;
             }
         }
     } catch (std::exception e)

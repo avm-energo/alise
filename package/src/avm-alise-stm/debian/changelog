@@ -1,3 +1,9 @@
+avm-alise-stm (4.0.0) unstable; urgency=low
+
+  * gpiod2 implemented in nostm flavour
+
+ -- AVM-Energo <support@avmenergo.ru>  Fri, 20 Mar 2026 16:58:52 +0300
+
 avm-alise-stm (3.3.0) unstable; urgency=low
 
   * start datetime in ping replies

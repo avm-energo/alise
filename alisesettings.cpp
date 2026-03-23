@@ -40,11 +40,11 @@ void AliseSettings::readSettings()
     serialNumB = m_settings->value("Module/BoardSerialNumber", "4294967295").toString().toUInt();
     hwVersion = m_settings->value("Module/HardwareVersion", "4294967295").toString().toUInt();
     swVersion = m_settings->value("Module/SoftwareVersion", "4294967295").toString().toUInt();
-
     m_gpioMap["Power1"] = parseGPIOSettings("Power1");
     m_gpioMap["Power2"] = parseGPIOSettings("Power2");
     m_gpioMap["ModeLed"] = parseGPIOSettings("ModeLed");
     m_gpioMap["Reset"] = parseGPIOSettings("Reset");
+    gpioExceptionsAreOn = m_settings->value("Test/exceptions", "1").toBool();
     flush();
 }
 
@@ -94,6 +94,8 @@ void AliseSettings::logSettings()
     Logger::writeLog(Logger::All, "Board serial: " + QString::number(serialNumB));
     Logger::writeLog(Logger::All, "Board hardware: " + StdFunc::VerToStr(hwVersion));
     Logger::writeLog(Logger::All, "MCU software version: " + StdFunc::VerToStr(swVersion));
+    const QString exceptionsMsg = (gpioExceptionsAreOn) ? "on" : "off";
+    Logger::writeLog(Logger::All, "Log exceptions flag is " + exceptionsMsg);
 }
 
 void AliseSettings::writeSettings()
@@ -118,6 +120,7 @@ void AliseSettings::writeSettings()
     m_settings->setValue("Module/BoardSerialNumber", serialNumB);
     m_settings->setValue("Module/HardwareVersion", hwVersion);
     m_settings->setValue("Module/SoftwareVersion", swVersion);
+    m_settings->setValue("Test/exceptions", gpioExceptionsAreOn);
     setGPIOValues();
     flush();
 }

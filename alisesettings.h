@@ -33,6 +33,7 @@ public:
     std::uint32_t swVersion;
     int httpPort;
     QMap<QString, GPIOInfo> m_gpioMap;
+    bool gpioExceptionsAreOn;
 
 private:
     QSettings *m_settings;
