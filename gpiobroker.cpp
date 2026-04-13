@@ -6,21 +6,21 @@
 #include <QRandomGenerator>
 #include <avm-gen/error.h>
 #include <config.h>
-#include <filesystem>
-#include <gpiod.hpp>
 #include <sys/reboot.h>
 #include <unistd.h>
 
 using namespace Alise;
 
-GpioBroker::GpioBroker(QMap<QString, AliseSettings::GPIOInfo> &gpioMap, QObject *parent) : Broker(parent)
+GpioBroker::GpioBroker(QMap<QString, AliseSettings::GPIOInfo> &gpioMap, bool gpioExceptionsAreOn, QObject *parent)
+    : Broker(parent)
 {
+    m_gpio = new GPIO(gpioExceptionsAreOn, this);
     qDebug() << "[GPIO] GPIO Broker has been created";
     m_blinkMode = BlinkMode::ONEBLINK;
-    m_pinMap[pwr1] = { gpioMap[pwr1].pin, gpioMap[pwr1].offset, PinDirections::INPUT };
-    m_pinMap[pwr2] = { gpioMap[pwr2].pin, gpioMap[pwr2].offset, PinDirections::INPUT };
-    m_pinMap[mode] = { gpioMap[mode].pin, gpioMap[mode].offset, PinDirections::OUTPUT };
-    m_pinMap[rst] = { gpioMap[rst].pin, gpioMap[rst].offset, PinDirections::INPUT };
+    m_pinMap[pwr1] = { gpioMap[pwr1].pin, gpioMap[pwr1].offset, GPIO::PinDirections::INPUT };
+    m_pinMap[pwr2] = { gpioMap[pwr2].pin, gpioMap[pwr2].offset, GPIO::PinDirections::INPUT };
+    m_pinMap[mode] = { gpioMap[mode].pin, gpioMap[mode].offset, GPIO::PinDirections::OUTPUT };
+    m_pinMap[rst] = { gpioMap[rst].pin, gpioMap[rst].offset, GPIO::PinDirections::INPUT };
 }
 
 GpioBroker::~GpioBroker()
@@ -35,7 +35,7 @@ bool GpioBroker::connect()
     QObject::connect(&m_gpioTimer, &QTimer::timeout, this, &GpioBroker::blink);
     m_resetTimer.start();
     m_gpioTimer.start();
-    gpioSetLineValue(m_pinMap[mode], PinOutputs::ON);
+    m_gpio->gpioSetLineValue(m_pinMap[mode], GPIO::PinOutputs::ON);
     return true;
 }
 
@@ -43,8 +43,8 @@ void GpioBroker::checkPowerUnit()
 {
     QMutexLocker locker(&_mutex);
 #ifndef ALISE_LOCALDEBUG
-    auto status1 = gpioGetLineValue(m_pinMap[pwr1]);
-    auto status2 = gpioGetLineValue(m_pinMap[pwr2]);
+    auto status1 = m_gpio->gpioGetLineValue(m_pinMap[pwr1]);
+    auto status2 = m_gpio->gpioGetLineValue(m_pinMap[pwr2]);
 #else
     int status1 = 0;
     int status2 = 0;
@@ -108,7 +108,7 @@ void GpioBroker::rebootMyself()
     m_gpioTimer.stop();
     m_resetTimer.stop();
 #ifndef ALISE_LOCALDEBUG
-    gpioSetLineValue(m_pinMap[mode], PinOutputs::OFF);
+    m_gpio->gpioSetLineValue(m_pinMap[mode], GPIO::PinOutputs::OFF);
 #endif
     reboot(RB_AUTOBOOT);
 }
@@ -117,7 +117,7 @@ void GpioBroker::reset()
 {
     QMutexLocker locker(&_mutex);
 #ifndef ALISE_LOCALDEBUG
-    bool value = !gpioGetLineValue(m_pinMap[rst]);
+    bool value = !m_gpio->gpioGetLineValue(m_pinMap[rst]);
 
     if (value) // button pushed, counting seconds...
     {
@@ -160,58 +160,11 @@ void GpioBroker::restartBlinkTimer()
     m_gpioTimer.start(m_blinkFreq);
 }
 
-bool GpioBroker::gpioGetLineValue(GpioPin pin)
-{
-    try
-    {
-        const ::std::filesystem::path chip_path(getChipName(pin.chip).toStdString());
-        auto request = ::gpiod::chip(chip_path)
-                           .prepare_request()
-                           .set_consumer("get-line-value")
-                           .add_line_settings(
-                               pin.offset, ::gpiod::line_settings().set_direction(::gpiod::line::direction::INPUT))
-                           .do_request();
-        return (request.get_value(pin.offset) == ::gpiod::line::value::ACTIVE);
-    } catch (std::exception e)
-    {
-        if (m_settings.m_gpioExceptionsAreOn)
-            qDebug() << "gpioGetLineValue exception: " << e.what();
-    }
-    return false;
-}
-
-void GpioBroker::gpioSetLineValue(GpioPin pin, bool value)
-{
-    try
-    {
-        bool pinValue = gpioGetLineValue(pin);
-        if (pinValue ^ value)
-        {
-            const ::std::filesystem::path chip_path(getChipName(pin.chip).toStdString());
-            auto request = ::gpiod::chip(chip_path)
-                               .prepare_request()
-                               .set_consumer("toggle-line-value")
-                               .add_line_settings(
-                                   pin.offset, ::gpiod::line_settings().set_direction(::gpiod::line::direction::OUTPUT))
-                               .do_request();
-        }
-    } catch (std::exception e)
-    {
-        if (m_settings.m_gpioExceptionsAreOn)
-            qDebug() << "gpioSetLineValue exception: " << e.what();
-    }
-}
-
-QString GpioBroker::getChipName(int chipNum) const
-{
-    return "/dev/gpiochip" + QString::number(chipNum);
-}
-
 void GpioBroker::blink()
 {
 #ifndef ALISE_LOCALDEBUG
     --m_blinkCount;
-    gpioSetLineValue(m_pinMap[mode], (m_blinkStatus) ? PinOutputs::ON : PinOutputs::OFF);
+    m_gpio->gpioSetLineValue(m_pinMap[mode], (m_blinkStatus) ? GPIO::PinOutputs::ON : GPIO::PinOutputs::OFF);
     m_blinkStatus = !m_blinkStatus;
     if (m_blinkCount <= 0)
     {

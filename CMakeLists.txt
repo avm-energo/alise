@@ -71,15 +71,16 @@ if (ALISE_STM)
          stmbroker.cpp
          stmbroker.h)
 else()
-    if(${GPIOD_VERS} EQUAL 2)
     list(APPEND SOURCES
          gpiobroker.cpp
-         gpiobroker.h)
- else()
-     list(APPEND SOURCES
-          gpiobroker1.cpp
-          gpiobroker1.h)
-  endif()
+         gpiobroker.h
+         gpio.cpp
+         gpio.h)
+    if(${GPIOD_VERS} EQUAL 2)
+         add_compile_definitions(GPIO_TYPE=2)
+    else()
+         add_compile_definitions(GPIO_TYPE=1)
+    endif()
 endif()
 
 add_executable(${PROJECT_NAME} ${SOURCES})
